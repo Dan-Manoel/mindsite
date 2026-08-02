@@ -18,7 +18,7 @@ export default function DemoCTA() {
                 <a
                   className="active-cursor-accent"
                   data-cursor-text="Buy Now"
-                  href="https://themeforest.net/item/azurio-digital-agency-personal-portfolio-nextjs-template/63087539?s_rank=1"
+                  href="https://themeforest.net/item/MINDSITE-digital-agency-personal-portfolio-nextjs-template/63087539?s_rank=1"
                   target="_blank"
                   rel="noopener noreferrer"
                 >
@@ -38,7 +38,7 @@ export default function DemoCTA() {
               >
                 <a
                   className="btn btn-default-icon btn-default-icon-large btn-default-outline slide-right"
-                  href="https://themeforest.net/item/azurio-digital-agency-personal-portfolio-nextjs-template/63087539?s_rank=1"
+                  href="https://themeforest.net/item/MINDSITE-digital-agency-personal-portfolio-nextjs-template/63087539?s_rank=1"
                   target="_blank"
                   rel="noopener noreferrer"
                 >

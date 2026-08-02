@@ -9,8 +9,8 @@ import Components from "@/components/preview/Components";
 import FeaturesCards from "@/components/preview/FeaturesCards";
 import DemoCTA from "@/components/preview/DemoCTA";
 export const metadata: Metadata = {
-  title: "Preview | Azurio - Digital Agency & Portfolio NextJs Template",
-  description: "Azurio - Digital Agency & Portfolio NextJs Template",
+  title: "Preview | Mindsite - Agencia digital",
+  description: "A infraestrutura que o seu negócio precisa para escalar. Descubra como o Mindsite otimiza seu ecossistema digital do início ao fim.",
 };
 export default function PreviewPage() {
   return (

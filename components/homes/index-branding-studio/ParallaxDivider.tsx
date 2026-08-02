@@ -35,14 +35,14 @@ export default function ParallaxDivider() {
                   href={`/team`}
                 >
                   <TextScramble className="btn-caption mxd-scramble">
-                    Let&apos;s meet
+                    Conheça a Equipe
                   </TextScramble>
                 </Link>
               </CommonScrollAnimated>
               <div className="mxd-divider__caption">
                 <Link
                   className="active-cursor-accent"
-                  data-cursor-text="Our Team"
+                  data-cursor-text="Nossa Equipe"
                   href={`/team`}
                 >
                   <CommonAnimatedText
@@ -50,7 +50,7 @@ export default function ParallaxDivider() {
                     className="permanent mxd-split-lines"
                     animation="splitLines"
                   >
-                    Small but powerful team
+                    Equipe enxuta e poderosa
                   </CommonAnimatedText>
                 </Link>
               </div>

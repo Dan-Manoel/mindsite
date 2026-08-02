@@ -25,23 +25,23 @@ export default function About() {
                           href={`/about-us`}
                         >
                           <TextScramble className="btn-caption mxd-scramble">
-                            A few words
+                            Sobre Nós
                           </TextScramble>
                         </Link>
                       </CommonScrollAnimated>
                       <div className="mxd-section-manifest__text manifest-text-m">
-                        <Link data-cursor-text="About us" href={`/about-us`}>
+                        <Link data-cursor-text="Sobre nós" href={`/about-us`}>
                           <CommonAnimatedText
                             as="span"
                             className="manifest manifest-m mxd-split-lines active-cursor-accent"
                             animation="splitLines"
                           >
-                            Web design is evolving rapidly, and I strive to stay
-                            ahead.
+                            O design digital evolui rapidamente, e nos dedicamos a estar
+                            sempre à frente.
                             <span>
-                              Emerging tools and technologies enable me to
-                              create visually stunning and seamlessly functional
-                              websites.
+                              Ferramentas e tecnologias emergentes nos permitem
+                              criar plataformas visualmente impressionantes e perfeitamente
+                              funcionais.
                             </span>
                           </CommonAnimatedText>
                         </Link>

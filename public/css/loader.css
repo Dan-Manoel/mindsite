@@ -1,6 +1,6 @@
 /*! ------------------------------------------------
- * Project Name: Azurio - Digital Agency & Personal Portfolio React Nextjs Template
- * Project Description: Stand out and express your uniqueness with Azurio - a vibrant and minimal React Nextjs Template for creatives, studios and freelancers. Impress your website visitors with a clean, stylish layout and stunning visuals.
+ * Project Name: MINDSITE - Digital Agency & Personal Portfolio React Nextjs Template
+ * Project Description: Stand out and express your uniqueness with MINDSITE - a vibrant and minimal React Nextjs Template for creatives, studios and freelancers. Impress your website visitors with a clean, stylish layout and stunning visuals.
  * Tags: IB Themes, resume, portfolio, personal page, cv, template, one page, responsive, html5, css3, creative, clean, agency, studio 
  * Version: 1.0.0
  * Build Date: March 2026
@@ -134,6 +134,7 @@
   clip-path: polygon(100% 100%, 100% 100%, 0% 100%, 0% 100%);
   will-change: clip-path;
 }
+
 .mxd-loader__images img {
   display: block;
   position: absolute;
@@ -150,9 +151,11 @@
   -moz-transform: translateZ(0);
   transform: translateZ(0);
 }
+
 .mxd-loader__images img:first-child {
   opacity: 1;
 }
+
 @media only screen and (min-width: 1600px) {
   .mxd-loader__images {
     width: 300px;

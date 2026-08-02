@@ -10,9 +10,8 @@ import ParallaxDividerImage from "@/components/homes/index-digital-agency/Parall
 import BlogPreview from "@/components/homes/index-digital-agency/BlogPreview";
 import Divider from "@/components/homes/index-digital-agency/Divider";
 export const metadata: Metadata = {
-  title:
-    "Index Digital Agency | Azurio - Digital Agency & Portfolio NextJs Template",
-  description: "Azurio - Digital Agency & Portfolio NextJs Template",
+  title: "Agência Digital | Mindsite - Agência Digital",
+  description: "A infraestrutura que o seu negócio precisa para escalar. Descubra como o Mindsite otimiza seu ecossistema digital do início ao fim.",
 };
 export default function IndexDigitalAgencyPage() {
   return (

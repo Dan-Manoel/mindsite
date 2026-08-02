@@ -7,9 +7,8 @@ import DividerStickyImages from "@/components/animations/DividerStickyImages";
 import BlogPreview from "@/components/homes/index-freelancer-portfolio/BlogPreview";
 import CTA from "@/components/homes/index-freelancer-portfolio/CTA";
 export const metadata: Metadata = {
-  title:
-    "Index Freelancer Portfolio | Azurio - Digital Agency & Portfolio NextJs Template",
-  description: "Azurio - Digital Agency & Portfolio NextJs Template",
+  title: "Portfólio Freelancer | Mindsite - Agência Digital",
+  description: "A infraestrutura que o seu negócio precisa para escalar. Descubra como o Mindsite otimiza seu ecossistema digital do início ao fim.",
 };
 export default function IndexFreelancerPortfolioPage() {
   return (
@@ -18,7 +17,7 @@ export default function IndexFreelancerPortfolioPage() {
         <Hero />
         <About />
         <ProjectsList />
-        <DividerStickyImages ctaHref="/about-me" ctaLabel="My Approach" />
+        <DividerStickyImages ctaHref="/about-me" ctaLabel="Minha Abordagem" />
         <BlogPreview />
         <CTA />
       </>

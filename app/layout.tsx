@@ -17,6 +17,7 @@ const jetbrainsMono = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL("https://www.mindsite.com.br"),
   title: "Mindsite | Agencia digital",
   description:
     "A infraestrutura que o seu negócio precisa para escalar. Descubra como o Mindsite otimiza seu ecossistema digital do início ao fim.",
@@ -30,9 +31,10 @@ export const metadata: Metadata = {
     images: [
       {
         url: "/img/logo_og.webp",
-        width: 1200,
-        height: 630,
+        width: 1599,
+        height: 715,
         alt: "Mindsite | Agencia digital",
+        type: "image/webp",
       },
     ],
     type: "website",
@@ -42,7 +44,14 @@ export const metadata: Metadata = {
     title: "Mindsite | Agencia digital",
     description:
       "A infraestrutura que o seu negócio precisa para escalar. Descubra como o Mindsite otimiza seu ecossistema digital do início ao fim.",
-    images: ["/img/logo_og.webp"],
+    images: [
+      {
+        url: "/img/logo_og.webp",
+        width: 1599,
+        height: 715,
+        alt: "Mindsite | Agencia digital",
+      },
+    ],
   },
 };
 

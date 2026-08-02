@@ -5,8 +5,8 @@ import ParallaxDividerImage from "@/components/other-pages/contact/ParallaxDivid
 import SectionTitle from "@/components/other-pages/contact/SectionTitle";
 import CTAWithMarquee from "@/components/other-pages/contact/CTAWithMarquee";
 export const metadata: Metadata = {
-  title: "Contact | Azurio - Digital Agency & Portfolio NextJs Template",
-  description: "Azurio - Digital Agency & Portfolio NextJs Template",
+  title: "Contact | Mindsite - Agencia digital",
+  description: "A infraestrutura que o seu negócio precisa para escalar. Descubra como o Mindsite otimiza seu ecossistema digital do início ao fim.",
 };
 export default function ContactPage() {
   return (

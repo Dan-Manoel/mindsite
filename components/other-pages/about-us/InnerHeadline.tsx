@@ -120,7 +120,7 @@ export default function InnerHeadline() {
                         className="headline-banner-01 landscape image-01"
                       >
                         <Image
-                          alt="Azurio Template Sample Image"
+                          alt="MINDSITE Template Sample Image"
                           src="/img/illustrations/about-us-01.webp"
                           width={640}
                           height={480}
@@ -131,7 +131,7 @@ export default function InnerHeadline() {
                         className="headline-banner-01 portrait image-02"
                       >
                         <Image
-                          alt="Azurio Template Sample Image"
+                          alt="MINDSITE Template Sample Image"
                           src="/img/illustrations/about-us-02.webp"
                           width={560}
                           height={700}
@@ -142,7 +142,7 @@ export default function InnerHeadline() {
                         className="headline-banner-01 landscape image-03"
                       >
                         <Image
-                          alt="Azurio Template Sample Image"
+                          alt="MINDSITE Template Sample Image"
                           src="/img/illustrations/about-us-03.webp"
                           width={640}
                           height={480}
@@ -153,7 +153,7 @@ export default function InnerHeadline() {
                         className="headline-banner-01 portrait image-04"
                       >
                         <Image
-                          alt="Azurio Template Sample Image"
+                          alt="MINDSITE Template Sample Image"
                           src="/img/illustrations/about-us-04.webp"
                           width={560}
                           height={700}
@@ -164,7 +164,7 @@ export default function InnerHeadline() {
                         className="headline-banner-02 portrait image-05"
                       >
                         <Image
-                          alt="Azurio Template Sample Image"
+                          alt="MINDSITE Template Sample Image"
                           src="/img/illustrations/about-us-05.webp"
                           width={560}
                           height={700}
@@ -175,7 +175,7 @@ export default function InnerHeadline() {
                         className="headline-banner-02 landscape image-06"
                       >
                         <Image
-                          alt="Azurio Template Sample Image"
+                          alt="MINDSITE Template Sample Image"
                           src="/img/illustrations/about-us-06.webp"
                           width={640}
                           height={480}
@@ -186,7 +186,7 @@ export default function InnerHeadline() {
                         className="headline-banner-02 portrait image-07"
                       >
                         <Image
-                          alt="Azurio Template Sample Image"
+                          alt="MINDSITE Template Sample Image"
                           src="/img/illustrations/about-us-07.webp"
                           width={560}
                           height={700}
@@ -197,7 +197,7 @@ export default function InnerHeadline() {
                         className="headline-banner-02 landscape image-08"
                       >
                         <Image
-                          alt="Azurio Template Sample Image"
+                          alt="MINDSITE Template Sample Image"
                           src="/img/illustrations/about-us-08.webp"
                           width={640}
                           height={480}

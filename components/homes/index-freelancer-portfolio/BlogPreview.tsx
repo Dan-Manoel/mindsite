@@ -31,8 +31,8 @@ export default function BlogPreview() {
                             className="t-bold t-large mxd-split-lines"
                             animation="splitLines"
                           >
-                            Inspiring ideas, creative insights, and
-                            <span>the latest in design and tech.</span>
+                            Ideias inspiradoras, insights criativos e
+                            <span>o mais recente em design e tecnologia.</span>
                           </CommonAnimatedText>
                         </div>
                         <CommonScrollAnimated
@@ -45,7 +45,7 @@ export default function BlogPreview() {
                             href={`/blog-creative`}
                           >
                             <TextScramble className="btn-caption mxd-scramble">
-                              News Overview
+                              Ver Todas as Notícias
                             </TextScramble>
                           </Link>
                         </CommonScrollAnimated>
@@ -59,9 +59,9 @@ export default function BlogPreview() {
                           className="mxd-split-lines"
                           animation="splitLines"
                         >
-                          My newest
+                          Meus insights
                           <br />
-                          insights
+                          mais recentes
                         </CommonAnimatedText>
                       </div>
                     </div>
@@ -81,11 +81,11 @@ export default function BlogPreview() {
                       columns={3}
                     >
                       <div className="mxd-blog-item__date">
-                        <span className="meta-date">02 February, 2026</span>
+                        <span className="meta-date">02 de Fevereiro de 2026</span>
                       </div>
                       <Link
                         className="mxd-blog-item__media active-cursor-permanent"
-                        data-cursor-text="Read Post"
+                        data-cursor-text="Ler Artigo"
                         href={`/blog-article`}
                       >
                         <Image
@@ -99,7 +99,7 @@ export default function BlogPreview() {
                       <div className="mxd-blog-item__caption">
                         <div className="mxd-blog-item__title">
                           <Link className="blog-name-m" href={`/blog-article`}>
-                            Frontend innovations and user journeys
+                            Inovações no Frontend e jornadas do usuário
                           </Link>
                         </div>
                         <div className="mxd-blog-item__tags">
@@ -107,7 +107,7 @@ export default function BlogPreview() {
                             UI/UX
                           </TextScramble>
                           <TextScramble className="tag tag-s tag-medium mxd-scramble">
-                            Development
+                            Desenvolvimento
                           </TextScramble>
                           <TextScramble className="tag tag-s tag-medium mxd-scramble">
                             Insights
@@ -121,11 +121,11 @@ export default function BlogPreview() {
                       columns={3}
                     >
                       <div className="mxd-blog-item__date">
-                        <span className="meta-date">28 January, 2026</span>
+                        <span className="meta-date">28 de Janeiro de 2026</span>
                       </div>
                       <Link
                         className="mxd-blog-item__media active-cursor-permanent"
-                        data-cursor-text="Read Post"
+                        data-cursor-text="Ler Artigo"
                         href={`/blog-article`}
                       >
                         <Image
@@ -139,18 +139,18 @@ export default function BlogPreview() {
                       <div className="mxd-blog-item__caption">
                         <div className="mxd-blog-item__title">
                           <Link className="blog-name-m" href={`/blog-article`}>
-                            Branding in creating digital experiences
+                            Branding na criação de experiências digitais
                           </Link>
                         </div>
                         <div className="mxd-blog-item__tags">
                           <TextScramble className="tag tag-s tag-medium mxd-scramble">
-                            Concept
+                            Conceito
                           </TextScramble>
                           <TextScramble className="tag tag-s tag-medium mxd-scramble">
                             Editorial
                           </TextScramble>
                           <TextScramble className="tag tag-s tag-medium mxd-scramble">
-                            Event
+                            Evento
                           </TextScramble>
                         </div>
                       </div>
@@ -161,11 +161,11 @@ export default function BlogPreview() {
                       columns={3}
                     >
                       <div className="mxd-blog-item__date">
-                        <span className="meta-date">15 January, 2026</span>
+                        <span className="meta-date">15 de Janeiro de 2026</span>
                       </div>
                       <Link
                         className="mxd-blog-item__media active-cursor-permanent"
-                        data-cursor-text="Read Post"
+                        data-cursor-text="Ler Artigo"
                         href={`/blog-article`}
                       >
                         <Image
@@ -179,8 +179,7 @@ export default function BlogPreview() {
                       <div className="mxd-blog-item__caption">
                         <div className="mxd-blog-item__title">
                           <Link className="blog-name-m" href={`/blog-article`}>
-                            Designing for the future of interactive digital
-                            spaces
+                            Projetando para o futuro dos espaços digitais interativos
                           </Link>
                         </div>
                         <div className="mxd-blog-item__tags">
@@ -188,7 +187,7 @@ export default function BlogPreview() {
                             Midjourney
                           </TextScramble>
                           <TextScramble className="tag tag-s tag-medium mxd-scramble">
-                            News
+                            Notícias
                           </TextScramble>
                           <TextScramble className="tag tag-s tag-medium mxd-scramble">
                             Editorial

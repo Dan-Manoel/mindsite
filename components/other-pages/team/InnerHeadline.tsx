@@ -22,7 +22,7 @@ export default function InnerHeadline() {
                 <div className="inner-headline fullheight">
                   <div className="inner-headline__bg">
                     <Image
-                      alt="Azurio Template Sample Image"
+                      alt="MINDSITE Template Sample Image"
                       src="/img/backgrounds/1920x1280_bg01.webp"
                       width={1920}
                       height={1280}

@@ -29,7 +29,7 @@ export default function NicheCards() {
                               Frontend
                             </TextScramble>
                             <TextScramble className="tag tag-m tag-medium mxd-scramble">
-                              Interactions
+                              Interações
                             </TextScramble>
                             <TextScramble className="tag tag-m tag-medium mxd-scramble">
                               Backend
@@ -38,16 +38,15 @@ export default function NicheCards() {
                         </div>
                         <div className="mxd-niche-cards__descr wide">
                           <p className="t-bold t-medium">
-                            Innovative financial solutions, from digital banking
-                            to{" "}
+                            Soluções financeiras inovadoras, de bancos digitais a{" "}
                             <span>
-                              payment processing and investment platforms.
+                              processamento de pagamentos e plataformas de investimento.
                             </span>
                           </p>
                         </div>
                         <div className="mxd-niche-cards__image absolute-desktop-bottom">
                           <Image
-                            alt="Azurio Template Sample Image"
+                            alt="MINDSITE Template Sample Image"
                             src="/img/illustrations/niche01.webp"
                             width={1200}
                             height={1611}
@@ -69,7 +68,7 @@ export default function NicheCards() {
                             <div className="mxd-niche-cards__inner fixed-height-desktop space-between-desktop">
                               <div className="mxd-niche-cards__title">
                                 <div className="mxd-niche-cards__name">
-                                  <p>AI-powered solutions</p>
+                                  <p>Soluções com IA</p>
                                 </div>
                                 <div className="mxd-niche-cards__tags">
                                   <TextScramble className="tag tag-m tag-medium mxd-scramble">
@@ -79,27 +78,27 @@ export default function NicheCards() {
                                     Web Design
                                   </TextScramble>
                                   <TextScramble className="tag tag-m tag-medium mxd-scramble">
-                                    Packaging
+                                    Embalagem
                                   </TextScramble>
                                   <TextScramble className="tag tag-m tag-medium mxd-scramble">
-                                    Motion
+                                    Animação
                                   </TextScramble>
                                   <TextScramble className="tag tag-m tag-medium mxd-scramble">
-                                    3D Models
+                                    Modelagem 3D
                                   </TextScramble>
                                 </div>
                               </div>
                               <div className="mxd-niche-cards__descr wide">
                                 <p className="t-bold t-medium">
-                                  Intelligent automation, predictive analytics,{" "}
+                                  Automação inteligente, análise preditiva,{" "}
                                   <span>
-                                    and machine learning-driven applications.
+                                    e aplicações baseadas em machine learning.
                                   </span>
                                 </p>
                               </div>
                               <div className="mxd-niche-cards__image absolute-desktop-full">
                                 <Image
-                                  alt="Azurio Template Sample Image"
+                                  alt="MINDSITE Template Sample Image"
                                   src="/img/illustrations/niche02.webp"
                                   width={1320}
                                   height={800}
@@ -118,30 +117,29 @@ export default function NicheCards() {
                             <div className="mxd-niche-cards__inner permanent fixed-height-desktop space-between-desktop">
                               <div className="mxd-niche-cards__title">
                                 <div className="mxd-niche-cards__name">
-                                  <p className="permanent">Cybersecurity</p>
+                                  <p className="permanent">Cibersegurança</p>
                                 </div>
                                 <div className="mxd-niche-cards__tags">
                                   <TextScramble className="tag tag-m tag-permanent mxd-scramble">
-                                    Brand Strategy
+                                    Estratégia de Marca
                                   </TextScramble>
                                   <TextScramble className="tag tag-m tag-permanent mxd-scramble">
-                                    Logo Design
+                                    Design de Logo
                                   </TextScramble>
                                   <TextScramble className="tag tag-m tag-permanent mxd-scramble">
-                                    Guidelines
+                                    Diretrizes
                                   </TextScramble>
                                 </div>
                               </div>
                               <div className="mxd-niche-cards__descr wide">
                                 <p className="t-bold t-medium t-permanent">
-                                  Advanced threat detection, encryption
-                                  solutions,
-                                  <span>and secure data protection.</span>
+                                  Detecção avançada de ameaças, criptografia,
+                                  <span> e proteção segura de dados.</span>
                                 </p>
                               </div>
                               <div className="mxd-niche-cards__image absolute-desktop-full">
                                 <Image
-                                  alt="Azurio Template Sample Image"
+                                  alt="MINDSITE Template Sample Image"
                                   src="/img/illustrations/niche03.webp"
                                   width={1200}
                                   height={974}
@@ -160,29 +158,29 @@ export default function NicheCards() {
                             <div className="mxd-niche-cards__inner fixed-height-desktop space-between-desktop">
                               <div className="mxd-niche-cards__title">
                                 <div className="mxd-niche-cards__name">
-                                  <p>Game Industry</p>
+                                  <p>Indústria de Games</p>
                                 </div>
                                 <div className="mxd-niche-cards__tags">
                                   <TextScramble className="tag tag-m tag-medium mxd-scramble">
                                     E-commerce
                                   </TextScramble>
                                   <TextScramble className="tag tag-m tag-medium mxd-scramble">
-                                    Maintenance
+                                    Manutenção
                                   </TextScramble>
                                   <TextScramble className="tag tag-m tag-medium mxd-scramble">
-                                    Support
+                                    Suporte
                                   </TextScramble>
                                 </div>
                               </div>
                               <div className="mxd-niche-cards__descr short">
                                 <p className="t-bold t-medium">
-                                  Immersive experiences, multiplayer platforms,
-                                  <span>and game engine development.</span>
+                                  Experiências imersivas, plataformas multiplayer,
+                                  <span> e desenvolvimento de engines.</span>
                                 </p>
                               </div>
                               <div className="mxd-niche-cards__image absolute-desktop-aside">
                                 <Image
-                                  alt="Azurio Template Sample Image"
+                                  alt="MINDSITE Template Sample Image"
                                   src="/img/illustrations/niche04.webp"
                                   width={800}
                                   height={1040}

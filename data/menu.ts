@@ -1,41 +1,41 @@
 import type { MenuLinkItem } from "@/types/menu";
 
 export const homeLinks: MenuLinkItem[] = [
-  { href: "/index-branding-studio", label: "Branding studio" },
+  { href: "/index-branding-studio", label: "Estúdio de Branding" },
   {
     href: "/index-software-development-company",
-    label: "Software development company",
+    label: "Desenvolvimento de Software",
   },
-  { href: "/index-creative-agency", label: "Creative agency" },
-  { href: "/index-freelancer-portfolio", label: "Freelancer portfolio" },
-  { href: "/index-design-studio", label: "Design studio" },
-  { href: "/index-web-developer", label: "Web Developer" },
-  { href: "/index-personal-portfolio", label: "Personal portfolio" },
-  { href: "/index-digital-agency", label: "Digital agency" },
-  { href: "/index-web-studio", label: "Web Studio" },
-  { href: "/index-digital-designer", label: "Digital designer" },
+  { href: "/index-creative-agency", label: "Agência Criativa" },
+  { href: "/index-freelancer-portfolio", label: "Portfólio Freelancer" },
+  { href: "/index-design-studio", label: "Estúdio de Design" },
+  { href: "/index-web-developer", label: "Desenvolvedor Web" },
+  { href: "/index-personal-portfolio", label: "Portfólio Pessoal" },
+  { href: "/index-digital-agency", label: "Agência Digital" },
+  { href: "/index-web-studio", label: "Estúdio Web" },
+  { href: "/index-digital-designer", label: "Designer Digital" },
 ];
 
 export const worksLinks: MenuLinkItem[] = [
-  { href: "/works-default", label: "Works default" },
-  { href: "/works-grid", label: "Works grid" },
-  { href: "/works-grid-sticky", label: "Works grid sticky" },
-  { href: "/project-details", label: "Project details" },
+  { href: "/works-default", label: "Trabalhos Padrão" },
+  { href: "/works-grid", label: "Grade de Trabalhos" },
+  { href: "/works-grid-sticky", label: "Grade Fixa" },
+  { href: "/project-details", label: "Detalhes do Projeto" },
 ];
 
 export const pageLinks: MenuLinkItem[] = [
-  { href: "/about-me", label: "About me" },
-  { href: "/about-us", label: "About us" },
-  { href: "/services", label: "Services" },
-  { href: "/team", label: "Our team" },
-  { href: "/pricing", label: "Pricing" },
-  { href: "/faq", label: "FAQ page" },
-  { href: "/404", label: "404 error page" },
-  { href: "/", label: "Landing page" },
+  { href: "/about-me", label: "Sobre Mim" },
+  { href: "/about-us", label: "Sobre Nós" },
+  { href: "/services", label: "Serviços" },
+  { href: "/team", label: "Nossa Equipe" },
+  { href: "/pricing", label: "Preços" },
+  { href: "/faq", label: "Perguntas Frequentes" },
+  { href: "/404", label: "Página 404" },
+  { href: "/", label: "Página Inicial" },
 ];
 
 export const insightLinks: MenuLinkItem[] = [
-  { href: "/blog-standard", label: "Blog standard" },
-  { href: "/blog-creative", label: "Blog creative" },
-  { href: "/blog-article", label: "Single post" },
+  { href: "/blog-standard", label: "Blog Padrão" },
+  { href: "/blog-creative", label: "Blog Criativo" },
+  { href: "/blog-article", label: "Artigo Único" },
 ];

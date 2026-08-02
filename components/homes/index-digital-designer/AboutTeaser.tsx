@@ -26,7 +26,7 @@ export default function AboutTeaser() {
                         href={`/about-me`}
                       >
                         <TextScramble className="btn-caption mxd-scramble">
-                          I make
+                          Eu crio
                         </TextScramble>
                       </Link>
                     </CommonScrollAnimated>
@@ -37,18 +37,18 @@ export default function AboutTeaser() {
                         as="p"
                         animation="slideRightToLeft"
                       >
-                        <span className="mxd-teaser__text">Innovative</span>
+                        <span className="mxd-teaser__text">Designs</span>
                         <span className="mxd-teaser__icon">
                           <i>
                             <Image
-                              alt="Azurio Icon"
+                              alt="MINDSITE Icon"
                               src="/img/icons/fire.svg"
                               width={9}
                               height={9}
                             />
                           </i>
                         </span>
-                        <span className="mxd-teaser__text">designs</span>
+                        <span className="mxd-teaser__text">inovadores</span>
                       </CommonScrollAnimated>
                       {/* caption #2 */}
                       <CommonScrollAnimated
@@ -56,9 +56,9 @@ export default function AboutTeaser() {
                         as="p"
                         animation="slideLeftToRight"
                       >
-                        <span className="mxd-teaser__text">Visuals</span>
-                        <span className="mxd-teaser__text">sparking</span>
-                        <span className="mxd-teaser__text">emotion</span>
+                        <span className="mxd-teaser__text">Visuais</span>
+                        <span className="mxd-teaser__text">que geram</span>
+                        <span className="mxd-teaser__text">emoção</span>
                       </CommonScrollAnimated>
                       {/* caption #3 */}
                       <CommonScrollAnimated
@@ -66,18 +66,18 @@ export default function AboutTeaser() {
                         as="p"
                         animation="slideRightToLeft"
                       >
-                        <span className="mxd-teaser__text">Creative</span>
+                        <span className="mxd-teaser__text">Experiências</span>
                         <span className="mxd-teaser__icon">
                           <i>
                             <Image
-                              alt="Azurio Icon"
+                              alt="MINDSITE Icon"
                               src="/img/icons/lightning-bolt-2.svg"
                               width={9}
                               height={9}
                             />
                           </i>
                         </span>
-                        <span className="mxd-teaser__text">experiences</span>
+                        <span className="mxd-teaser__text">criativas</span>
                       </CommonScrollAnimated>
                     </div>
                   </div>
@@ -101,7 +101,7 @@ export default function AboutTeaser() {
                               animation="clipImage"
                             >
                               <Image
-                                alt="Azurio Image"
+                                alt="MINDSITE Image"
                                 src="/img/illustrations/about01.webp"
                                 width={800}
                                 height={534}
@@ -110,7 +110,7 @@ export default function AboutTeaser() {
                             <div className="mxd-about-images__descr">
                               <div className="mxd-about-images__date">
                                 <TextScramble className="meta-date mxd-scramble">
-                                  28 February, 2026
+                                  28 de Fevereiro, 2026
                                 </TextScramble>
                               </div>
                             </div>
@@ -126,7 +126,7 @@ export default function AboutTeaser() {
                             animation="clipImage"
                           >
                             <Image
-                              alt="Azurio Image"
+                              alt="MINDSITE Image"
                               src="/img/illustrations/about02.webp"
                               width={918}
                               height={1200}
@@ -135,12 +135,12 @@ export default function AboutTeaser() {
                           <div className="mxd-about-images__descr">
                             <div className="mxd-about-images__title">
                               <span className="meta-tag">
-                                Working with my assistant
+                                Trabalhando com meu assistente
                               </span>
                             </div>
                             <div className="mxd-about-images__date">
                               <TextScramble className="meta-date mxd-scramble">
-                                28 February, 2026
+                                28 de Fevereiro, 2026
                               </TextScramble>
                             </div>
                           </div>
@@ -156,7 +156,7 @@ export default function AboutTeaser() {
                               animation="clipImage"
                             >
                               <Image
-                                alt="Azurio Image"
+                                alt="MINDSITE Image"
                                 src="/img/illustrations/about03.webp"
                                 width={800}
                                 height={534}
@@ -165,7 +165,7 @@ export default function AboutTeaser() {
                             <div className="mxd-about-images__descr">
                               <div className="mxd-about-images__date">
                                 <TextScramble className="meta-date mxd-scramble">
-                                  28 February, 2026
+                                  28 de Fevereiro, 2026
                                 </TextScramble>
                               </div>
                             </div>

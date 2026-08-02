@@ -6,8 +6,8 @@ import ParallaxDividerVideo from "@/components/other-pages/pricing/ParallaxDivid
 import BlogPreview from "@/components/other-pages/pricing/BlogPreview";
 import CTAWithMarquee from "@/components/other-pages/pricing/CTAWithMarquee";
 export const metadata: Metadata = {
-  title: "Pricing | Azurio - Digital Agency & Portfolio NextJs Template",
-  description: "Azurio - Digital Agency & Portfolio NextJs Template",
+  title: "Pricing | Mindsite - Agencia digital",
+  description: "A infraestrutura que o seu negócio precisa para escalar. Descubra como o Mindsite otimiza seu ecossistema digital do início ao fim.",
 };
 export default function PricingPage() {
   return (

@@ -10,8 +10,8 @@ import Approach from "@/components/other-pages/about-us/Approach";
 import BlogPreview from "@/components/other-pages/about-us/BlogPreview";
 import CTAWithMarquee from "@/components/other-pages/about-us/CTAWithMarquee";
 export const metadata: Metadata = {
-  title: "About Us | Azurio - Digital Agency & Portfolio NextJs Template",
-  description: "Azurio - Digital Agency & Portfolio NextJs Template",
+  title: "About Us | Mindsite - Agencia digital",
+  description: "A infraestrutura que o seu negócio precisa para escalar. Descubra como o Mindsite otimiza seu ecossistema digital do início ao fim.",
 };
 export default function AboutUsPage() {
   return (

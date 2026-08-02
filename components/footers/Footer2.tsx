@@ -7,7 +7,7 @@ import {
   CommonScrollAnimatedLink,
 } from "@/components/animations/CommonScrollAnimated";
 import TextScramble from "@/components/animations/TextScramble";
-export default function Footer2({ name = "Azurio" }: { name?: string }) {
+export default function Footer2({ name = "MINDSITE" }: { name?: string }) {
   return (
     <BlurSection as="footer" className="mxd-footer">
       <div className="mxd-container grid-l-container">
@@ -115,11 +115,11 @@ export default function Footer2({ name = "Azurio" }: { name?: string }) {
                               <li>
                                 <CommonScrollAnimated
                                   className="anim-uni-slide-down"
-                                  href="mailto:contato@mindsite.com.br?subject=Message%20from%20your%20site"
+                                  href="mailto:ola@mindsite.com.br?subject=Message%20from%20your%20site"
                                   as="a"
                                   animation="slideDownLine"
                                 >
-                                  <span>contato@mindsite.com.br</span>
+                                  <span>ola@mindsite.com.br</span>
                                 </CommonScrollAnimated>
                               </li>
                               <li>
@@ -524,7 +524,7 @@ export default function Footer2({ name = "Azurio" }: { name?: string }) {
                     animation="fadeIn"
                   >
                     <p className="footer-data">
-                      <span>Copyright Azurio. All rights reserved</span>
+                      <span>Copyright MINDSITE. All rights reserved</span>
                     </p>
                   </CommonScrollAnimated>
                 </div>
@@ -537,19 +537,6 @@ export default function Footer2({ name = "Azurio" }: { name?: string }) {
                           as="div"
                           animation="fadeIn"
                         >
-                          <p className="footer-data">
-                            <span>
-                              React Nextjs Template by&nbsp;
-                              <a
-                                href="https://themeforest.net/user/ib-themes"
-                                target="_blank"
-                              >
-                                <TextScramble className="mxd-scramble">
-                                  IB Themes
-                                </TextScramble>
-                              </a>
-                            </span>
-                          </p>
                         </CommonScrollAnimated>
                       </div>
                       <div className="col-12 col-xl-6 mxd-grid-item">

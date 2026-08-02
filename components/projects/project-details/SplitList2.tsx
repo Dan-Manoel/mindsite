@@ -98,7 +98,7 @@ export default function SplitList2() {
                               animation="inUp"
                             >
                               The project relies on a minimal yet expressive
-                              identity that highlights Azurio&apos;s character.
+                              identity that highlights MINDSITE&apos;s character.
                               Carefully selected colors, type, and graphic
                               accents reinforce recognition and visual cohesion.
                             </CommonScrollAnimated>

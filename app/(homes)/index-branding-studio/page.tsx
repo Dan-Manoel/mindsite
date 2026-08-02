@@ -9,8 +9,38 @@ import ParallaxDivider from "@/components/homes/index-branding-studio/ParallaxDi
 import BlogPreview from "@/components/homes/index-branding-studio/BlogPreview";
 import CTAWithMarquee from "@/components/homes/index-branding-studio/CTAWithMarquee";
 export const metadata: Metadata = {
-  title: "Azurio - Digital Agency & Portfolio NextJs Template",
-  description: "Azurio — Digital Agency & Portfolio NextJs Template",
+  title: "Mindsite | Agencia digital",
+  description:
+    "A infraestrutura que o seu negócio precisa para escalar. Descubra como o Mindsite otimiza seu ecossistema digital do início ao fim.",
+  openGraph: {
+    title: "Mindsite | Agencia digital",
+    description:
+      "A infraestrutura que o seu negócio precisa para escalar. Descubra como o Mindsite otimiza seu ecossistema digital do início ao fim.",
+    images: [
+      {
+        url: "/img/logo_og.webp",
+        width: 1599,
+        height: 715,
+        alt: "Mindsite | Agencia digital",
+        type: "image/webp",
+      },
+    ],
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Mindsite | Agencia digital",
+    description:
+      "A infraestrutura que o seu negócio precisa para escalar. Descubra como o Mindsite otimiza seu ecossistema digital do início ao fim.",
+    images: [
+      {
+        url: "/img/logo_og.webp",
+        width: 1599,
+        height: 715,
+        alt: "Mindsite | Agencia digital",
+      },
+    ],
+  },
 };
 export default function IndexBrandingStudioPage() {
   return (
@@ -18,16 +48,15 @@ export default function IndexBrandingStudioPage() {
       <Hero />
       <ProtectsStack />
       <DividerStickyCaption
-        topCtaLabel="Services"
+        topCtaLabel="Serviços"
         topCtaHref="/services"
-        captionCursorText={"What We\u00a0Do"}
+        captionCursorText={"O Que\u00a0Fazemos"}
         captionHref="/services"
       >
-        Digital agency specializing in
-        <span>innovative design</span> &amp; cutting-edge
-        <span>development</span>
+        Agência digital especializada em
+        <span>design inovador</span> &amp; <span>desenvolvimento de ponta</span>
       </DividerStickyCaption>
-      <DividerStickyImages ctaHref="/services" ctaLabel="Process" />
+      <DividerStickyImages ctaHref="/services" ctaLabel="Processo" />
       <SplitDescription />
       <ParallaxDivider />
       <BlogPreview />

@@ -28,7 +28,7 @@ export default function SplitList3() {
                           className="manifest manifest-s mxd-split-lines"
                           animation="splitLines"
                         >
-                          Azurio was built using modern web technologies with a
+                          MINDSITE was built using modern web technologies with a
                           focus on flexibility.
                           <span>
                             Clean React Nextjs structure, scalable CSS

@@ -26,9 +26,9 @@ export default function BlogPreview() {
                           className="reveal-type"
                           animation="revealType"
                         >
-                          My featured
+                          Artigos em
                           <br />
-                          insights
+                          destaque
                         </CommonAnimatedText>
                       </div>
                     </div>
@@ -44,7 +44,7 @@ export default function BlogPreview() {
                             href={`/blog-standard`}
                           >
                             <TextScramble className="btn-caption mxd-scramble">
-                              My Blog
+                              Ver Blog
                             </TextScramble>
                           </Link>
                         </CommonScrollAnimated>
@@ -61,7 +61,7 @@ export default function BlogPreview() {
                 <Link
                   className="mxd-blog-list__item active-cursor-image active-cursor-permanent"
                   data-cursor-image="/img/blog/preview/500x500_pr01.webp"
-                  data-cursor-text="Read Post"
+                  data-cursor-text="Ler Artigo"
                   href={`/blog-article`}
                 >
                   <div className="mxd-blog-list__divider top" />
@@ -69,28 +69,28 @@ export default function BlogPreview() {
                     <div className="row gx-0">
                       <div className="col-12 mxd-grid-padding">
                         <div className="mxd-blog-list__meta">
-                          <span className="meta-tag comma-tag">Press</span>
-                          <span className="meta-tag comma-tag">Insights</span>
-                          <span className="meta-time">5 mins</span>
+                          <span className="meta-tag comma-tag">Imprensa</span>
+                          <span className="meta-tag comma-tag">Artigos</span>
+                          <span className="meta-time">5 min</span>
                         </div>
                       </div>
                       <div className="col-12 col-xl-7 mxd-grid-padding">
                         <div className="mxd-blog-list__title">
-                          <p>Frontend innovations and user journeys</p>
+                          <p>Inovações em Frontend e jornadas do usuário</p>
                           <div className="mxd-blog-list__data">
                             <span className="meta-author comma-tag">
-                              Alex Walker
+                              Danilo Oliveira
                             </span>
-                            <span className="meta-date">02 February, 2026</span>
+                            <span className="meta-date">02 de Fevereiro de 2026</span>
                           </div>
                         </div>
                       </div>
                       <div className="col-12 col-xl-5 mxd-grid-padding">
                         <div className="mxd-blog-list__excerpt">
                           <p className="t-medium">
-                            Discover how artificial intelligence is transforming
-                            artistic processes, pushing boundaries, and
-                            inspiring new possibilities in digital design.
+                            Descubra como tecnologias emergentes estão moldando
+                            o futuro do desenvolvimento web, ampliando limites e
+                            inspirando novas possibilidades.
                           </p>
                         </div>
                       </div>
@@ -101,7 +101,7 @@ export default function BlogPreview() {
                 <Link
                   className="mxd-blog-list__item active-cursor-image active-cursor-permanent"
                   data-cursor-image="/img/blog/preview/500x500_pr02.webp"
-                  data-cursor-text="Read Post"
+                  data-cursor-text="Ler Artigo"
                   href={`/blog-article`}
                 >
                   <div className="mxd-blog-list__divider top" />
@@ -109,30 +109,30 @@ export default function BlogPreview() {
                     <div className="row gx-0">
                       <div className="col-12 mxd-grid-padding">
                         <div className="mxd-blog-list__meta">
-                          <span className="meta-tag comma-tag">News</span>
-                          <span className="meta-tag comma-tag">Insights</span>
-                          <span className="meta-time">3 mins</span>
+                          <span className="meta-tag comma-tag">Notícias</span>
+                          <span className="meta-tag comma-tag">Artigos</span>
+                          <span className="meta-time">3 min</span>
                         </div>
                       </div>
                       <div className="col-12 col-xl-7 mxd-grid-padding">
                         <div className="mxd-blog-list__title">
                           <p>
-                            Elevating digital workshops with engaging design
+                            Elevando workshops digitais com um design envolvente
                           </p>
                           <div className="mxd-blog-list__data">
                             <span className="meta-author comma-tag">
-                              Alex Walker
+                              Danilo Oliveira
                             </span>
-                            <span className="meta-date">28 January, 2026</span>
+                            <span className="meta-date">28 de Janeiro de 2026</span>
                           </div>
                         </div>
                       </div>
                       <div className="col-12 col-xl-5 mxd-grid-padding">
                         <div className="mxd-blog-list__excerpt">
                           <p className="t-medium">
-                            Discover how artificial intelligence is transforming
-                            artistic processes, pushing boundaries, and
-                            inspiring new possibilities in digital design.
+                            Como criar experiências digitais mais interativas e
+                            cativantes para os usuários por meio de estratégias
+                            visuais inovadoras.
                           </p>
                         </div>
                       </div>

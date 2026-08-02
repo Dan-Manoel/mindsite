@@ -75,7 +75,7 @@ export default function Awards() {
                     <div className="col-12 col-xl-4 order-1 order-xl-2 mxd-grid-item">
                       <div className="mxd-awards__image">
                         <Image
-                          alt="Azurio Image"
+                          alt="MINDSITE Image"
                           src="/img/illustrations/awards01.webp"
                           width={1000}
                           height={455}
@@ -137,7 +137,7 @@ export default function Awards() {
                     <div className="col-12 col-xl-4 order-1 order-xl-2 mxd-grid-item">
                       <div className="mxd-awards__image">
                         <Image
-                          alt="Azurio Image"
+                          alt="MINDSITE Image"
                           src="/img/illustrations/awards02.webp"
                           width={1000}
                           height={455}
@@ -199,7 +199,7 @@ export default function Awards() {
                     <div className="col-12 col-xl-4 order-1 order-xl-2 mxd-grid-item">
                       <div className="mxd-awards__image">
                         <Image
-                          alt="Azurio Image"
+                          alt="MINDSITE Image"
                           src="/img/illustrations/awards03.webp"
                           width={1000}
                           height={455}
@@ -261,7 +261,7 @@ export default function Awards() {
                     <div className="col-12 col-xl-4 order-1 order-xl-2 mxd-grid-item">
                       <div className="mxd-awards__image">
                         <Image
-                          alt="Azurio Image"
+                          alt="MINDSITE Image"
                           src="/img/illustrations/awards04.webp"
                           width={1000}
                           height={455}
@@ -323,7 +323,7 @@ export default function Awards() {
                     <div className="col-12 col-xl-4 order-1 order-xl-2 mxd-grid-item">
                       <div className="mxd-awards__image">
                         <Image
-                          alt="Azurio Image"
+                          alt="MINDSITE Image"
                           src="/img/illustrations/awards05.webp"
                           width={1000}
                           height={455}
@@ -385,7 +385,7 @@ export default function Awards() {
                     <div className="col-12 col-xl-4 order-1 order-xl-2 mxd-grid-item">
                       <div className="mxd-awards__image">
                         <Image
-                          alt="Azurio Image"
+                          alt="MINDSITE Image"
                           src="/img/illustrations/awards06.webp"
                           width={1000}
                           height={455}

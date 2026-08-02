@@ -42,7 +42,7 @@ export default function OurCapabilities() {
                     <div className="mxd-section-title__title">
                       <Link
                         className="active-cursor-accent"
-                        data-cursor-text="All Services"
+                        data-cursor-text="Todos os Serviços"
                         href={`/services`}
                       >
                         <CommonAnimatedText
@@ -50,9 +50,9 @@ export default function OurCapabilities() {
                           className="mxd-split-lines"
                           animation="splitLines"
                         >
-                          Our
+                          Nossas
                           <br />
-                          capabilities
+                          capacidades
                         </CommonAnimatedText>
                       </Link>
                     </div>
@@ -90,7 +90,7 @@ export default function OurCapabilities() {
                         </div>
                         <div className="col-12 col-md-6 col-xl-4 mxd-grid-item mxd-cpb-list__image">
                           <Image
-                            alt="Azurio Services Image"
+                            alt="MINDSITE Services Image"
                             src={item.imageSrc}
                             width={1200}
                             height={980}

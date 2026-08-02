@@ -43,7 +43,7 @@ export default function MyExpertise() {
                     <div className="mxd-section-title__title">
                       <Link
                         className="active-cursor-accent"
-                        data-cursor-text="I do best"
+                        data-cursor-text="Especialidades"
                         href={`/services`}
                       >
                         <CommonAnimatedText
@@ -51,7 +51,7 @@ export default function MyExpertise() {
                           className="mxd-split-lines"
                           animation="splitLines"
                         >
-                          My expertise
+                          Minhas especialidades
                         </CommonAnimatedText>
                       </Link>
                     </div>
@@ -89,7 +89,7 @@ export default function MyExpertise() {
                         </div>
                         <div className="col-12 col-md-6 col-xl-4 mxd-grid-item mxd-cpb-list__image">
                           <Image
-                            alt="Azurio Services Image"
+                            alt="MINDSITE Services Image"
                             src={item.imageSrc}
                             width={1200}
                             height={980}

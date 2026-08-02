@@ -26,7 +26,7 @@ export default function ServicesList() {
                           className="reveal-type"
                           animation="revealType"
                         >
-                          Intersection of art &amp; technology
+                          Interseção de arte &amp; tecnologia
                         </CommonAnimatedText>
                       </div>
                     </div>
@@ -42,7 +42,7 @@ export default function ServicesList() {
                             href={`/services`}
                           >
                             <TextScramble className="btn-caption mxd-scramble">
-                              All Services
+                              Todos os Serviços
                             </TextScramble>
                           </Link>
                         </CommonScrollAnimated>
@@ -72,15 +72,15 @@ export default function ServicesList() {
                       </div>
                       <div className="col-12 col-xl-6 mxd-grid-padding">
                         <div className="mxd-services-list__title">
-                          <h3>Graphic design</h3>
+                          <h3>Design gráfico</h3>
                         </div>
                       </div>
                       <div className="col-12 col-xl-5 mxd-grid-padding">
                         <div className="mxd-services-list__descr">
                           <p className="t-medium">
-                            We create visually compelling designs that enhance
-                            user experience. We make sure your brand&apos;s
-                            visuals resonate with your audience.
+                            Criamos designs visualmente atraentes que melhoram a
+                            experiência do usuário. Garantimos que o visual da
+                            sua marca se conecte com seu público.
                           </p>
                         </div>
                       </div>
@@ -104,16 +104,16 @@ export default function ServicesList() {
                       </div>
                       <div className="col-12 col-xl-6 mxd-grid-padding">
                         <div className="mxd-services-list__title">
-                          <h3>Creative development</h3>
+                          <h3>Desenvolvimento criativo</h3>
                         </div>
                       </div>
                       <div className="col-12 col-xl-5 mxd-grid-padding">
                         <div className="mxd-services-list__descr">
                           <p className="t-medium">
-                            We build high-performance websites and applications
-                            using modern technologies. Our solutions are
-                            designed to be scalable and functional for optimal
-                            performance.
+                            Desenvolvemos sites e aplicativos de alta performance
+                            usando tecnologias modernas. Nossas soluções são
+                            projetadas para serem escaláveis e funcionais, com
+                            desempenho ideal.
                           </p>
                         </div>
                       </div>
@@ -137,15 +137,15 @@ export default function ServicesList() {
                       </div>
                       <div className="col-12 col-xl-6 mxd-grid-padding">
                         <div className="mxd-services-list__title">
-                          <h3>Digital marketing solutions</h3>
+                          <h3>Soluções de marketing digital</h3>
                         </div>
                       </div>
                       <div className="col-12 col-xl-5 mxd-grid-padding">
                         <div className="mxd-services-list__descr">
                           <p className="t-medium">
-                            SEO and content marketing, social media management
-                            and paid campaigns - we help you reach and engage
-                            your target audience effectively.
+                            SEO e marketing de conteúdo, gestão de redes sociais
+                            e campanhas pagas - ajudamos você a alcançar e engajar
+                            seu público-alvo de forma eficaz.
                           </p>
                         </div>
                       </div>
@@ -169,16 +169,16 @@ export default function ServicesList() {
                       </div>
                       <div className="col-12 col-xl-6 mxd-grid-padding">
                         <div className="mxd-services-list__title">
-                          <h3>Brand identity</h3>
+                          <h3>Identidade de marca</h3>
                         </div>
                       </div>
                       <div className="col-12 col-xl-5 mxd-grid-padding">
                         <div className="mxd-services-list__descr">
                           <p className="t-medium">
-                            From logo design to comprehensive brand strategies,
-                            we ensure your business stands out with a unique
-                            visual identity and consistent messaging across all
-                            touchpoints.
+                            Desde a criação de logotipos até estratégias completas
+                            de marca, garantimos que sua empresa se destaque com
+                            uma identidade visual única e comunicação consistente
+                            em todos os pontos de contato.
                           </p>
                         </div>
                       </div>
@@ -202,15 +202,15 @@ export default function ServicesList() {
                       </div>
                       <div className="col-12 col-xl-6 mxd-grid-padding">
                         <div className="mxd-services-list__title">
-                          <h3>Long-lasting support</h3>
+                          <h3>Suporte contínuo</h3>
                         </div>
                       </div>
                       <div className="col-12 col-xl-5 mxd-grid-padding">
                         <div className="mxd-services-list__descr">
                           <p className="t-medium">
-                            We take the time to understand your unique needs and
-                            create tailored design solutions to help you make an
-                            impact.
+                            Dedicamos tempo para entender suas necessidades
+                            exclusivas e criar soluções de design sob medida
+                            para ajudar você a gerar impacto.
                           </p>
                         </div>
                       </div>

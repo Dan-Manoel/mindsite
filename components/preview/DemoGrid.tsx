@@ -39,7 +39,7 @@ export default function DemoGrid() {
                           target="_blank"
                         >
                           <Image
-                            alt="Azurio Template Preview Image"
+                            alt="MINDSITE Template Preview Image"
                             src="/img/demo/screens/01.webp"
                             width={900}
                             height={563}
@@ -82,7 +82,7 @@ export default function DemoGrid() {
                           target="_blank"
                         >
                           <Image
-                            alt="Azurio Template Preview Image"
+                            alt="MINDSITE Template Preview Image"
                             src="/img/demo/screens/02.webp"
                             width={900}
                             height={563}
@@ -124,7 +124,7 @@ export default function DemoGrid() {
                           target="_blank"
                         >
                           <Image
-                            alt="Azurio Template Preview Image"
+                            alt="MINDSITE Template Preview Image"
                             src="/img/demo/screens/03.webp"
                             width={900}
                             height={563}
@@ -166,7 +166,7 @@ export default function DemoGrid() {
                           target="_blank"
                         >
                           <Image
-                            alt="Azurio Template Preview Image"
+                            alt="MINDSITE Template Preview Image"
                             src="/img/demo/screens/04.webp"
                             width={900}
                             height={563}
@@ -208,7 +208,7 @@ export default function DemoGrid() {
                           target="_blank"
                         >
                           <Image
-                            alt="Azurio Template Preview Image"
+                            alt="MINDSITE Template Preview Image"
                             src="/img/demo/screens/05.webp"
                             width={900}
                             height={563}
@@ -250,7 +250,7 @@ export default function DemoGrid() {
                           target="_blank"
                         >
                           <Image
-                            alt="Azurio Template Preview Image"
+                            alt="MINDSITE Template Preview Image"
                             src="/img/demo/screens/06.webp"
                             width={900}
                             height={563}
@@ -292,7 +292,7 @@ export default function DemoGrid() {
                           target="_blank"
                         >
                           <Image
-                            alt="Azurio Template Preview Image"
+                            alt="MINDSITE Template Preview Image"
                             src="/img/demo/screens/07.webp"
                             width={900}
                             height={563}
@@ -334,7 +334,7 @@ export default function DemoGrid() {
                           target="_blank"
                         >
                           <Image
-                            alt="Azurio Template Preview Image"
+                            alt="MINDSITE Template Preview Image"
                             src="/img/demo/screens/08.webp"
                             width={900}
                             height={563}
@@ -376,7 +376,7 @@ export default function DemoGrid() {
                           target="_blank"
                         >
                           <Image
-                            alt="Azurio Template Preview Image"
+                            alt="MINDSITE Template Preview Image"
                             src="/img/demo/screens/09.webp"
                             width={900}
                             height={563}
@@ -418,7 +418,7 @@ export default function DemoGrid() {
                           target="_blank"
                         >
                           <Image
-                            alt="Azurio Template Preview Image"
+                            alt="MINDSITE Template Preview Image"
                             src="/img/demo/screens/10.webp"
                             width={900}
                             height={563}

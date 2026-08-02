@@ -13,7 +13,7 @@ export default function CommonGravityPortfolioObjects() {
         <CommonGravityObject index={0}>
           <div className="object object-image">
             <Image
-              alt="Azurio Template Gravity Image"
+              alt="MINDSITE Template Gravity Image"
               src="/img/cta/01.webp"
               width={469}
               height={600}
@@ -28,7 +28,7 @@ export default function CommonGravityPortfolioObjects() {
         <CommonGravityObject index={2}>
           <div className="object object-image">
             <Image
-              alt="Azurio Template Gravity Image"
+              alt="MINDSITE Template Gravity Image"
               src="/img/cta/02.webp"
               width={454}
               height={600}
@@ -43,7 +43,7 @@ export default function CommonGravityPortfolioObjects() {
         <CommonGravityObject index={4}>
           <div className="object object-image">
             <Image
-              alt="Azurio Template Gravity Image"
+              alt="MINDSITE Template Gravity Image"
               src="/img/cta/03.webp"
               width={442}
               height={570}
@@ -58,7 +58,7 @@ export default function CommonGravityPortfolioObjects() {
         <CommonGravityObject index={6}>
           <div className="object object-image">
             <Image
-              alt="Azurio Template Gravity Image"
+              alt="MINDSITE Template Gravity Image"
               src="/img/cta/04.webp"
               width={431}
               height={600}
@@ -73,7 +73,7 @@ export default function CommonGravityPortfolioObjects() {
         <CommonGravityObject index={8}>
           <div className="object object-image">
             <Image
-              alt="Azurio Template Gravity Image"
+              alt="MINDSITE Template Gravity Image"
               src="/img/cta/05.webp"
               width={400}
               height={521}
@@ -88,7 +88,7 @@ export default function CommonGravityPortfolioObjects() {
         <CommonGravityObject index={10}>
           <div className="object object-image">
             <Image
-              alt="Azurio Template Gravity Image"
+              alt="MINDSITE Template Gravity Image"
               src="/img/cta/06.webp"
               width={400}
               height={520}

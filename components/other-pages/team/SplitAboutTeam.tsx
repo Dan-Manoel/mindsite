@@ -59,7 +59,7 @@ export default function SplitAboutTeam() {
                         externalRAF={false}
                       >
                         <Image
-                          alt="Azurio Template Sample Image"
+                          alt="MINDSITE Template Sample Image"
                           src="/img/illustrations/team01.webp"
                           width={1000}
                           height={1500}
@@ -78,7 +78,7 @@ export default function SplitAboutTeam() {
                           externalRAF={false}
                         >
                           <Image
-                            alt="Azurio Template Sample Image"
+                            alt="MINDSITE Template Sample Image"
                             src="/img/illustrations/team02.webp"
                             width={1500}
                             height={1000}

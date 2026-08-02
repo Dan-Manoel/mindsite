@@ -12,9 +12,8 @@ import ParallaxDividerImage3 from "@/components/homes/index-software-development
 import BlogPreview from "@/components/homes/index-software-development-company/BlogPreview";
 import CTA from "@/components/homes/index-software-development-company/CTA";
 export const metadata: Metadata = {
-  title:
-    "Index Software Development Company | Azurio - Digital Agency & Portfolio NextJs Template",
-  description: "Azurio - Digital Agency & Portfolio NextJs Template",
+  title: "Desenvolvimento de Software | Mindsite - Agência Digital",
+  description: "A infraestrutura que o seu negócio precisa para escalar. Descubra como o Mindsite otimiza seu ecossistema digital do início ao fim.",
 };
 export default function IndexSoftwareDevelopmentCompanyPage() {
   return (

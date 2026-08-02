@@ -32,22 +32,22 @@ export default function SplitDescription() {
                             href="/about-us"
                           >
                             <TextScramble className="btn-caption mxd-scramble">
-                              The Studio
+                              O Estúdio
                             </TextScramble>
                           </Link>
                         </CommonScrollAnimated>
                         <div className="mxd-section-manifest__text manifest-text-m">
                           <CommonAnimatedTextLink
                             className="manifest manifest-l mxd-split-lines active-cursor-accent"
-                            data-cursor-text="About Us"
+                            data-cursor-text="Sobre Nós"
                             href="/about-us"
                             animation="splitLines"
                           >
-                            We are a creative web agency specializing in
-                            innovative design and cutting-edge development.
+                            Somos uma agência digital criativa especializada em
+                            design inovador e desenvolvimento de ponta.
                             <span>
-                              We help businesses stand out and thrive in the
-                              modern landscape.
+                              Ajudamos marcas a se destacarem e prosperarem no
+                              cenário digital moderno.
                             </span>
                           </CommonAnimatedTextLink>
                         </div>
@@ -66,7 +66,7 @@ export default function SplitDescription() {
                     <div className="col-12 col-lg-6 mxd-grid-item">
                       <div className="mxd-split-descr__image">
                         <Image
-                          alt="Azurio Template Example Image"
+                          alt="MINDSITE Template Example Image"
                           src="/img/illustrations/about04.webp"
                           width={1200}
                           height={800}
@@ -81,13 +81,13 @@ export default function SplitDescription() {
                             className="t-bold t-large mxd-split-lines"
                             animation="splitLines"
                           >
-                            From pixel-perfect designs to flawless code, every
-                            aspect of our projects is crafted with care to
-                            ensure the highest standards of quality.
+                            De designs impecáveis a código de alta performance, cada
+                            detalhe dos nossos projetos é construído com excelência para
+                            garantir o mais alto padrão de qualidade.
                             <span>
-                              We are passionate about integrating the latest
-                              technologies and trends, including interactive
-                              animations and mobile-first strategies.
+                              Somos apaixonados por integrar as tecnologias e
+                              tendências mais recentes, incluindo animações
+                              interativas e estratégias mobile-first.
                             </span>
                           </CommonAnimatedText>
                         </div>
@@ -101,7 +101,7 @@ export default function SplitDescription() {
                                   animation="inUp"
                                 >
                                   <TextScramble className="mxd-scramble">
-                                    Innovations
+                                    Inovação
                                   </TextScramble>
                                 </CommonScrollAnimated>
                                 <CommonScrollAnimated
@@ -110,7 +110,7 @@ export default function SplitDescription() {
                                   animation="inUp"
                                 >
                                   <TextScramble className="mxd-scramble">
-                                    Excellence
+                                    Excelência
                                   </TextScramble>
                                 </CommonScrollAnimated>
                                 <CommonScrollAnimated
@@ -119,7 +119,7 @@ export default function SplitDescription() {
                                   animation="inUp"
                                 >
                                   <TextScramble className="mxd-scramble">
-                                    Creativity
+                                    Criatividade
                                   </TextScramble>
                                 </CommonScrollAnimated>
                               </div>
@@ -130,7 +130,7 @@ export default function SplitDescription() {
                                   animation="inUp"
                                 >
                                   <TextScramble className="mxd-scramble">
-                                    Experience
+                                    Experiência
                                   </TextScramble>
                                 </CommonScrollAnimated>
                                 <CommonScrollAnimated
@@ -139,7 +139,7 @@ export default function SplitDescription() {
                                   animation="inUp"
                                 >
                                   <TextScramble className="mxd-scramble">
-                                    Competence
+                                    Competência
                                   </TextScramble>
                                 </CommonScrollAnimated>
                                 <CommonScrollAnimated
@@ -148,7 +148,7 @@ export default function SplitDescription() {
                                   animation="inUp"
                                 >
                                   <TextScramble className="mxd-scramble">
-                                    Passion
+                                    Paixão
                                   </TextScramble>
                                 </CommonScrollAnimated>
                               </div>

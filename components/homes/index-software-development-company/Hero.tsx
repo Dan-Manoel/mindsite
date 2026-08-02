@@ -25,7 +25,7 @@ export default function Hero() {
             <div className="mxd-hero-03__headline">
               <Link
                 className="active-cursor-accent"
-                data-cursor-text="Let's Chat"
+                data-cursor-text="Vamos Conversar"
                 href={`/contact`}
               >
                 <CommonAnimatedText
@@ -33,7 +33,7 @@ export default function Hero() {
                   className="permanent loading-split"
                   animation="splitLinesLoad"
                 >
-                  Innovative software development company
+                  Empresa inovadora de desenvolvimento de software
                 </CommonAnimatedText>
               </Link>
               <div className="mxd-hero-media__small">
@@ -69,7 +69,7 @@ export default function Hero() {
                   href={`/about-us`}
                 >
                   <TextScramble className="btn-caption mxd-scramble">
-                    Studio
+                    Estúdio
                   </TextScramble>
                 </Link>
               </div>
@@ -82,7 +82,7 @@ export default function Hero() {
                   href={`/works-default`}
                 >
                   <TextScramble className="btn-caption mxd-scramble">
-                    Works
+                    Projetos
                   </TextScramble>
                 </Link>
               </div>
@@ -156,7 +156,7 @@ export default function Hero() {
                       targetId="about"
                     >
                       <TextScramble className="btn-caption mxd-scramble">
-                        Scroll to explore
+                        Role para explorar
                       </TextScramble>
                       <i>
                         <svg

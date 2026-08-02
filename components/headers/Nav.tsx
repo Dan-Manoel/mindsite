@@ -116,7 +116,7 @@ export default function Nav({
               </svg>
               {/* logo text */}
               <div className="menu-logo__text">
-                <span ref={headerSlots[0]}>Azurio</span>
+                <span ref={headerSlots[0]}>MINDSITE</span>
                 <span ref={headerSlots[1]}>Template</span>
               </div>
             </Link>
@@ -142,9 +142,9 @@ export default function Nav({
               <div className="mxd-menu__shadow shadow-top" />
               <div className="mxd-menu__caption">
                 <p ref={headerSlots[2]}>
-                  🦄 Innovative design
+                  🦄 Design inovador
                   <br />
-                  and cutting-edge development
+                  e desenvolvimento de ponta
                 </p>
               </div>
               {/* left side */}
@@ -172,7 +172,7 @@ export default function Nav({
                               ref={mainSlots[1]}
                               className="main-menu__caption"
                             >
-                              Home
+                              Início
                             </span>
                           </p>
                           <div ref={arrowSlots[0]} className="main-menu__arrow">
@@ -209,7 +209,7 @@ export default function Nav({
                               ref={mainSlots[3]}
                               className="main-menu__caption"
                             >
-                              Works
+                              Trabalhos
                             </span>
                           </p>
                           <div ref={arrowSlots[1]} className="main-menu__arrow">
@@ -246,7 +246,7 @@ export default function Nav({
                               ref={mainSlots[5]}
                               className="main-menu__caption"
                             >
-                              Pages
+                              Páginas
                             </span>
                           </p>
                           <div ref={arrowSlots[2]} className="main-menu__arrow">
@@ -283,7 +283,7 @@ export default function Nav({
                               ref={mainSlots[7]}
                               className="main-menu__caption"
                             >
-                              Insights
+                              Artigos
                             </span>
                           </p>
                           <div ref={arrowSlots[3]} className="main-menu__arrow">
@@ -320,7 +320,7 @@ export default function Nav({
                               ref={mainSlots[9]}
                               className="main-menu__caption"
                             >
-                              Contact
+                              Contato
                             </span>
                           </Link>
                         </div>
@@ -342,13 +342,13 @@ export default function Nav({
                         <a
                           ref={contactSlots[0]}
                           className="tag tag-m"
-                          href="mailto:contato@mindsite.com.br?subject=Message%20from%20your%20site"
+                          href="mailto:ola@mindsite.com.br?subject=Message%20from%20your%20site"
                         >
                           <TextScramble
                             ref={contactRevealSlots[0]}
                             className="mxd-scramble"
                           >
-                            contato@mindsite.com.br
+                            ola@mindsite.com.br
                           </TextScramble>
                         </a>
                       </li>
@@ -378,11 +378,11 @@ export default function Nav({
                           target="_blank"
                         >
                           <span ref={contactRevealSlots[2]}>
-                            11 West 53 Street,
+                            Av. Paulista, 1000,
                             <br />
-                            New York, NY
+                            São Paulo, SP
                             <br />
-                            10019
+                            Brasil
                           </span>
                         </a>
                       </li>
@@ -474,7 +474,7 @@ export default function Nav({
               <div className="mxd-menu__data">
                 <div className="menu-data__left">
                   <p ref={footerSlots[0]} className="menu-data__text">
-                    Made with{" "}
+                    Feito com{" "}
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
                       version="1.1"
@@ -483,7 +483,7 @@ export default function Nav({
                       <path d="M2.6,6.4v2.6H0V3.9h2.6v2.6ZM15.4,3.9v5.1h2.6V3.9h-2.6ZM12.9,11.6h2.6v-2.6h-2.6v2.6ZM2.6,9v2.6h2.6v-2.6h-2.6ZM10.3,14.1h2.6v-2.6h-2.6v2.6ZM5.1,11.6v2.6h2.6v-2.6h-2.6ZM7.7,3.9V1.3H2.6v2.6h5.1ZM15.4,3.9V1.3h-5.1v2.6h5.1ZM10.3,6.4v-2.6h-2.6v2.6h2.6ZM7.7,16.7h2.6v-2.6h-2.6v2.6Z" />
                     </svg>{" "}
                     {/* <i class="ph-fill ph-heart t-additional"></i> */}
-                    by{" "}
+                    por{" "}
                     <a
                       ref={footerSlots[1]}
                       href="https://themeforest.net/user/ib-themes"
@@ -497,7 +497,7 @@ export default function Nav({
                 </div>
                 <div className="menu-data__right">
                   <p ref={footerSlots[2]} className="menu-data__text">
-                    Copyright Azurio
+                    Todos os direitos reservados - MINDSITE
                   </p>
                   <p ref={footerSlots[3]} className="menu-data__text">
                     ©{new Date().getFullYear()}

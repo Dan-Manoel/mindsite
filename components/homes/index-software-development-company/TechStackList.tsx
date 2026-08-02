@@ -32,9 +32,9 @@ export default function TechStackList() {
                         className="mxd-split-lines"
                         animation="splitLines"
                       >
-                        Our tech
+                        Nossa stack
                         <br />
-                        stack
+                        tecnológica
                       </CommonAnimatedText>
                     </div>
                   </div>
@@ -54,8 +54,8 @@ export default function TechStackList() {
                     className="t-bold t-large t-aside mxd-split-lines"
                     animation="splitLines"
                   >
-                    A powerhouse in
-                    <span>full-stack development solutions</span>
+                    Uma referência em
+                    <span>soluções de desenvolvimento full-stack</span>
                   </CommonAnimatedText>
                 </div>
                 {/* tech stack columns */}

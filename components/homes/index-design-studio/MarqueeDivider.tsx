@@ -37,12 +37,12 @@ export default function MarqueeDivider() {
                 <div className="marquee__item item-imageblock">
                   <div className="marquee__tags">
                     <TextScramble className="tag tag-s tag-medium mxd-scramble">
-                      Photography
+                      Fotografia
                     </TextScramble>
                   </div>
                   <div className="marquee__image">
                     <Image
-                      alt="Azurio Template Image Example"
+                      alt="MINDSITE Template Image Example"
                       src="/img/cta/mar_01.webp"
                       width={1200}
                       height={1200}
@@ -53,12 +53,12 @@ export default function MarqueeDivider() {
                 <div className="marquee__item item-imageblock">
                   <div className="marquee__tags">
                     <TextScramble className="tag tag-s tag-medium mxd-scramble">
-                      3D Models
+                      Modelagem 3D
                     </TextScramble>
                   </div>
                   <div className="marquee__image">
                     <Image
-                      alt="Azurio Template Image Example"
+                      alt="MINDSITE Template Image Example"
                       src="/img/cta/mar_02.webp"
                       width={1200}
                       height={685}
@@ -69,12 +69,12 @@ export default function MarqueeDivider() {
                 <div className="marquee__item item-imageblock">
                   <div className="marquee__tags">
                     <TextScramble className="tag tag-s tag-medium mxd-scramble">
-                      Development
+                      Desenvolvimento
                     </TextScramble>
                   </div>
                   <div className="marquee__image">
                     <Image
-                      alt="Azurio Template Image Example"
+                      alt="MINDSITE Template Image Example"
                       src="/img/cta/mar_03.webp"
                       width={700}
                       height={700}
@@ -85,12 +85,12 @@ export default function MarqueeDivider() {
                 <div className="marquee__item item-imageblock">
                   <div className="marquee__tags">
                     <TextScramble className="tag tag-s tag-medium mxd-scramble">
-                      Illustrations
+                      Ilustrações
                     </TextScramble>
                   </div>
                   <div className="marquee__image">
                     <Image
-                      alt="Azurio Template Image Example"
+                      alt="MINDSITE Template Image Example"
                       src="/img/cta/mar_04.webp"
                       width={737}
                       height={1200}
@@ -101,12 +101,12 @@ export default function MarqueeDivider() {
                 <div className="marquee__item item-imageblock">
                   <div className="marquee__tags">
                     <TextScramble className="tag tag-s tag-medium mxd-scramble">
-                      Fashion
+                      Moda
                     </TextScramble>
                   </div>
                   <div className="marquee__image">
                     <Image
-                      alt="Azurio Template Image Example"
+                      alt="MINDSITE Template Image Example"
                       src="/img/cta/mar_05.webp"
                       width={800}
                       height={1200}
@@ -117,12 +117,12 @@ export default function MarqueeDivider() {
                 <div className="marquee__item item-imageblock">
                   <div className="marquee__tags">
                     <TextScramble className="tag tag-s tag-medium mxd-scramble">
-                      Digital Art
+                      Arte Digital
                     </TextScramble>
                   </div>
                   <div className="marquee__image">
                     <Image
-                      alt="Azurio Template Image Example"
+                      alt="MINDSITE Template Image Example"
                       src="/img/cta/mar_06.webp"
                       width={1200}
                       height={1200}
@@ -133,12 +133,12 @@ export default function MarqueeDivider() {
                 <div className="marquee__item item-imageblock">
                   <div className="marquee__tags">
                     <TextScramble className="tag tag-s tag-medium mxd-scramble">
-                      Packaging
+                      Embalagem
                     </TextScramble>
                   </div>
                   <div className="marquee__image">
                     <Image
-                      alt="Azurio Template Image Example"
+                      alt="MINDSITE Template Image Example"
                       src="/img/cta/mar_07.webp"
                       width={1200}
                       height={900}
@@ -149,12 +149,12 @@ export default function MarqueeDivider() {
                 <div className="marquee__item item-imageblock">
                   <div className="marquee__tags">
                     <TextScramble className="tag tag-s tag-medium mxd-scramble">
-                      Motion
+                      Animação
                     </TextScramble>
                   </div>
                   <div className="marquee__image">
                     <Image
-                      alt="Azurio Template Image Example"
+                      alt="MINDSITE Template Image Example"
                       src="/img/cta/mar_08.webp"
                       width={737}
                       height={1200}
@@ -165,12 +165,12 @@ export default function MarqueeDivider() {
                 <div className="marquee__item item-imageblock">
                   <div className="marquee__tags">
                     <TextScramble className="tag tag-s tag-medium mxd-scramble">
-                      Illustrations
+                      Ilustrações
                     </TextScramble>
                   </div>
                   <div className="marquee__image">
                     <Image
-                      alt="Azurio Template Image Example"
+                      alt="MINDSITE Template Image Example"
                       src="/img/cta/mar_09.webp"
                       width={800}
                       height={1200}
@@ -181,12 +181,12 @@ export default function MarqueeDivider() {
                 <div className="marquee__item item-imageblock">
                   <div className="marquee__tags">
                     <TextScramble className="tag tag-s tag-medium mxd-scramble">
-                      Video Production
+                      Produção de Vídeo
                     </TextScramble>
                   </div>
                   <div className="marquee__image">
                     <Image
-                      alt="Azurio Template Image Example"
+                      alt="MINDSITE Template Image Example"
                       src="/img/cta/mar_10.webp"
                       width={1200}
                       height={873}
@@ -197,12 +197,12 @@ export default function MarqueeDivider() {
                 <div className="marquee__item item-imageblock">
                   <div className="marquee__tags">
                     <TextScramble className="tag tag-s tag-medium mxd-scramble">
-                      Product Design
+                      Design de Produto
                     </TextScramble>
                   </div>
                   <div className="marquee__image">
                     <Image
-                      alt="Azurio Template Image Example"
+                      alt="MINDSITE Template Image Example"
                       src="/img/cta/mar_11.webp"
                       width={1200}
                       height={1200}
@@ -213,12 +213,12 @@ export default function MarqueeDivider() {
                 <div className="marquee__item item-imageblock">
                   <div className="marquee__tags">
                     <TextScramble className="tag tag-s tag-medium mxd-scramble">
-                      AI Experiments
+                      Experimentos com IA
                     </TextScramble>
                   </div>
                   <div className="marquee__image">
                     <Image
-                      alt="Azurio Template Image Example"
+                      alt="MINDSITE Template Image Example"
                       src="/img/cta/mar_12.webp"
                       width={1200}
                       height={685}
@@ -229,12 +229,12 @@ export default function MarqueeDivider() {
                 <div className="marquee__item item-imageblock">
                   <div className="marquee__tags">
                     <TextScramble className="tag tag-s tag-medium mxd-scramble">
-                      Brand Identity
+                      Identidade de Marca
                     </TextScramble>
                   </div>
                   <div className="marquee__image">
                     <Image
-                      alt="Azurio Template Image Example"
+                      alt="MINDSITE Template Image Example"
                       src="/img/cta/mar_13.webp"
                       width={700}
                       height={700}
@@ -245,12 +245,12 @@ export default function MarqueeDivider() {
                 <div className="marquee__item item-imageblock">
                   <div className="marquee__tags">
                     <TextScramble className="tag tag-s tag-medium mxd-scramble">
-                      Motion
+                      Animação
                     </TextScramble>
                   </div>
                   <div className="marquee__image">
                     <Image
-                      alt="Azurio Template Image Example"
+                      alt="MINDSITE Template Image Example"
                       src="/img/cta/mar_14.webp"
                       width={737}
                       height={1200}
@@ -261,12 +261,12 @@ export default function MarqueeDivider() {
                 <div className="marquee__item item-imageblock">
                   <div className="marquee__tags">
                     <TextScramble className="tag tag-s tag-medium mxd-scramble">
-                      Mobile Apps
+                      Aplicativos Mobile
                     </TextScramble>
                   </div>
                   <div className="marquee__image">
                     <Image
-                      alt="Azurio Template Image Example"
+                      alt="MINDSITE Template Image Example"
                       src="/img/cta/mar_15.webp"
                       width={800}
                       height={1200}
@@ -284,7 +284,7 @@ export default function MarqueeDivider() {
                 <div className="marquee__item item-imageblock">
                   <div className="marquee__image">
                     <Image
-                      alt="Azurio Template Image Example"
+                      alt="MINDSITE Template Image Example"
                       src="/img/cta/mar_15.webp"
                       width={800}
                       height={1200}
@@ -292,7 +292,7 @@ export default function MarqueeDivider() {
                   </div>
                   <div className="marquee__tags">
                     <TextScramble className="tag tag-s tag-medium mxd-scramble">
-                      Mobile Apps
+                      Aplicativos Mobile
                     </TextScramble>
                   </div>
                 </div>
@@ -300,7 +300,7 @@ export default function MarqueeDivider() {
                 <div className="marquee__item item-imageblock">
                   <div className="marquee__image">
                     <Image
-                      alt="Azurio Template Image Example"
+                      alt="MINDSITE Template Image Example"
                       src="/img/cta/mar_14.webp"
                       width={737}
                       height={1200}
@@ -308,7 +308,7 @@ export default function MarqueeDivider() {
                   </div>
                   <div className="marquee__tags">
                     <TextScramble className="tag tag-s tag-medium mxd-scramble">
-                      Motion
+                      Animação
                     </TextScramble>
                   </div>
                 </div>
@@ -316,7 +316,7 @@ export default function MarqueeDivider() {
                 <div className="marquee__item item-imageblock">
                   <div className="marquee__image">
                     <Image
-                      alt="Azurio Template Image Example"
+                      alt="MINDSITE Template Image Example"
                       src="/img/cta/mar_13.webp"
                       width={700}
                       height={700}
@@ -324,7 +324,7 @@ export default function MarqueeDivider() {
                   </div>
                   <div className="marquee__tags">
                     <TextScramble className="tag tag-s tag-medium mxd-scramble">
-                      Brand Identity
+                      Identidade de Marca
                     </TextScramble>
                   </div>
                 </div>
@@ -332,7 +332,7 @@ export default function MarqueeDivider() {
                 <div className="marquee__item item-imageblock">
                   <div className="marquee__image">
                     <Image
-                      alt="Azurio Template Image Example"
+                      alt="MINDSITE Template Image Example"
                       src="/img/cta/mar_12.webp"
                       width={1200}
                       height={685}
@@ -340,7 +340,7 @@ export default function MarqueeDivider() {
                   </div>
                   <div className="marquee__tags">
                     <TextScramble className="tag tag-s tag-medium mxd-scramble">
-                      AI Experiments
+                      Experimentos com IA
                     </TextScramble>
                   </div>
                 </div>
@@ -348,7 +348,7 @@ export default function MarqueeDivider() {
                 <div className="marquee__item item-imageblock">
                   <div className="marquee__image">
                     <Image
-                      alt="Azurio Template Image Example"
+                      alt="MINDSITE Template Image Example"
                       src="/img/cta/mar_11.webp"
                       width={1200}
                       height={1200}
@@ -356,7 +356,7 @@ export default function MarqueeDivider() {
                   </div>
                   <div className="marquee__tags">
                     <TextScramble className="tag tag-s tag-medium mxd-scramble">
-                      Product Design
+                      Design de Produto
                     </TextScramble>
                   </div>
                 </div>
@@ -364,7 +364,7 @@ export default function MarqueeDivider() {
                 <div className="marquee__item item-imageblock">
                   <div className="marquee__image">
                     <Image
-                      alt="Azurio Template Image Example"
+                      alt="MINDSITE Template Image Example"
                       src="/img/cta/mar_10.webp"
                       width={1200}
                       height={873}
@@ -372,7 +372,7 @@ export default function MarqueeDivider() {
                   </div>
                   <div className="marquee__tags">
                     <TextScramble className="tag tag-s tag-medium mxd-scramble">
-                      Video Production
+                      Produção de Vídeo
                     </TextScramble>
                   </div>
                 </div>
@@ -380,7 +380,7 @@ export default function MarqueeDivider() {
                 <div className="marquee__item item-imageblock">
                   <div className="marquee__image">
                     <Image
-                      alt="Azurio Template Image Example"
+                      alt="MINDSITE Template Image Example"
                       src="/img/cta/mar_09.webp"
                       width={800}
                       height={1200}
@@ -388,7 +388,7 @@ export default function MarqueeDivider() {
                   </div>
                   <div className="marquee__tags">
                     <TextScramble className="tag tag-s tag-medium mxd-scramble">
-                      Illustrations
+                      Ilustrações
                     </TextScramble>
                   </div>
                 </div>
@@ -396,7 +396,7 @@ export default function MarqueeDivider() {
                 <div className="marquee__item item-imageblock">
                   <div className="marquee__image">
                     <Image
-                      alt="Azurio Template Image Example"
+                      alt="MINDSITE Template Image Example"
                       src="/img/cta/mar_08.webp"
                       width={737}
                       height={1200}
@@ -404,7 +404,7 @@ export default function MarqueeDivider() {
                   </div>
                   <div className="marquee__tags">
                     <TextScramble className="tag tag-s tag-medium mxd-scramble">
-                      Motion
+                      Animação
                     </TextScramble>
                   </div>
                 </div>
@@ -412,7 +412,7 @@ export default function MarqueeDivider() {
                 <div className="marquee__item item-imageblock">
                   <div className="marquee__image">
                     <Image
-                      alt="Azurio Template Image Example"
+                      alt="MINDSITE Template Image Example"
                       src="/img/cta/mar_07.webp"
                       width={1200}
                       height={900}
@@ -420,7 +420,7 @@ export default function MarqueeDivider() {
                   </div>
                   <div className="marquee__tags">
                     <TextScramble className="tag tag-s tag-medium mxd-scramble">
-                      Packaging
+                      Embalagem
                     </TextScramble>
                   </div>
                 </div>
@@ -428,7 +428,7 @@ export default function MarqueeDivider() {
                 <div className="marquee__item item-imageblock">
                   <div className="marquee__image">
                     <Image
-                      alt="Azurio Template Image Example"
+                      alt="MINDSITE Template Image Example"
                       src="/img/cta/mar_06.webp"
                       width={1200}
                       height={1200}
@@ -436,7 +436,7 @@ export default function MarqueeDivider() {
                   </div>
                   <div className="marquee__tags">
                     <TextScramble className="tag tag-s tag-medium mxd-scramble">
-                      Digital Art
+                      Arte Digital
                     </TextScramble>
                   </div>
                 </div>
@@ -444,7 +444,7 @@ export default function MarqueeDivider() {
                 <div className="marquee__item item-imageblock">
                   <div className="marquee__image">
                     <Image
-                      alt="Azurio Template Image Example"
+                      alt="MINDSITE Template Image Example"
                       src="/img/cta/mar_05.webp"
                       width={800}
                       height={1200}
@@ -452,7 +452,7 @@ export default function MarqueeDivider() {
                   </div>
                   <div className="marquee__tags">
                     <TextScramble className="tag tag-s tag-medium mxd-scramble">
-                      Fashion
+                      Moda
                     </TextScramble>
                   </div>
                 </div>
@@ -460,7 +460,7 @@ export default function MarqueeDivider() {
                 <div className="marquee__item item-imageblock">
                   <div className="marquee__image">
                     <Image
-                      alt="Azurio Template Image Example"
+                      alt="MINDSITE Template Image Example"
                       src="/img/cta/mar_04.webp"
                       width={737}
                       height={1200}
@@ -468,7 +468,7 @@ export default function MarqueeDivider() {
                   </div>
                   <div className="marquee__tags">
                     <TextScramble className="tag tag-s tag-medium mxd-scramble">
-                      Illustrations
+                      Ilustrações
                     </TextScramble>
                   </div>
                 </div>
@@ -476,7 +476,7 @@ export default function MarqueeDivider() {
                 <div className="marquee__item item-imageblock">
                   <div className="marquee__image">
                     <Image
-                      alt="Azurio Template Image Example"
+                      alt="MINDSITE Template Image Example"
                       src="/img/cta/mar_03.webp"
                       width={700}
                       height={700}
@@ -484,7 +484,7 @@ export default function MarqueeDivider() {
                   </div>
                   <div className="marquee__tags">
                     <TextScramble className="tag tag-s tag-medium mxd-scramble">
-                      Development
+                      Desenvolvimento
                     </TextScramble>
                   </div>
                 </div>
@@ -492,7 +492,7 @@ export default function MarqueeDivider() {
                 <div className="marquee__item item-imageblock">
                   <div className="marquee__image">
                     <Image
-                      alt="Azurio Template Image Example"
+                      alt="MINDSITE Template Image Example"
                       src="/img/cta/mar_02.webp"
                       width={1200}
                       height={685}
@@ -500,7 +500,7 @@ export default function MarqueeDivider() {
                   </div>
                   <div className="marquee__tags">
                     <TextScramble className="tag tag-s tag-medium mxd-scramble">
-                      3D Models
+                      Modelagem 3D
                     </TextScramble>
                   </div>
                 </div>
@@ -508,7 +508,7 @@ export default function MarqueeDivider() {
                 <div className="marquee__item item-imageblock">
                   <div className="marquee__image">
                     <Image
-                      alt="Azurio Template Image Example"
+                      alt="MINDSITE Template Image Example"
                       src="/img/cta/mar_01.webp"
                       width={1200}
                       height={1200}
@@ -516,7 +516,7 @@ export default function MarqueeDivider() {
                   </div>
                   <div className="marquee__tags">
                     <TextScramble className="tag tag-s tag-medium mxd-scramble">
-                      Photography
+                      Fotografia
                     </TextScramble>
                   </div>
                 </div>

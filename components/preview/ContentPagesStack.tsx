@@ -93,7 +93,7 @@ export default function ContentPagesStack() {
                               <div className="demo-card__image fullheight">
                                 <Image
                                   className="img-01"
-                                  alt="Azurio Template Sample Image"
+                                  alt="MINDSITE Template Sample Image"
                                   src="/img/demo/01_pages-img.webp"
                                   width={1400}
                                   height={1236}
@@ -120,7 +120,7 @@ export default function ContentPagesStack() {
                               <div className="demo-card__image fullheight">
                                 <Image
                                   className="img-02"
-                                  alt="Azurio Template Sample Image"
+                                  alt="MINDSITE Template Sample Image"
                                   src="/img/demo/02_pages-img.webp"
                                   width={1400}
                                   height={1183}

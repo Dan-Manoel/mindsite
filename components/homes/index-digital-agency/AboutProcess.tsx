@@ -21,17 +21,17 @@ export default function AboutProcess() {
                   <div className="col-12 mxd-grid-item">
                     <div className="mxd-section-manifest__wrap wrap-text-m">
                       <div className="mxd-section-manifest__text manifest-text-m">
-                        <Link data-cursor-text="About us" href={`/about-me`}>
+                        <Link data-cursor-text="Sobre nós" href={`/about-me`}>
                           <CommonAnimatedText
                             as="span"
                             className="manifest manifest-m manifest-accent mxd-split-lines active-cursor-permanent"
                             animation="splitLines"
                           >
-                            We are a creative web agency specializing in
-                            innovative design and cutting-edge development.
+                            Somos uma agência digital criativa especializada em
+                            design inovador e desenvolvimento de ponta.
                             <span>
-                              We help businesses stand out and thrive in the
-                              modern landscape.
+                              Ajudamos empresas a se destacarem e prosperarem
+                              no cenário moderno.
                             </span>
                           </CommonAnimatedText>
                         </Link>
@@ -59,18 +59,18 @@ export default function AboutProcess() {
                       <div className="mxd-process-points__icon accent">
                         <i className="ph ph-crosshair" />
                       </div>
-                      <p className="accent">Strategy</p>
+                      <p className="accent">Estratégia</p>
                     </div>
                     <div className="mxd-process-points__descr">
                       <p className="t-medium t-accent">
-                        Discover how artificial intelligence is transforming
-                        artistic processes, pushing boundaries, and inspiring
-                        new possibilities in digital design.
+                        Descubra como a inteligência artificial está transformando
+                        processos artísticos, expandindo limites e inspirando
+                        novas possibilidades no design digital.
                       </p>
                     </div>
                     <div className="mxd-process-points__time">
                       <span className="tag tag-m tag-permanent">
-                        1-2 weeks timeline
+                        Prazo de 1-2 semanas
                       </span>
                     </div>
                   </CommonCardBatchAnimated>
@@ -93,14 +93,14 @@ export default function AboutProcess() {
                     </div>
                     <div className="mxd-process-points__descr">
                       <p className="t-medium t-accent">
-                        Discover how artificial intelligence is transforming
-                        artistic processes, pushing boundaries, and inspiring
-                        new possibilities in digital design.
+                        Descubra como a inteligência artificial está transformando
+                        processos artísticos, expandindo limites e inspirando
+                        novas possibilidades no design digital.
                       </p>
                     </div>
                     <div className="mxd-process-points__time">
                       <span className="tag tag-m tag-permanent">
-                        ~2 weeks timeline
+                        Prazo de ~2 semanas
                       </span>
                     </div>
                   </CommonCardBatchAnimated>
@@ -119,18 +119,18 @@ export default function AboutProcess() {
                       <div className="mxd-process-points__icon accent">
                         <i className="ph ph-codesandbox-logo" />
                       </div>
-                      <p className="accent">Development</p>
+                      <p className="accent">Desenvolvimento</p>
                     </div>
                     <div className="mxd-process-points__descr">
                       <p className="t-medium t-accent">
-                        Discover how artificial intelligence is transforming
-                        artistic processes, pushing boundaries, and inspiring
-                        new possibilities in digital design.
+                        Descubra como a inteligência artificial está transformando
+                        processos artísticos, expandindo limites e inspirando
+                        novas possibilidades no design digital.
                       </p>
                     </div>
                     <div className="mxd-process-points__time">
                       <span className="tag tag-m tag-permanent">
-                        3-4 weeks timeline
+                        Prazo de 3-4 semanas
                       </span>
                     </div>
                     <CommonScrollAnimated

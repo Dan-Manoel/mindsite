@@ -59,7 +59,7 @@ export default function Footer1() {
                     {/* logo text */}
                     <div className="mxd-logo__text">
                       <TextScramble className="mxd-scramble">
-                        Azurio
+                        MINDSITE
                       </TextScramble>
                       <TextScramble className="mxd-scramble">
                         Template
@@ -73,7 +73,7 @@ export default function Footer1() {
                     className="t-bold t-large t-120 mxd-split-lines-reverse"
                     animation="splitLinesReverse"
                   >
-                    New Azurio template is here!
+                    New MINDSITE template is here!
                     <span>
                       Showcase your projects, services and expertise with
                       impact.
@@ -87,7 +87,7 @@ export default function Footer1() {
                 >
                   <a
                     className="btn btn-default-icon-small btn-default-fullwidth-mobile btn-default-accent slide-right"
-                    href="https://themeforest.net/item/azurio-digital-agency-personal-portfolio-nextjs-template/63087539?s_rank=1"
+                    href="https://themeforest.net/item/MINDSITE-digital-agency-personal-portfolio-nextjs-template/63087539?s_rank=1"
                     target="_blank"
                     rel="noopener noreferrer"
                   >
@@ -249,7 +249,7 @@ export default function Footer1() {
             >
               <Image
                 className="mxd-move-slow"
-                alt="Azurio Footer Decoration Image"
+                alt="MINDSITE Footer Decoration Image"
                 src="/img/demo/planet-01.webp"
                 width={400}
                 height={404}
@@ -278,7 +278,7 @@ export default function Footer1() {
             >
               <Image
                 className="mxd-move"
-                alt="Azurio Footer Decoration Image"
+                alt="MINDSITE Footer Decoration Image"
                 src="/img/demo/planet-02.webp"
                 width={250}
                 height={255}
@@ -315,7 +315,7 @@ export default function Footer1() {
                     animation="fadeIn"
                   >
                     <p className="footer-data bright">
-                      <span>Copyright Azurio. All rights reserved</span>
+                      <span>Copyright MINDSITE. All rights reserved</span>
                     </p>
                   </CommonScrollAnimated>
                 </div>
@@ -328,19 +328,7 @@ export default function Footer1() {
                           as="div"
                           animation="fadeIn"
                         >
-                          <p className="footer-data bright">
-                            <span>
-                              React Nextjs Template by&nbsp;
-                              <a
-                                href="https://themeforest.net/user/ib-themes"
-                                target="_blank"
-                              >
-                                <TextScramble className="mxd-scramble">
-                                  IB Themes
-                                </TextScramble>
-                              </a>
-                            </span>
-                          </p>
+                          
                         </CommonScrollAnimated>
                       </div>
                       <div className="col-12 col-xl-6 mxd-grid-item">

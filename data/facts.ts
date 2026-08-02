@@ -4,21 +4,21 @@ export const softwareDevelopmentCompanyFacts: FactItem[] = [
   {
     id: "stats-counter-1",
     value: "50+",
-    caption: "Happy clients who trust our work",
+    caption: "Clientes satisfeitos que confiam no nosso trabalho",
   },
   {
     id: "stats-counter-2",
     value: "86%",
-    caption: "Clients come back for a new projects",
+    caption: "Clientes recorrentes para novos projetos",
   },
   {
     id: "stats-counter-3",
     value: "5+",
-    caption: "Years of professional experience",
+    caption: "Anos de experiência profissional",
   },
   {
     id: "stats-counter-4",
     value: "70+",
-    caption: "Successfully completed projects",
+    caption: "Projetos concluídos com sucesso",
   },
 ];

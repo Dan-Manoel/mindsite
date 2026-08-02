@@ -29,9 +29,9 @@ export default function BlogPreview() {
                         className="mxd-split-lines"
                         animation="splitLines"
                       >
-                        Featured
+                        Últimas
                         <br />
-                        news
+                        notícias
                       </CommonAnimatedText>
                     </div>
                   </div>
@@ -47,7 +47,7 @@ export default function BlogPreview() {
                           href={`/blog-standard`}
                         >
                           <TextScramble className="btn-caption mxd-scramble">
-                            News Overview
+                            Ver Artigos
                           </TextScramble>
                         </Link>
                       </CommonScrollAnimated>
@@ -57,10 +57,10 @@ export default function BlogPreview() {
                           className="t-bold t-large mxd-split-lines"
                           animation="splitLines"
                         >
-                          Inspiring ideas, creative insights, and the latest in
-                          design and tech.
+                          Ideias inspiradoras, insights criativos e as novidades em
+                          design e tecnologia.
                           <span>
-                            Fueling innovation for your digital journey.
+                            Impulsionando a inovação na sua jornada digital.
                           </span>
                         </CommonAnimatedText>
                       </div>
@@ -83,11 +83,11 @@ export default function BlogPreview() {
                     columns={4}
                   >
                     <div className="mxd-blog-item__date">
-                      <span className="meta-date">02 February, 2026</span>
+                      <span className="meta-date">02 de Fevereiro de 2026</span>
                     </div>
                     <Link
                       className="mxd-blog-item__media active-cursor-permanent"
-                      data-cursor-text="Read Post"
+                      data-cursor-text="Ler Artigo"
                       href={`/blog-article`}
                     >
                       <Image
@@ -101,7 +101,7 @@ export default function BlogPreview() {
                     <div className="mxd-blog-item__caption">
                       <div className="mxd-blog-item__title">
                         <Link className="blog-name-s" href={`/blog-article`}>
-                          Frontend innovations and user journeys
+                          Inovações no Frontend e jornada do usuário
                         </Link>
                       </div>
                     </div>
@@ -113,11 +113,11 @@ export default function BlogPreview() {
                     columns={4}
                   >
                     <div className="mxd-blog-item__date">
-                      <span className="meta-date">28 January, 2026</span>
+                      <span className="meta-date">28 de Janeiro de 2026</span>
                     </div>
                     <Link
                       className="mxd-blog-item__media active-cursor-permanent"
-                      data-cursor-text="Read Post"
+                      data-cursor-text="Ler Artigo"
                       href={`/blog-article`}
                     >
                       <Image
@@ -131,7 +131,7 @@ export default function BlogPreview() {
                     <div className="mxd-blog-item__caption">
                       <div className="mxd-blog-item__title">
                         <Link className="blog-name-s" href={`/blog-article`}>
-                          Branding in creating digital experiences
+                          O poder do branding em experiências digitais
                         </Link>
                       </div>
                     </div>
@@ -143,11 +143,11 @@ export default function BlogPreview() {
                     columns={4}
                   >
                     <div className="mxd-blog-item__date">
-                      <span className="meta-date">15 January, 2026</span>
+                      <span className="meta-date">15 de Janeiro de 2026</span>
                     </div>
                     <Link
                       className="mxd-blog-item__media active-cursor-permanent"
-                      data-cursor-text="Read Post"
+                      data-cursor-text="Ler Artigo"
                       href={`/blog-article`}
                     >
                       <Image
@@ -161,7 +161,7 @@ export default function BlogPreview() {
                     <div className="mxd-blog-item__caption">
                       <div className="mxd-blog-item__title">
                         <Link className="blog-name-s" href={`/blog-article`}>
-                          Elevating digital workshops with engaging design
+                          Elevando workshops digitais com design envolvente
                         </Link>
                       </div>
                     </div>
@@ -173,11 +173,11 @@ export default function BlogPreview() {
                     columns={4}
                   >
                     <div className="mxd-blog-item__date">
-                      <span className="meta-date">03 January, 2026</span>
+                      <span className="meta-date">03 de Janeiro de 2026</span>
                     </div>
                     <Link
                       className="mxd-blog-item__media active-cursor-permanent"
-                      data-cursor-text="Read Post"
+                      data-cursor-text="Ler Artigo"
                       href={`/blog-article`}
                     >
                       <Image
@@ -191,7 +191,7 @@ export default function BlogPreview() {
                     <div className="mxd-blog-item__caption">
                       <div className="mxd-blog-item__title">
                         <Link className="blog-name-s" href={`/blog-article`}>
-                          Designing for the future of interactive digital spaces
+                          Design para o futuro dos espaços digitais interativos
                         </Link>
                       </div>
                     </div>

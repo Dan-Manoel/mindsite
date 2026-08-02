@@ -41,7 +41,7 @@ export default function Hero() {
                 href={`/project-details`}
               >
                 <Image
-                  alt="Azurio Template Sample Image"
+                  alt="MINDSITE Template Sample Image"
                   src="/img/hero/hero-03_1.webp"
                   width={1280}
                   height={800}
@@ -49,7 +49,7 @@ export default function Hero() {
               </CommonHero3DImage>
               <CommonHero3DImage index={1} className="hero-02__img">
                 <Image
-                  alt="Azurio Template Sample Image"
+                  alt="MINDSITE Template Sample Image"
                   src="/img/hero/hero-03_2.webp"
                   width={1280}
                   height={800}
@@ -57,7 +57,7 @@ export default function Hero() {
               </CommonHero3DImage>
               <CommonHero3DImage index={2} className="hero-02__img">
                 <Image
-                  alt="Azurio Template Sample Image"
+                  alt="MINDSITE Template Sample Image"
                   src="/img/hero/hero-03_3.webp"
                   width={1280}
                   height={800}
@@ -65,7 +65,7 @@ export default function Hero() {
               </CommonHero3DImage>
               <CommonHero3DImage index={3} className="hero-02__img">
                 <Image
-                  alt="Azurio Template Sample Image"
+                  alt="MINDSITE Template Sample Image"
                   src="/img/hero/hero-03_4.webp"
                   width={1280}
                   height={800}
@@ -73,7 +73,7 @@ export default function Hero() {
               </CommonHero3DImage>
               <CommonHero3DImage index={4} className="hero-02__img">
                 <Image
-                  alt="Azurio Template Sample Image"
+                  alt="MINDSITE Template Sample Image"
                   src="/img/hero/hero-03_5.webp"
                   width={1280}
                   height={800}
@@ -81,7 +81,7 @@ export default function Hero() {
               </CommonHero3DImage>
               <CommonHero3DImage index={5} className="hero-02__img">
                 <Image
-                  alt="Azurio Template Sample Image"
+                  alt="MINDSITE Template Sample Image"
                   src="/img/hero/hero-03_6.webp"
                   width={1280}
                   height={800}
@@ -89,7 +89,7 @@ export default function Hero() {
               </CommonHero3DImage>
               <CommonHero3DImage index={6} className="hero-02__img">
                 <Image
-                  alt="Azurio Template Sample Image"
+                  alt="MINDSITE Template Sample Image"
                   src="/img/hero/hero-03_7.webp"
                   width={1280}
                   height={800}
@@ -97,7 +97,7 @@ export default function Hero() {
               </CommonHero3DImage>
               <CommonHero3DImage index={7} className="hero-02__img">
                 <Image
-                  alt="Azurio Template Sample Image"
+                  alt="MINDSITE Template Sample Image"
                   src="/img/hero/hero-03_8.webp"
                   width={1280}
                   height={800}
@@ -105,7 +105,7 @@ export default function Hero() {
               </CommonHero3DImage>
               <CommonHero3DImage index={8} className="hero-02__img">
                 <Image
-                  alt="Azurio Template Sample Image"
+                  alt="MINDSITE Template Sample Image"
                   src="/img/hero/hero-03_9.webp"
                   width={1280}
                   height={800}
@@ -113,7 +113,7 @@ export default function Hero() {
               </CommonHero3DImage>
               <CommonHero3DImage index={9} className="hero-02__img">
                 <Image
-                  alt="Azurio Template Sample Image"
+                  alt="MINDSITE Template Sample Image"
                   src="/img/hero/hero-03_10.webp"
                   width={1280}
                   height={800}
@@ -121,7 +121,7 @@ export default function Hero() {
               </CommonHero3DImage>
               <CommonHero3DImage index={10} className="hero-02__img">
                 <Image
-                  alt="Azurio Template Sample Image"
+                  alt="MINDSITE Template Sample Image"
                   src="/img/hero/hero-03_11.webp"
                   width={1280}
                   height={800}
@@ -129,7 +129,7 @@ export default function Hero() {
               </CommonHero3DImage>
               <CommonHero3DImage index={11} className="hero-02__img">
                 <Image
-                  alt="Azurio Template Sample Image"
+                  alt="MINDSITE Template Sample Image"
                   src="/img/hero/hero-03_12.webp"
                   width={1280}
                   height={800}
@@ -137,7 +137,7 @@ export default function Hero() {
               </CommonHero3DImage>
               <CommonHero3DImage index={12} className="hero-02__img">
                 <Image
-                  alt="Azurio Template Sample Image"
+                  alt="MINDSITE Template Sample Image"
                   src="/img/hero/hero-03_13.webp"
                   width={1280}
                   height={800}
@@ -145,7 +145,7 @@ export default function Hero() {
               </CommonHero3DImage>
               <CommonHero3DImage index={13} className="hero-02__img">
                 <Image
-                  alt="Azurio Template Sample Image"
+                  alt="MINDSITE Template Sample Image"
                   src="/img/hero/hero-03_14.webp"
                   width={1280}
                   height={800}
@@ -153,7 +153,7 @@ export default function Hero() {
               </CommonHero3DImage>
               <CommonHero3DImage index={14} className="hero-02__img">
                 <Image
-                  alt="Azurio Template Sample Image"
+                  alt="MINDSITE Template Sample Image"
                   src="/img/hero/hero-03_15.webp"
                   width={1280}
                   height={800}
@@ -161,7 +161,7 @@ export default function Hero() {
               </CommonHero3DImage>
               <CommonHero3DImage index={15} className="hero-02__img">
                 <Image
-                  alt="Azurio Template Sample Image"
+                  alt="MINDSITE Template Sample Image"
                   src="/img/hero/hero-03_16.webp"
                   width={1280}
                   height={800}
@@ -169,7 +169,7 @@ export default function Hero() {
               </CommonHero3DImage>
               <CommonHero3DImage index={16} className="hero-02__img">
                 <Image
-                  alt="Azurio Template Sample Image"
+                  alt="MINDSITE Template Sample Image"
                   src="/img/hero/hero-03_17.webp"
                   width={1280}
                   height={800}
@@ -177,7 +177,7 @@ export default function Hero() {
               </CommonHero3DImage>
               <CommonHero3DImage index={17} className="hero-02__img">
                 <Image
-                  alt="Azurio Template Sample Image"
+                  alt="MINDSITE Template Sample Image"
                   src="/img/hero/hero-03_18.webp"
                   width={1280}
                   height={800}
@@ -185,7 +185,7 @@ export default function Hero() {
               </CommonHero3DImage>
               <CommonHero3DImage index={18} className="hero-02__img">
                 <Image
-                  alt="Azurio Template Sample Image"
+                  alt="MINDSITE Template Sample Image"
                   src="/img/hero/hero-03_19.webp"
                   width={1280}
                   height={800}
@@ -193,7 +193,7 @@ export default function Hero() {
               </CommonHero3DImage>
               <CommonHero3DImage index={19} className="hero-02__img">
                 <Image
-                  alt="Azurio Template Sample Image"
+                  alt="MINDSITE Template Sample Image"
                   src="/img/hero/hero-03_20.webp"
                   width={1280}
                   height={800}
@@ -279,7 +279,7 @@ export default function Hero() {
                       targetId="about"
                     >
                       <TextScramble className="btn-caption mxd-scramble">
-                        Scroll to explore
+                        Role para explorar
                       </TextScramble>
                       <i>
                         <svg
@@ -298,7 +298,7 @@ export default function Hero() {
             {/* cover image */}
             <CommonHero3DCover className="mxd-hero-02__cover-img">
               <Image
-                alt="Azurio Template Sample Image"
+                alt="MINDSITE Template Sample Image"
                 src="/img/hero/hero-03_cover.webp"
                 width={1920}
                 height={1200}
@@ -309,13 +309,13 @@ export default function Hero() {
             <div className="mxd-hero-02__intro">
               <CommonHero3DIntroText>
                 <h1 className="medium permanent">
-                  Design, tech &amp; some magic
+                  Design, tecnologia &amp; um pouco de magia
                 </h1>
               </CommonHero3DIntroText>
             </div>
             <div className="mxd-hero-02__outro">
               <CommonHero3DOutroText>
-                <p>Ready for the game changing project?</p>
+                <p>Pronto para um projeto revolucionário?</p>
               </CommonHero3DOutroText>
             </div>
           </CommonHero3DImages>

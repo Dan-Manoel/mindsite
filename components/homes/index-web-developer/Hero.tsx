@@ -38,12 +38,12 @@ export default function Hero() {
                         {/* single item */}
                         <Link
                           className="marquee__item item-hero active-cursor-permanent"
-                          data-cursor-text="View Work"
+                          data-cursor-text="Ver Projeto"
                           href={`/project-details`}
                         >
                           <div className="marquee__image">
                             <Image
-                              alt="Azurio Template Image Example"
+                              alt="MINDSITE Template Image Example"
                               src="/img/cta/mar_15.webp"
                               width={800}
                               height={1200}
@@ -54,12 +54,12 @@ export default function Hero() {
                         {/* single item */}
                         <Link
                           className="marquee__item item-hero active-cursor-permanent"
-                          data-cursor-text="View Work"
+                          data-cursor-text="Ver Projeto"
                           href={`/project-details`}
                         >
                           <div className="marquee__image">
                             <Image
-                              alt="Azurio Template Image Example"
+                              alt="MINDSITE Template Image Example"
                               src="/img/cta/mar_14.webp"
                               width={737}
                               height={1200}
@@ -69,12 +69,12 @@ export default function Hero() {
                         {/* single item */}
                         <Link
                           className="marquee__item item-hero active-cursor-permanent"
-                          data-cursor-text="View Work"
+                          data-cursor-text="Ver Projeto"
                           href={`/project-details`}
                         >
                           <div className="marquee__image">
                             <Image
-                              alt="Azurio Template Image Example"
+                              alt="MINDSITE Template Image Example"
                               src="/img/cta/mar_13.webp"
                               width={700}
                               height={700}
@@ -84,12 +84,12 @@ export default function Hero() {
                         {/* single item */}
                         <Link
                           className="marquee__item item-hero active-cursor-permanent"
-                          data-cursor-text="View Work"
+                          data-cursor-text="Ver Projeto"
                           href={`/project-details`}
                         >
                           <div className="marquee__image">
                             <Image
-                              alt="Azurio Template Image Example"
+                              alt="MINDSITE Template Image Example"
                               src="/img/cta/mar_12.webp"
                               width={1200}
                               height={685}
@@ -99,12 +99,12 @@ export default function Hero() {
                         {/* single item */}
                         <Link
                           className="marquee__item item-hero active-cursor-permanent"
-                          data-cursor-text="View Work"
+                          data-cursor-text="Ver Projeto"
                           href={`/project-details`}
                         >
                           <div className="marquee__image">
                             <Image
-                              alt="Azurio Template Image Example"
+                              alt="MINDSITE Template Image Example"
                               src="/img/cta/mar_11.webp"
                               width={1200}
                               height={1200}
@@ -114,12 +114,12 @@ export default function Hero() {
                         {/* single item */}
                         <Link
                           className="marquee__item item-hero active-cursor-permanent"
-                          data-cursor-text="View Work"
+                          data-cursor-text="Ver Projeto"
                           href={`/project-details`}
                         >
                           <div className="marquee__image">
                             <Image
-                              alt="Azurio Template Image Example"
+                              alt="MINDSITE Template Image Example"
                               src="/img/cta/mar_10.webp"
                               width={1200}
                               height={873}
@@ -129,12 +129,12 @@ export default function Hero() {
                         {/* single item */}
                         <Link
                           className="marquee__item item-hero active-cursor-permanent"
-                          data-cursor-text="View Work"
+                          data-cursor-text="Ver Projeto"
                           href={`/project-details`}
                         >
                           <div className="marquee__image">
                             <Image
-                              alt="Azurio Template Image Example"
+                              alt="MINDSITE Template Image Example"
                               src="/img/cta/mar_09.webp"
                               width={800}
                               height={1200}
@@ -144,12 +144,12 @@ export default function Hero() {
                         {/* single item */}
                         <Link
                           className="marquee__item item-hero active-cursor-permanent"
-                          data-cursor-text="View Work"
+                          data-cursor-text="Ver Projeto"
                           href={`/project-details`}
                         >
                           <div className="marquee__image">
                             <Image
-                              alt="Azurio Template Image Example"
+                              alt="MINDSITE Template Image Example"
                               src="/img/cta/mar_08.webp"
                               width={737}
                               height={1200}
@@ -159,12 +159,12 @@ export default function Hero() {
                         {/* single item */}
                         <Link
                           className="marquee__item item-hero active-cursor-permanent"
-                          data-cursor-text="View Work"
+                          data-cursor-text="Ver Projeto"
                           href={`/project-details`}
                         >
                           <div className="marquee__image">
                             <Image
-                              alt="Azurio Template Image Example"
+                              alt="MINDSITE Template Image Example"
                               src="/img/cta/mar_07.webp"
                               width={1200}
                               height={900}
@@ -174,12 +174,12 @@ export default function Hero() {
                         {/* single item */}
                         <Link
                           className="marquee__item item-hero active-cursor-permanent"
-                          data-cursor-text="View Work"
+                          data-cursor-text="Ver Projeto"
                           href={`/project-details`}
                         >
                           <div className="marquee__image">
                             <Image
-                              alt="Azurio Template Image Example"
+                              alt="MINDSITE Template Image Example"
                               src="/img/cta/mar_06.webp"
                               width={1200}
                               height={1200}
@@ -198,7 +198,7 @@ export default function Hero() {
                         <div className="mxd-hero__mark loading-fade">
                           <span className="mark-icon" />
                           <span className="mark-text">
-                            Available for freelance
+                            Disponível para projetos
                           </span>
                         </div>
                       </CommonLoadFade>
@@ -208,10 +208,10 @@ export default function Hero() {
                           className="t-bold t-large loading-split"
                           animation="splitLinesLoad"
                         >
-                          I am Alex Walker.
+                          Eu sou Danilo Oliveira.
                           <span>
-                            I&apos;m passionate about crafting designs that tell
-                            stories, spark emotions, and make an impact.
+                            Sou apaixonado por criar designs e aplicações web que contam
+                            histórias, despertam emoções e geram impacto.
                           </span>
                         </CommonAnimatedText>
                       </div>
@@ -293,7 +293,7 @@ export default function Hero() {
                         targetId="works"
                       >
                         <TextScramble className="btn-caption mxd-scramble">
-                          Scroll to explore
+                          Role para explorar
                         </TextScramble>
                         <i>
                           <svg

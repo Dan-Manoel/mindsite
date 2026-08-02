@@ -12,7 +12,7 @@ import {
 
 const MARQUEE_WORDS = [
   "Design/",
-  "Development/",
+  "Desenvolvimento/",
   "Branding/",
   "eCommerce/",
   "Marketing/",
@@ -32,36 +32,36 @@ type CreativeServiceCard = {
 const CREATIVE_SERVICE_CARDS: CreativeServiceCard[] = [
   {
     key: "innovative-design",
-    leftTags: ["UI/UX", "Web design", "Applications", "Print design"],
-    rightTags: ["Packaging", "Logo design", "Motion", "3D models"],
-    titleLines: ["Innovative", "design"],
+    leftTags: ["UI/UX", "Web design", "Aplicativos", "Design impresso"],
+    rightTags: ["Embalagem", "Design de Logo", "Animação", "Modelagem 3D"],
+    titleLines: ["Design", "inovador"],
     imageSrc: "/img/services/services-stack/pr01.webp",
     imageWidth: 1920,
     imageHeight: 1180,
   },
   {
     key: "creative-development",
-    leftTags: ["Frontend", "Interactions", "Backend", "E-Commerce"],
-    rightTags: ["Mobile Apps", "Maintenance", "Updates", "Support"],
-    titleLines: ["Creative", "development"],
+    leftTags: ["Frontend", "Interações", "Backend", "E-Commerce"],
+    rightTags: ["Apps Mobile", "Manutenção", "Atualizações", "Suporte"],
+    titleLines: ["Desenvolvimento", "criativo"],
     imageSrc: "/img/services/services-stack/pr02.webp",
     imageWidth: 1920,
     imageHeight: 1180,
   },
   {
     key: "brand-identity",
-    leftTags: ["Brand strategy", "Logo design", "Guidelines"],
-    rightTags: ["Visual identity", "Rebranding", "Support"],
-    titleLines: ["Brand Identity"],
+    leftTags: ["Estratégia de marca", "Design de Logo", "Guia de marca"],
+    rightTags: ["Identidade visual", "Rebranding", "Suporte"],
+    titleLines: ["Identidade de Marca"],
     imageSrc: "/img/services/services-stack/pr03.webp",
     imageWidth: 1920,
     imageHeight: 1180,
   },
   {
     key: "marketing-solutions",
-    leftTags: ["Strategy", "Social media", "SEO"],
-    rightTags: ["Optimization", "Email", "Campaigns"],
-    titleLines: ["Marketing", "solutions"],
+    leftTags: ["Estratégia", "Redes sociais", "SEO"],
+    rightTags: ["Otimização", "Email", "Campanhas"],
+    titleLines: ["Soluções de", "Marketing"],
     imageSrc: "/img/services/services-stack/pr04.webp",
     imageWidth: 1920,
     imageHeight: 1180,
@@ -237,7 +237,7 @@ export default function ServicesStack() {
                       </div>
                       <Link
                         className="card__title active-cursor-permanent"
-                        data-cursor-text="Know More"
+                        data-cursor-text="Saiba Mais"
                         href="/services"
                       >
                         <p

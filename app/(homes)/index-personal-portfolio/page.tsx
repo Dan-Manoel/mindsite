@@ -13,9 +13,8 @@ import ParallaxDividerVideo from "@/components/homes/index-personal-portfolio/Pa
 import BlogPreview from "@/components/homes/index-personal-portfolio/BlogPreview";
 import CTA from "@/components/homes/index-personal-portfolio/CTA";
 export const metadata: Metadata = {
-  title:
-    "Index Personal Portfolio | Azurio - Digital Agency & Portfolio NextJs Template",
-  description: "Azurio - Digital Agency & Portfolio NextJs Template",
+  title: "Portfólio Pessoal | Mindsite - Agência Digital",
+  description: "A infraestrutura que o seu negócio precisa para escalar. Descubra como o Mindsite otimiza seu ecossistema digital do início ao fim.",
 };
 export default function IndexPersonalPortfolioPage() {
   return (
@@ -26,7 +25,7 @@ export default function IndexPersonalPortfolioPage() {
         <ProjectsGrid />
         <ParallaxDividerImage2 />
         <StatisticsLines />
-        <DividerStickyImages ctaHref="/about-me" ctaLabel="My Approach" />
+        <DividerStickyImages ctaHref="/about-me" ctaLabel="Minha Abordagem" />
         <MyExpertise />
         <ParallaxDividerImage3 />
         <Resume />

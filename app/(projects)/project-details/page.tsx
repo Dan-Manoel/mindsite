@@ -11,9 +11,8 @@ import ClientSFeedback from "@/components/projects/project-details/ClientSFeedba
 import NextProjectLink from "@/components/projects/project-details/NextProjectLink";
 import CTAWithMarquee from "@/components/projects/project-details/CTAWithMarquee";
 export const metadata: Metadata = {
-  title:
-    "Project Details | Azurio - Digital Agency & Portfolio NextJs Template",
-  description: "Azurio - Digital Agency & Portfolio NextJs Template",
+  title: "Project Details | Mindsite - Agencia digital",
+  description: "A infraestrutura que o seu negócio precisa para escalar. Descubra como o Mindsite otimiza seu ecossistema digital do início ao fim.",
 };
 export default function ProjectDetailsPage() {
   return (

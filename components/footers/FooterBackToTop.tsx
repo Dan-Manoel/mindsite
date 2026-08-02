@@ -8,7 +8,7 @@ export default function FooterBackToTop() {
   return (
     <BackToTop className="btn btn-line-icon btn-line-default slide-up">
       <TextScramble className="btn-caption mxd-scramble">
-        Back to Top
+        Voltar ao topo
       </TextScramble>
       <i>
         <svg

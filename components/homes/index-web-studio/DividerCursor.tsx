@@ -22,7 +22,7 @@ export default function DividerCursor() {
               <CommonCursorTrailImage
                 index={0}
                 className="mxd-trail-transparent-image"
-                alt="Azurio Template Cursor Trail Image"
+                alt="MINDSITE Template Cursor Trail Image"
                 src="/img/cursor-trail-transparent/01_trail.webp"
                 width={400}
                 height={521}
@@ -30,7 +30,7 @@ export default function DividerCursor() {
               <CommonCursorTrailImage
                 index={1}
                 className="mxd-trail-transparent-image"
-                alt="Azurio Template Cursor Trail Image"
+                alt="MINDSITE Template Cursor Trail Image"
                 src="/img/cursor-trail-transparent/02_trail.webp"
                 width={412}
                 height={400}
@@ -38,7 +38,7 @@ export default function DividerCursor() {
               <CommonCursorTrailImage
                 index={2}
                 className="mxd-trail-transparent-image"
-                alt="Azurio Template Cursor Trail Image"
+                alt="MINDSITE Template Cursor Trail Image"
                 src="/img/cursor-trail-transparent/03_trail.webp"
                 width={485}
                 height={400}
@@ -46,7 +46,7 @@ export default function DividerCursor() {
               <CommonCursorTrailImage
                 index={3}
                 className="mxd-trail-transparent-image"
-                alt="Azurio Template Cursor Trail Image"
+                alt="MINDSITE Template Cursor Trail Image"
                 src="/img/cursor-trail-transparent/04_trail.webp"
                 width={530}
                 height={400}
@@ -54,7 +54,7 @@ export default function DividerCursor() {
               <CommonCursorTrailImage
                 index={4}
                 className="mxd-trail-transparent-image"
-                alt="Azurio Template Cursor Trail Image"
+                alt="MINDSITE Template Cursor Trail Image"
                 src="/img/cursor-trail-transparent/05_trail.webp"
                 width={400}
                 height={520}
@@ -62,7 +62,7 @@ export default function DividerCursor() {
               <CommonCursorTrailImage
                 index={5}
                 className="mxd-trail-transparent-image"
-                alt="Azurio Template Cursor Trail Image"
+                alt="MINDSITE Template Cursor Trail Image"
                 src="/img/cursor-trail-transparent/06_trail.webp"
                 width={407}
                 height={400}
@@ -70,7 +70,7 @@ export default function DividerCursor() {
               <CommonCursorTrailImage
                 index={6}
                 className="mxd-trail-transparent-image"
-                alt="Azurio Template Cursor Trail Image"
+                alt="MINDSITE Template Cursor Trail Image"
                 src="/img/cursor-trail-transparent/07_trail.webp"
                 width={400}
                 height={480}
@@ -78,7 +78,7 @@ export default function DividerCursor() {
               <CommonCursorTrailImage
                 index={7}
                 className="mxd-trail-transparent-image"
-                alt="Azurio Template Cursor Trail Image"
+                alt="MINDSITE Template Cursor Trail Image"
                 src="/img/cursor-trail-transparent/08_trail.webp"
                 width={637}
                 height={400}
@@ -86,7 +86,7 @@ export default function DividerCursor() {
               <CommonCursorTrailImage
                 index={8}
                 className="mxd-trail-transparent-image"
-                alt="Azurio Template Cursor Trail Image"
+                alt="MINDSITE Template Cursor Trail Image"
                 src="/img/cursor-trail-transparent/09_trail.webp"
                 width={400}
                 height={992}
@@ -104,14 +104,14 @@ export default function DividerCursor() {
                     href={`/contact`}
                   >
                     <TextScramble className="btn-caption mxd-scramble">
-                      Contact
+                      Contato
                     </TextScramble>
                   </Link>
                 </div>
                 <div className="mxd-divider-xl__caption difference">
                   <Link
                     className="active-cursor-permanent"
-                    data-cursor-text="Let's Talk"
+                    data-cursor-text="Vamos Conversar"
                     href={`/contact`}
                   >
                     <CommonAnimatedText
@@ -119,14 +119,14 @@ export default function DividerCursor() {
                       className="mxd-split-lines permanent"
                       animation="splitLines"
                     >
-                      Ready for the game changing website?
+                      Pronto para um site que transforma o jogo?
                     </CommonAnimatedText>
                   </Link>
                 </div>
                 <div className="mxd-divider-gif">
                   <div className="mxd-divider-gif__back left accent">
                     <Image
-                      alt="Azurio Template Example Image"
+                      alt="MINDSITE Template Example Image"
                       src="/img/gifs/nice-thumbs-up.gif"
                       width={640}
                       height={440}
@@ -134,7 +134,7 @@ export default function DividerCursor() {
                   </div>
                   <div className="mxd-divider-gif__front">
                     <Image
-                      alt="Azurio Template Example Image"
+                      alt="MINDSITE Template Example Image"
                       src="/img/gifs/nice-thumbs-up.gif"
                       width={640}
                       height={440}
@@ -142,7 +142,7 @@ export default function DividerCursor() {
                   </div>
                   <div className="mxd-divider-gif__back right accent">
                     <Image
-                      alt="Azurio Template Example Image"
+                      alt="MINDSITE Template Example Image"
                       src="/img/gifs/nice-thumbs-up.gif"
                       width={640}
                       height={440}

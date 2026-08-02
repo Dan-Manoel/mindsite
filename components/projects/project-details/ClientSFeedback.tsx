@@ -48,7 +48,7 @@ export default function ClientSFeedback() {
                         >
                           <div className="mxd-testimonials-project__photo round">
                             <Image
-                              alt="Azurio Template Example Image"
+                              alt="MINDSITE Template Example Image"
                               src="/img/avatars/300x300_ava-01.webp"
                               width={300}
                               height={300}

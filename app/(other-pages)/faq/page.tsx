@@ -4,8 +4,8 @@ import ParallaxDividerImage from "@/components/other-pages/faq/ParallaxDividerIm
 import BlogPreview from "@/components/other-pages/faq/BlogPreview";
 import CTAWithMarquee from "@/components/other-pages/faq/CTAWithMarquee";
 export const metadata: Metadata = {
-  title: "Faq | Azurio - Digital Agency & Portfolio NextJs Template",
-  description: "Azurio - Digital Agency & Portfolio NextJs Template",
+  title: "Faq | Mindsite - Agencia digital",
+  description: "A infraestrutura que o seu negócio precisa para escalar. Descubra como o Mindsite otimiza seu ecossistema digital do início ao fim.",
 };
 export default function FaqPage() {
   return (

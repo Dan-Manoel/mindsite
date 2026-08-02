@@ -8,9 +8,8 @@ import Process from "@/components/homes/index-web-studio/Process";
 import DividerCursor from "@/components/homes/index-web-studio/DividerCursor";
 import ParallaxDividerImage from "@/components/homes/index-web-studio/ParallaxDividerImage";
 export const metadata: Metadata = {
-  title:
-    "Index Web Studio | Azurio - Digital Agency & Portfolio NextJs Template",
-  description: "Azurio - Digital Agency & Portfolio NextJs Template",
+  title: "Estúdio Web | Mindsite - Agência Digital",
+  description: "A infraestrutura que o seu negócio precisa para escalar. Descubra como o Mindsite otimiza seu ecossistema digital do início ao fim.",
 };
 export default function IndexWebStudioPage() {
   return (

@@ -43,35 +43,35 @@ export default function Hero() {
                         <CommonLoadItem index={0}>
                           <li className="loading-item">
                             <TextScramble className="tag tag-s-mobile tag-permanent-medium mxd-scramble">
-                              Innovations
+                              Inovação
                             </TextScramble>
                           </li>
                         </CommonLoadItem>
                         <CommonLoadItem index={1}>
                           <li className="loading-item">
                             <TextScramble className="tag tag-s-mobile tag-permanent-medium mxd-scramble">
-                              Excellence
+                              Excelência
                             </TextScramble>
                           </li>
                         </CommonLoadItem>
                         <CommonLoadItem index={2}>
                           <li className="loading-item">
                             <TextScramble className="tag tag-s-mobile tag-permanent-medium mxd-scramble">
-                              Experience
+                              Experiência
                             </TextScramble>
                           </li>
                         </CommonLoadItem>
                         <CommonLoadItem index={3}>
                           <li className="loading-item">
                             <TextScramble className="tag tag-s-mobile tag-permanent-medium mxd-scramble">
-                              Competence
+                              Competência
                             </TextScramble>
                           </li>
                         </CommonLoadItem>
                         <CommonLoadItem index={4}>
                           <li className="loading-item">
                             <TextScramble className="tag tag-s-mobile tag-permanent-medium mxd-scramble">
-                              Passion
+                              Paixão
                             </TextScramble>
                           </li>
                         </CommonLoadItem>
@@ -82,21 +82,21 @@ export default function Hero() {
                         <CommonLoadItem index={5}>
                           <li className="loading-item">
                             <TextScramble className="tag tag-s-mobile tag-permanent-medium mxd-scramble">
-                              IU/UX
+                              UI/UX
                             </TextScramble>
                           </li>
                         </CommonLoadItem>
                         <CommonLoadItem index={6}>
                           <li className="loading-item">
                             <TextScramble className="tag tag-s-mobile tag-permanent-medium mxd-scramble">
-                              App design
+                              Design de Apps
                             </TextScramble>
                           </li>
                         </CommonLoadItem>
                         <CommonLoadItem index={7}>
                           <li className="loading-item">
                             <TextScramble className="tag tag-s-mobile tag-permanent-medium mxd-scramble">
-                              Development
+                              Desenvolvimento
                             </TextScramble>
                           </li>
                         </CommonLoadItem>
@@ -110,7 +110,7 @@ export default function Hero() {
                         <CommonLoadItem index={9}>
                           <li className="loading-item">
                             <TextScramble className="tag tag-s-mobile tag-permanent-medium mxd-scramble">
-                              Motion
+                              Animação
                             </TextScramble>
                           </li>
                         </CommonLoadItem>
@@ -123,9 +123,9 @@ export default function Hero() {
                       className="medium permanent loading-split"
                       animation="splitLinesLoad"
                     >
-                      The power
+                      O poder
                       <br />
-                      of imagination
+                      da imaginação
                     </CommonAnimatedText>
                   </div>
                 </div>
@@ -137,9 +137,9 @@ export default function Hero() {
                       className="t-bold t-permanent loading-split"
                       animation="splitLinesLoad"
                     >
-                      We are a creative design studio specializing in
+                      Somos um estúdio de design criativo especializado em
                       <span>
-                        innovative design and cutting-edge development
+                        {" "}design inovador e desenvolvimento de ponta
                       </span>
                     </CommonAnimatedText>
                   </div>
@@ -150,7 +150,7 @@ export default function Hero() {
                         targetId="works"
                       >
                         <TextScramble className="btn-caption mxd-scramble">
-                          Scroll to explore
+                          Role para explorar
                         </TextScramble>
                         <i>
                           <svg

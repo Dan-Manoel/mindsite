@@ -32,16 +32,16 @@ export default function StatisticsLines() {
                   <div className="col-12 col-xl-8 mxd-grid-item">
                     {/* Manifest Start */}
                     <div className="mxd-section-title__manifest title-manifest-s no-padding-mobile">
-                      <Link data-cursor-text="About us" href={`/about-us`}>
+                      <Link data-cursor-text="Sobre nós" href={`/about-us`}>
                         <CommonAnimatedText
                           as="span"
                           className="manifest manifest-s mxd-split-lines active-cursor-accent"
                           animation="splitLines"
                         >
-                          From pixel-perfect designs to flawless code,{" "}
+                          De designs impecáveis a um código perfeito,{" "}
                           <span>
-                            every aspect of our projects is crafted with care to
-                            ensure the highest standards of quality.
+                            cada aspecto de nossos projetos é elaborado com
+                            cuidado para garantir os mais altos padrões de qualidade.
                           </span>
                         </CommonAnimatedText>
                       </Link>

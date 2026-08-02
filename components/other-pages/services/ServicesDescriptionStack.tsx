@@ -9,7 +9,7 @@ import CommonServicesStack, {
 
 const IMG_W = 1200;
 const IMG_H = 1300;
-const IMG_ALT = "Azurio Template Sample Image";
+const IMG_ALT = "MINDSITE Template Sample Image";
 
 type Card = {
   subtitle: string;

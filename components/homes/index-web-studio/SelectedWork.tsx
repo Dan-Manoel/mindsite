@@ -60,7 +60,7 @@ export default function SelectedWork() {
                 <Link
                   className="mxd-projects-list__item active-cursor-image active-cursor-permanent"
                   data-cursor-image="/img/works/showcase-archive/500x500_pr01.webp"
-                  data-cursor-text="View Work"
+                  data-cursor-text="Ver Projeto"
                   href={`/project-details`}
                 >
                   <div className="mxd-projects-list__divider top" />
@@ -115,7 +115,7 @@ export default function SelectedWork() {
                 <Link
                   className="mxd-projects-list__item active-cursor-image active-cursor-permanent"
                   data-cursor-image="/img/works/showcase-archive/500x500_pr02.webp"
-                  data-cursor-text="View Work"
+                  data-cursor-text="Ver Projeto"
                   href={`/project-details`}
                 >
                   <div className="mxd-projects-list__divider top" />
@@ -167,7 +167,7 @@ export default function SelectedWork() {
                 <Link
                   className="mxd-projects-list__item active-cursor-image active-cursor-permanent"
                   data-cursor-image="/img/works/showcase-archive/500x500_pr03.webp"
-                  data-cursor-text="View Work"
+                  data-cursor-text="Ver Projeto"
                   href={`/project-details`}
                 >
                   <div className="mxd-projects-list__divider top" />
@@ -237,7 +237,7 @@ export default function SelectedWork() {
                         >
                           <path d="M143.9,0v28.8h-28.8V0h28.8ZM143.9,28.8v28.8h28.8v-28.8h-28.8ZM172.7,57.6v28.8h28.8v-28.8h-28.8ZM230.2,115.2v-28.8h-28.8v28.8H0v28.8h201.4v28.8h28.8v-28.8h28.8v-28.8h-28.8ZM172.7,201.6h28.8v-28.8h-28.8v28.8ZM143.9,230.4h28.8v-28.8h-28.8v28.8ZM114.3,260h28.8v-28.8h-28.8v28.8Z" />
                         </svg>
-                        {/* <Image   alt="Azurio Image"    src="/img/cursor-trail-transparent/07_trail.webp" width="400" height="480" /> */}
+                        {/* <Image   alt="MINDSITE Image"    src="/img/cursor-trail-transparent/07_trail.webp" width="400" height="480" /> */}
                       </CommonScrollAnimated>
                     </div>
                     <div className="col-12 col-md-6 col-xl-4 mxd-object-link__item justify-end">

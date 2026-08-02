@@ -25,9 +25,9 @@ export default function TestimonialsSticky() {
                               className="reveal-type"
                               animation="revealType"
                             >
-                              Few words
+                              O que dizem
                               <br />
-                              from our clients
+                              nossos clientes
                             </CommonAnimatedText>
                           </div>
                           <CommonScrollAnimated
@@ -101,7 +101,7 @@ export default function TestimonialsSticky() {
                                   href="#0"
                                 >
                                   <TextScramble className="btn-caption mxd-scramble">
-                                    Project Page
+                                    Ver Projeto
                                   </TextScramble>
                                   <i>
                                     <svg
@@ -116,15 +116,15 @@ export default function TestimonialsSticky() {
                               </div>
                             </div>
                             <div className="mxd-testimonials-card__content">
-                              <p className="mxd-testimonials-card__descr">
-                                Working with Azurio team was
-                                <span>an absolute pleasure!</span>
-                              </p>
+                                <p className="mxd-testimonials-card__descr">
+                                  Trabalhar com a equipe MINDSITE foi
+                                  <span> um prazer absoluto!</span>
+                                </p>
                             </div>
                             <div className="mxd-testimonials-card__author">
                               <div className="mxd-testimonials-card__photo">
                                 <Image
-                                  alt="Azurio Template Example Image"
+                                  alt="MINDSITE Template Example Image"
                                   src="/img/avatars/300x300_ava-01.webp"
                                   width={300}
                                   height={300}
@@ -135,7 +135,7 @@ export default function TestimonialsSticky() {
                                   John Lemon
                                 </p>
                                 <p className="mxd-testimonials-card__position">
-                                  Brand manager in
+                                  Gerente de Marca na
                                   <a href="#">
                                     <TextScramble className="mxd-scramble">
                                       Instant design
@@ -153,7 +153,7 @@ export default function TestimonialsSticky() {
                               animation="clipImage"
                             >
                               <Image
-                                alt="Azurio Template Example Image"
+                                alt="MINDSITE Template Example Image"
                                 src="/img/avatars/800x800_ava-01.webp"
                                 width={800}
                                 height={800}
@@ -181,7 +181,7 @@ export default function TestimonialsSticky() {
                                     href="#0"
                                   >
                                     <TextScramble className="btn-caption mxd-scramble">
-                                      Project Page
+                                      Ver Projeto
                                     </TextScramble>
                                     <i>
                                       <svg
@@ -195,19 +195,18 @@ export default function TestimonialsSticky() {
                                   </a>
                                 </div>
                               </div>
-                              <p className="mxd-testimonials-card__descr">
-                                Azurio team took the time to understand our
-                                business needs{" "}
-                                <span>
-                                  and translated them into a beautifully
-                                  designed, user-friendly website.
-                                </span>
-                              </p>
+                                <p className="mxd-testimonials-card__descr">
+                                  A equipe MINDSITE dedicou tempo para entender nosso
+                                  negócio{" "}
+                                  <span>
+                                    e traduziu isso em um site belíssimo e intuitivo.
+                                  </span>
+                                </p>
                             </div>
                             <div className="mxd-testimonials-card__author">
                               <div className="mxd-testimonials-card__photo">
                                 <Image
-                                  alt="Azurio Template Example Image"
+                                  alt="MINDSITE Template Example Image"
                                   src="/img/avatars/300x300_ava-02.webp"
                                   width={300}
                                   height={300}
@@ -218,7 +217,7 @@ export default function TestimonialsSticky() {
                                   Ashley Cherry
                                 </p>
                                 <p className="mxd-testimonials-card__position">
-                                  SEO in
+                                  SEO na
                                   <a href="#">
                                     <TextScramble className="mxd-scramble">
                                       Eye Candy
@@ -244,7 +243,7 @@ export default function TestimonialsSticky() {
                               animation="clipImage"
                             >
                               <Image
-                                alt="Azurio Template Example Image"
+                                alt="MINDSITE Template Example Image"
                                 src="/img/avatars/800x800_ava-02.webp"
                                 width={800}
                                 height={800}
@@ -271,7 +270,7 @@ export default function TestimonialsSticky() {
                                   href="#0"
                                 >
                                   <TextScramble className="btn-caption mxd-scramble">
-                                    Project Page
+                                    Ver Projeto
                                   </TextScramble>
                                   <i>
                                     <svg
@@ -286,19 +285,19 @@ export default function TestimonialsSticky() {
                               </div>
                             </div>
                             <div className="mxd-testimonials-card__content">
-                              <p className="mxd-testimonials-card__descr">
-                                The Azurio team nailed it! They understood our
-                                vision{" "}
-                                <span>
-                                  and delivered a sleek, intuitive site that our
-                                  clients love.
-                                </span>
-                              </p>
+                                <p className="mxd-testimonials-card__descr">
+                                  A equipe MINDSITE acertou em cheio! Eles entenderam nossa
+                                  visão{" "}
+                                  <span>
+                                    e entregaram um site moderno e intuitivo que nossos
+                                    clientes adoram.
+                                  </span>
+                                </p>
                             </div>
                             <div className="mxd-testimonials-card__author">
                               <div className="mxd-testimonials-card__photo">
                                 <Image
-                                  alt="Azurio Template Example Image"
+                                  alt="MINDSITE Template Example Image"
                                   src="/img/avatars/300x300_ava-03.webp"
                                   width={300}
                                   height={300}
@@ -309,7 +308,7 @@ export default function TestimonialsSticky() {
                                   Lea Tomato
                                 </p>
                                 <p className="mxd-testimonials-card__position">
-                                  Senior designer in
+                                  Designer Sênior na
                                   <a href="#">
                                     <TextScramble className="mxd-scramble">
                                       The Way
@@ -328,7 +327,7 @@ export default function TestimonialsSticky() {
                               animation="clipImage"
                             >
                               <Image
-                                alt="Azurio Template Example Image"
+                                alt="MINDSITE Template Example Image"
                                 src="/img/avatars/800x800_ava-03.webp"
                                 width={800}
                                 height={800}
@@ -362,7 +361,7 @@ export default function TestimonialsSticky() {
                                     href="#0"
                                   >
                                     <TextScramble className="btn-caption mxd-scramble">
-                                      Project Page
+                                      Ver Projeto
                                     </TextScramble>
                                     <i>
                                       <svg
@@ -376,20 +375,20 @@ export default function TestimonialsSticky() {
                                   </a>
                                 </div>
                               </div>
-                              <p className="mxd-testimonials-card__descr">
-                                The team&apos;s attention to detail, creativity,
-                                and technical expertise exceeded our
-                                expectations.
-                                <span>
-                                  We&apos;ve received so much positive feedback
-                                  from our customers already.
-                                </span>
-                              </p>
+                                <p className="mxd-testimonials-card__descr">
+                                  A atenção aos detalhes, criatividade
+                                  e experiência técnica superaram nossas
+                                  expectativas.
+                                  <span>
+                                    Já recebemos inúmeros feedbacks positivos de
+                                    nossos clientes.
+                                  </span>
+                                </p>
                             </div>
                             <div className="mxd-testimonials-card__author">
                               <div className="mxd-testimonials-card__photo">
                                 <Image
-                                  alt="Azurio Template Example Image"
+                                  alt="MINDSITE Template Example Image"
                                   src="/img/avatars/300x300_ava-04.webp"
                                   width={300}
                                   height={300}
@@ -400,7 +399,7 @@ export default function TestimonialsSticky() {
                                   Patrick Pineapple
                                 </p>
                                 <p className="mxd-testimonials-card__position">
-                                  SEO in
+                                  SEO na
                                   <a href="#">
                                     <TextScramble className="mxd-scramble">
                                       Instant design
@@ -430,7 +429,7 @@ export default function TestimonialsSticky() {
                                   href="#0"
                                 >
                                   <TextScramble className="btn-caption mxd-scramble">
-                                    Project Page
+                                    Ver Projeto
                                   </TextScramble>
                                   <i>
                                     <svg
@@ -445,17 +444,17 @@ export default function TestimonialsSticky() {
                               </div>
                             </div>
                             <div className="mxd-testimonials-card__content">
-                              <p className="mxd-testimonials-card__descr">
-                                Amazing experience!
-                                <span>
-                                  Our new website truly reflects our brand.
-                                </span>
-                              </p>
+                                <p className="mxd-testimonials-card__descr">
+                                  Experiência incrível!
+                                  <span>
+                                    Nosso novo site realmente reflete nossa marca.
+                                  </span>
+                                </p>
                             </div>
                             <div className="mxd-testimonials-card__author">
                               <div className="mxd-testimonials-card__photo">
                                 <Image
-                                  alt="Azurio Template Example Image"
+                                  alt="MINDSITE Template Example Image"
                                   src="/img/avatars/300x300_ava-05.webp"
                                   width={300}
                                   height={300}
@@ -466,7 +465,7 @@ export default function TestimonialsSticky() {
                                   Mary Cucumber
                                 </p>
                                 <p className="mxd-testimonials-card__position">
-                                  Brand manager in
+                                  Gerente de Marca na
                                   <a href="#">
                                     <TextScramble className="mxd-scramble">
                                       Hyper
@@ -484,7 +483,7 @@ export default function TestimonialsSticky() {
                               animation="clipImage"
                             >
                               <Image
-                                alt="Azurio Template Example Image"
+                                alt="MINDSITE Template Example Image"
                                 src="/img/avatars/800x800_ava-04.webp"
                                 width={800}
                                 height={800}

@@ -7,9 +7,8 @@ import MarqueeDivider from "@/components/homes/index-design-studio/MarqueeDivide
 import BlogPreview from "@/components/homes/index-design-studio/BlogPreview";
 import CTA from "@/components/homes/index-design-studio/CTA";
 export const metadata: Metadata = {
-  title:
-    "Index Design Studio | Azurio - Digital Agency & Portfolio NextJs Template",
-  description: "Azurio - Digital Agency & Portfolio NextJs Template",
+  title: "Estúdio de Design | Mindsite - Agência Digital",
+  description: "A infraestrutura que o seu negócio precisa para escalar. Descubra como o Mindsite otimiza seu ecossistema digital do início ao fim.",
 };
 export default function IndexDesignStudioPage() {
   return (

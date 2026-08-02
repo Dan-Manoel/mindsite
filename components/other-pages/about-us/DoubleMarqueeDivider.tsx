@@ -36,7 +36,7 @@ export default function DoubleMarqueeDivider() {
                 <div className="marquee__item item-imageblock">
                   <div className="marquee__image">
                     <Image
-                      alt="Azurio Template Image Example"
+                      alt="MINDSITE Template Image Example"
                       src="/img/cta/mar_01.webp"
                       width={1200}
                       height={1200}
@@ -47,7 +47,7 @@ export default function DoubleMarqueeDivider() {
                 <div className="marquee__item item-imageblock">
                   <div className="marquee__image">
                     <Image
-                      alt="Azurio Template Image Example"
+                      alt="MINDSITE Template Image Example"
                       src="/img/cta/mar_02.webp"
                       width={1200}
                       height={685}
@@ -58,7 +58,7 @@ export default function DoubleMarqueeDivider() {
                 <div className="marquee__item item-imageblock">
                   <div className="marquee__image">
                     <Image
-                      alt="Azurio Template Image Example"
+                      alt="MINDSITE Template Image Example"
                       src="/img/cta/mar_03.webp"
                       width={700}
                       height={700}
@@ -69,7 +69,7 @@ export default function DoubleMarqueeDivider() {
                 <div className="marquee__item item-imageblock">
                   <div className="marquee__image">
                     <Image
-                      alt="Azurio Template Image Example"
+                      alt="MINDSITE Template Image Example"
                       src="/img/cta/mar_04.webp"
                       width={737}
                       height={1200}
@@ -80,7 +80,7 @@ export default function DoubleMarqueeDivider() {
                 <div className="marquee__item item-imageblock">
                   <div className="marquee__image">
                     <Image
-                      alt="Azurio Template Image Example"
+                      alt="MINDSITE Template Image Example"
                       src="/img/cta/mar_05.webp"
                       width={800}
                       height={1200}
@@ -91,7 +91,7 @@ export default function DoubleMarqueeDivider() {
                 <div className="marquee__item item-imageblock">
                   <div className="marquee__image">
                     <Image
-                      alt="Azurio Template Image Example"
+                      alt="MINDSITE Template Image Example"
                       src="/img/cta/mar_06.webp"
                       width={1200}
                       height={1200}
@@ -102,7 +102,7 @@ export default function DoubleMarqueeDivider() {
                 <div className="marquee__item item-imageblock">
                   <div className="marquee__image">
                     <Image
-                      alt="Azurio Template Image Example"
+                      alt="MINDSITE Template Image Example"
                       src="/img/cta/mar_07.webp"
                       width={1200}
                       height={900}
@@ -113,7 +113,7 @@ export default function DoubleMarqueeDivider() {
                 <div className="marquee__item item-imageblock">
                   <div className="marquee__image">
                     <Image
-                      alt="Azurio Template Image Example"
+                      alt="MINDSITE Template Image Example"
                       src="/img/cta/mar_08.webp"
                       width={737}
                       height={1200}
@@ -124,7 +124,7 @@ export default function DoubleMarqueeDivider() {
                 <div className="marquee__item item-imageblock">
                   <div className="marquee__image">
                     <Image
-                      alt="Azurio Template Image Example"
+                      alt="MINDSITE Template Image Example"
                       src="/img/cta/mar_09.webp"
                       width={800}
                       height={1200}
@@ -135,7 +135,7 @@ export default function DoubleMarqueeDivider() {
                 <div className="marquee__item item-imageblock">
                   <div className="marquee__image">
                     <Image
-                      alt="Azurio Template Image Example"
+                      alt="MINDSITE Template Image Example"
                       src="/img/cta/mar_10.webp"
                       width={1200}
                       height={873}
@@ -146,7 +146,7 @@ export default function DoubleMarqueeDivider() {
                 <div className="marquee__item item-imageblock">
                   <div className="marquee__image">
                     <Image
-                      alt="Azurio Template Image Example"
+                      alt="MINDSITE Template Image Example"
                       src="/img/cta/mar_11.webp"
                       width={1200}
                       height={1200}
@@ -157,7 +157,7 @@ export default function DoubleMarqueeDivider() {
                 <div className="marquee__item item-imageblock">
                   <div className="marquee__image">
                     <Image
-                      alt="Azurio Template Image Example"
+                      alt="MINDSITE Template Image Example"
                       src="/img/cta/mar_12.webp"
                       width={1200}
                       height={685}
@@ -168,7 +168,7 @@ export default function DoubleMarqueeDivider() {
                 <div className="marquee__item item-imageblock">
                   <div className="marquee__image">
                     <Image
-                      alt="Azurio Template Image Example"
+                      alt="MINDSITE Template Image Example"
                       src="/img/cta/mar_13.webp"
                       width={700}
                       height={700}
@@ -179,7 +179,7 @@ export default function DoubleMarqueeDivider() {
                 <div className="marquee__item item-imageblock">
                   <div className="marquee__image">
                     <Image
-                      alt="Azurio Template Image Example"
+                      alt="MINDSITE Template Image Example"
                       src="/img/cta/mar_14.webp"
                       width={737}
                       height={1200}
@@ -190,7 +190,7 @@ export default function DoubleMarqueeDivider() {
                 <div className="marquee__item item-imageblock">
                   <div className="marquee__image">
                     <Image
-                      alt="Azurio Template Image Example"
+                      alt="MINDSITE Template Image Example"
                       src="/img/cta/mar_15.webp"
                       width={800}
                       height={1200}
@@ -208,7 +208,7 @@ export default function DoubleMarqueeDivider() {
                 <div className="marquee__item item-imageblock">
                   <div className="marquee__image">
                     <Image
-                      alt="Azurio Template Image Example"
+                      alt="MINDSITE Template Image Example"
                       src="/img/cta/mar_15.webp"
                       width={800}
                       height={1200}
@@ -219,7 +219,7 @@ export default function DoubleMarqueeDivider() {
                 <div className="marquee__item item-imageblock">
                   <div className="marquee__image">
                     <Image
-                      alt="Azurio Template Image Example"
+                      alt="MINDSITE Template Image Example"
                       src="/img/cta/mar_14.webp"
                       width={737}
                       height={1200}
@@ -230,7 +230,7 @@ export default function DoubleMarqueeDivider() {
                 <div className="marquee__item item-imageblock">
                   <div className="marquee__image">
                     <Image
-                      alt="Azurio Template Image Example"
+                      alt="MINDSITE Template Image Example"
                       src="/img/cta/mar_13.webp"
                       width={700}
                       height={700}
@@ -241,7 +241,7 @@ export default function DoubleMarqueeDivider() {
                 <div className="marquee__item item-imageblock">
                   <div className="marquee__image">
                     <Image
-                      alt="Azurio Template Image Example"
+                      alt="MINDSITE Template Image Example"
                       src="/img/cta/mar_12.webp"
                       width={1200}
                       height={685}
@@ -252,7 +252,7 @@ export default function DoubleMarqueeDivider() {
                 <div className="marquee__item item-imageblock">
                   <div className="marquee__image">
                     <Image
-                      alt="Azurio Template Image Example"
+                      alt="MINDSITE Template Image Example"
                       src="/img/cta/mar_11.webp"
                       width={1200}
                       height={1200}
@@ -263,7 +263,7 @@ export default function DoubleMarqueeDivider() {
                 <div className="marquee__item item-imageblock">
                   <div className="marquee__image">
                     <Image
-                      alt="Azurio Template Image Example"
+                      alt="MINDSITE Template Image Example"
                       src="/img/cta/mar_10.webp"
                       width={1200}
                       height={873}
@@ -274,7 +274,7 @@ export default function DoubleMarqueeDivider() {
                 <div className="marquee__item item-imageblock">
                   <div className="marquee__image">
                     <Image
-                      alt="Azurio Template Image Example"
+                      alt="MINDSITE Template Image Example"
                       src="/img/cta/mar_09.webp"
                       width={800}
                       height={1200}
@@ -285,7 +285,7 @@ export default function DoubleMarqueeDivider() {
                 <div className="marquee__item item-imageblock">
                   <div className="marquee__image">
                     <Image
-                      alt="Azurio Template Image Example"
+                      alt="MINDSITE Template Image Example"
                       src="/img/cta/mar_08.webp"
                       width={737}
                       height={1200}
@@ -296,7 +296,7 @@ export default function DoubleMarqueeDivider() {
                 <div className="marquee__item item-imageblock">
                   <div className="marquee__image">
                     <Image
-                      alt="Azurio Template Image Example"
+                      alt="MINDSITE Template Image Example"
                       src="/img/cta/mar_07.webp"
                       width={1200}
                       height={900}
@@ -307,7 +307,7 @@ export default function DoubleMarqueeDivider() {
                 <div className="marquee__item item-imageblock">
                   <div className="marquee__image">
                     <Image
-                      alt="Azurio Template Image Example"
+                      alt="MINDSITE Template Image Example"
                       src="/img/cta/mar_06.webp"
                       width={1200}
                       height={1200}
@@ -318,7 +318,7 @@ export default function DoubleMarqueeDivider() {
                 <div className="marquee__item item-imageblock">
                   <div className="marquee__image">
                     <Image
-                      alt="Azurio Template Image Example"
+                      alt="MINDSITE Template Image Example"
                       src="/img/cta/mar_05.webp"
                       width={800}
                       height={1200}
@@ -329,7 +329,7 @@ export default function DoubleMarqueeDivider() {
                 <div className="marquee__item item-imageblock">
                   <div className="marquee__image">
                     <Image
-                      alt="Azurio Template Image Example"
+                      alt="MINDSITE Template Image Example"
                       src="/img/cta/mar_04.webp"
                       width={737}
                       height={1200}
@@ -340,7 +340,7 @@ export default function DoubleMarqueeDivider() {
                 <div className="marquee__item item-imageblock">
                   <div className="marquee__image">
                     <Image
-                      alt="Azurio Template Image Example"
+                      alt="MINDSITE Template Image Example"
                       src="/img/cta/mar_03.webp"
                       width={700}
                       height={700}
@@ -351,7 +351,7 @@ export default function DoubleMarqueeDivider() {
                 <div className="marquee__item item-imageblock">
                   <div className="marquee__image">
                     <Image
-                      alt="Azurio Template Image Example"
+                      alt="MINDSITE Template Image Example"
                       src="/img/cta/mar_02.webp"
                       width={1200}
                       height={685}
@@ -362,7 +362,7 @@ export default function DoubleMarqueeDivider() {
                 <div className="marquee__item item-imageblock">
                   <div className="marquee__image">
                     <Image
-                      alt="Azurio Template Image Example"
+                      alt="MINDSITE Template Image Example"
                       src="/img/cta/mar_01.webp"
                       width={1200}
                       height={1200}

@@ -25,7 +25,7 @@ export default function ProjectsList() {
                 <Link
                   className="mxd-projects-list__item active-cursor-image active-cursor-permanent"
                   data-cursor-image="/img/works/showcase-archive/500x500_pr01.webp"
-                  data-cursor-text="View Work"
+                  data-cursor-text="Ver Trabalho"
                   href={`/project-details`}
                 >
                   <div className="mxd-projects-list__divider top" />
@@ -34,18 +34,18 @@ export default function ProjectsList() {
                       <div className="col-12 col-xl-2 mxd-grid-padding">
                         <div className="mxd-projects-list__niche">
                           <TextScramble className="meta-niche mxd-scramble">
-                            Tech
+                            Tecnologia
                           </TextScramble>
                         </div>
                       </div>
                       <div className="col-12 col-xl-6 mxd-grid-padding">
                         <div className="mxd-projects-list__title">
                           <p>
-                            Creative{" "}
+                            Template de{" "}
                             <span>
-                              studio
+                              estúdio
                               <br />
-                              template
+                              criativo
                             </span>
                           </p>
                         </div>
@@ -53,20 +53,20 @@ export default function ProjectsList() {
                       <div className="col-6 col-md-6 col-xl-2 mxd-grid-padding">
                         <div className="mxd-projects-list__meta">
                           <TextScramble className="meta-tag mxd-scramble">
-                            Brand
+                            Marca
                           </TextScramble>
                           <TextScramble className="meta-tag mxd-scramble">
                             Marketing
                           </TextScramble>
                           <TextScramble className="meta-tag mxd-scramble">
-                            Website
+                            Site
                           </TextScramble>
                         </div>
                       </div>
                       <div className="col-6 col-md-6 col-xl-2 mxd-grid-padding">
                         <div className="mxd-projects-list__date">
                           <TextScramble className="meta-date mxd-scramble">
-                            February
+                            Fevereiro
                           </TextScramble>
                           <TextScramble className="meta-date mxd-scramble">
                             2026
@@ -80,7 +80,7 @@ export default function ProjectsList() {
                 <Link
                   className="mxd-projects-list__item active-cursor-image active-cursor-permanent"
                   data-cursor-image="/img/works/showcase-archive/500x500_pr02.webp"
-                  data-cursor-text="View Work"
+                  data-cursor-text="Ver Trabalho"
                   href={`/project-details`}
                 >
                   <div className="mxd-projects-list__divider top" />
@@ -89,16 +89,16 @@ export default function ProjectsList() {
                       <div className="col-12 col-xl-2 mxd-grid-padding">
                         <div className="mxd-projects-list__niche">
                           <TextScramble className="meta-niche mxd-scramble">
-                            Fashion
+                            Moda
                           </TextScramble>
                         </div>
                       </div>
                       <div className="col-12 col-xl-6 mxd-grid-padding">
                         <div className="mxd-projects-list__title">
                           <p>
-                            Editorial
+                            Conjunto de
                             <br />
-                            <span>illustrations set</span>
+                            <span>ilustrações editoriais</span>
                           </p>
                         </div>
                       </div>
@@ -108,7 +108,7 @@ export default function ProjectsList() {
                             Midjourney
                           </TextScramble>
                           <TextScramble className="meta-tag mxd-scramble">
-                            Illustrations
+                            Ilustrações
                           </TextScramble>
                           <TextScramble className="meta-tag mxd-scramble">
                             Design
@@ -118,7 +118,7 @@ export default function ProjectsList() {
                       <div className="col-6 col-md-6 col-xl-2 mxd-grid-padding">
                         <div className="mxd-projects-list__date">
                           <TextScramble className="meta-date mxd-scramble">
-                            January
+                            Janeiro
                           </TextScramble>
                           <TextScramble className="meta-date mxd-scramble">
                             2026
@@ -132,7 +132,7 @@ export default function ProjectsList() {
                 <Link
                   className="mxd-projects-list__item active-cursor-image active-cursor-permanent"
                   data-cursor-image="/img/works/showcase-archive/500x500_pr03.webp"
-                  data-cursor-text="View Work"
+                  data-cursor-text="Ver Trabalho"
                   href={`/project-details`}
                 >
                   <div className="mxd-projects-list__divider top" />
@@ -148,11 +148,11 @@ export default function ProjectsList() {
                       <div className="col-12 col-xl-6 mxd-grid-padding">
                         <div className="mxd-projects-list__title">
                           <p>
-                            Interactive{" "}
+                            Conceito de{" "}
                             <span>
-                              media
+                              mídia
                               <br />
-                              concept
+                              interativa
                             </span>
                           </p>
                         </div>
@@ -160,20 +160,20 @@ export default function ProjectsList() {
                       <div className="col-6 col-md-6 col-xl-2 mxd-grid-padding">
                         <div className="mxd-projects-list__meta">
                           <TextScramble className="meta-tag mxd-scramble">
-                            Brand
+                            Marca
                           </TextScramble>
                           <TextScramble className="meta-tag mxd-scramble">
-                            Social Media
+                            Mídias Sociais
                           </TextScramble>
                           <TextScramble className="meta-tag mxd-scramble">
-                            Packaging
+                            Embalagens
                           </TextScramble>
                         </div>
                       </div>
                       <div className="col-6 col-md-6 col-xl-2 mxd-grid-padding">
                         <div className="mxd-projects-list__date">
                           <TextScramble className="meta-date mxd-scramble">
-                            December
+                            Dezembro
                           </TextScramble>
                           <TextScramble className="meta-date mxd-scramble">
                             2025
@@ -202,7 +202,7 @@ export default function ProjectsList() {
                         >
                           <path d="M143.9,0v28.8h-28.8V0h28.8ZM143.9,28.8v28.8h28.8v-28.8h-28.8ZM172.7,57.6v28.8h28.8v-28.8h-28.8ZM230.2,115.2v-28.8h-28.8v28.8H0v28.8h201.4v28.8h28.8v-28.8h28.8v-28.8h-28.8ZM172.7,201.6h28.8v-28.8h-28.8v28.8ZM143.9,230.4h28.8v-28.8h-28.8v28.8ZM114.3,260h28.8v-28.8h-28.8v28.8Z" />
                         </svg>
-                        {/* <Image   alt="Azurio Image"    src="/img/cursor-trail-transparent/07_trail.webp" width="400" height="480" /> */}
+                        {/* <Image   alt="MINDSITE Image"    src="/img/cursor-trail-transparent/07_trail.webp" width="400" height="480" /> */}
                       </CommonScrollAnimated>
                     </div>
                     <div className="col-12 col-md-6 col-xl-4 mxd-object-link__item justify-end">
@@ -217,13 +217,13 @@ export default function ProjectsList() {
                             href={`/works-default`}
                           >
                             <TextScramble className="btn-caption mxd-scramble">
-                              All Works
+                              Todos os Trabalhos
                             </TextScramble>
                           </Link>
                         </CommonScrollAnimated>
                         <CommonScrollAnimatedLink
                           className="mxd-object-link__media active-cursor-permanent anim-uni-in-up"
-                          data-cursor-text="All Works"
+                          data-cursor-text="Todos os Trabalhos"
                           href={`/works-default`}
                           animation="inUp"
                         >

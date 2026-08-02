@@ -20,7 +20,7 @@ export default function ImagesGrid2() {
                         externalRAF={false}
                       >
                         <Image
-                          alt="Azurio Template Sample Image"
+                          alt="MINDSITE Template Sample Image"
                           src="/img/works/project-details/details04.webp"
                           width={1280}
                           height={1280}
@@ -32,7 +32,7 @@ export default function ImagesGrid2() {
                     <div className="mxd-images-grid__inner">
                       <Image
                         className="transparent"
-                        alt="Azurio Template Sample Image"
+                        alt="MINDSITE Template Sample Image"
                         src="/img/works/project-details/details05.webp"
                         width={985}
                         height={1280}
@@ -50,7 +50,7 @@ export default function ImagesGrid2() {
                         externalRAF={false}
                       >
                         <Image
-                          alt="Azurio Template Sample Image"
+                          alt="MINDSITE Template Sample Image"
                           src="/img/works/project-details/details06.webp"
                           width={1920}
                           height={1440}

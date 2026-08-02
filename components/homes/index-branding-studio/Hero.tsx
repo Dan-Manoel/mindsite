@@ -28,35 +28,35 @@ export default function Hero() {
                           <CommonLoadItem index={0}>
                             <li className="loading-item">
                               <TextScramble className="tag tag-s-mobile tag-permanent mxd-scramble">
-                                Innovations
+                                Inovação
                               </TextScramble>
                             </li>
                           </CommonLoadItem>
                           <CommonLoadItem index={1}>
                             <li className="loading-item">
                               <TextScramble className="tag tag-s-mobile tag-permanent mxd-scramble">
-                                Excellence
+                                Excelência
                               </TextScramble>
                             </li>
                           </CommonLoadItem>
                           <CommonLoadItem index={2}>
                             <li className="loading-item">
                               <TextScramble className="tag tag-s-mobile tag-permanent mxd-scramble">
-                                Experience
+                                Experiência
                               </TextScramble>
                             </li>
                           </CommonLoadItem>
                           <CommonLoadItem index={3}>
                             <li className="loading-item">
                               <TextScramble className="tag tag-s-mobile tag-permanent mxd-scramble">
-                                Competence
+                                Competência
                               </TextScramble>
                             </li>
                           </CommonLoadItem>
                           <CommonLoadItem index={4}>
                             <li className="loading-item">
                               <TextScramble className="tag tag-s-mobile tag-permanent mxd-scramble">
-                                Passion
+                                Paixão
                               </TextScramble>
                             </li>
                           </CommonLoadItem>
@@ -67,21 +67,21 @@ export default function Hero() {
                           <CommonLoadItem index={5}>
                             <li className="loading-item">
                               <TextScramble className="tag tag-s-mobile tag-permanent mxd-scramble">
-                                IU/UX
+                                UI/UX
                               </TextScramble>
                             </li>
                           </CommonLoadItem>
                           <CommonLoadItem index={6}>
                             <li className="loading-item">
                               <TextScramble className="tag tag-s-mobile tag-permanent mxd-scramble">
-                                App design
+                                Design de App
                               </TextScramble>
                             </li>
                           </CommonLoadItem>
                           <CommonLoadItem index={7}>
                             <li className="loading-item">
                               <TextScramble className="tag tag-s-mobile tag-permanent mxd-scramble">
-                                Development
+                                Desenvolvimento
                               </TextScramble>
                             </li>
                           </CommonLoadItem>
@@ -95,7 +95,7 @@ export default function Hero() {
                           <CommonLoadItem index={9}>
                             <li className="loading-item">
                               <TextScramble className="tag tag-s-mobile tag-permanent mxd-scramble">
-                                Motion
+                                Animação
                               </TextScramble>
                             </li>
                           </CommonLoadItem>
@@ -124,7 +124,7 @@ export default function Hero() {
                               className="tag tag-s-mobile"
                             >
                               <TextScramble className="mxd-scramble">
-                                @azurioagency
+                                @MINDSITEagency
                               </TextScramble>
                             </a>
                           </li>
@@ -132,11 +132,11 @@ export default function Hero() {
                         <CommonLoadItem index={12}>
                           <li className="loading-item">
                             <a
-                              href="mailto:contato@mindsite.com.br?subject=Message%20from%20your%20site"
+                              href="mailto:ola@mindsite.com.br?subject=Message%20from%20your%20site"
                               className="tag tag-s-mobile"
                             >
                               <TextScramble className="mxd-scramble">
-                                contato@mindsite.com.br
+                                ola@mindsite.com.br
                               </TextScramble>
                             </a>
                           </li>
@@ -167,7 +167,7 @@ export default function Hero() {
                           href={`/project-details`}
                         >
                           <TextScramble className="btn-caption mxd-scramble">
-                            New Case
+                            Novo Case
                           </TextScramble>
                           {/* <i class="btn-icon ph-bold ph-arrow-right"></i> */}
                           <i className="btn-icon">
@@ -191,7 +191,7 @@ export default function Hero() {
                       <div className="fullwidth-text__wrap">
                         <Link
                           className="fullwidth-text__content permanent active-cursor-accent"
-                          data-cursor-text="Let's Chat"
+                          data-cursor-text="Vamos Conversar"
                           href={`/contact`}
                         >
                           <CommonAnimatedText
@@ -199,7 +199,7 @@ export default function Hero() {
                             className="loading-chars"
                             animation="animCharsLoad"
                           >
-                            Azurio
+                            MINDSITE
                           </CommonAnimatedText>
                         </Link>
                       </div>

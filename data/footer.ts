@@ -3,14 +3,14 @@ import { homeLinks, insightLinks, worksLinks } from "@/data/menu";
 
 /** Inner routes shown under “/ Inner pages” (subset of site; excludes landing home `/`). */
 export const footer1InnerPageLinks: MenuLinkItem[] = [
-  { href: "/about-me", label: "About me" },
-  { href: "/about-us", label: "About us" },
-  { href: "/services", label: "Services" },
-  { href: "/team", label: "Our team" },
-  { href: "/pricing", label: "Pricing" },
-  { href: "/faq", label: "FAQ page" },
-  { href: "/404", label: "404 error page" },
-  { href: "/contact", label: "Contact" },
+  { href: "/about-me", label: "Sobre Mim" },
+  { href: "/about-us", label: "Sobre Nós" },
+  { href: "/services", label: "Serviços" },
+  { href: "/team", label: "Nossa Equipe" },
+  { href: "/pricing", label: "Preços" },
+  { href: "/faq", label: "Perguntas Frequentes" },
+  { href: "/404", label: "Página 404" },
+  { href: "/contact", label: "Contato" },
 ];
 
 export type Footer1NavBlock = {
@@ -26,18 +26,18 @@ export type Footer1NavColumn = {
 export const footer1NavColumns: Footer1NavColumn[] = [
   {
     className: "col-12 col-md-4 mxd-grid-item",
-    blocks: [{ title: "/ Start pages", links: homeLinks }],
+    blocks: [{ title: "/ Páginas Iniciais", links: homeLinks }],
   },
   {
     className: "col-12 col-md-4 mxd-grid-item",
     blocks: [
-      { title: "/ Portfolio", links: worksLinks },
-      { title: "/ Insights pages", links: insightLinks },
+      { title: "/ Portfólio", links: worksLinks },
+      { title: "/ Artigos & Insights", links: insightLinks },
     ],
   },
   {
     className: "col-12 col-md-4 mxd-grid-item",
-    blocks: [{ title: "/ Inner pages", links: footer1InnerPageLinks }],
+    blocks: [{ title: "/ Páginas Internas", links: footer1InnerPageLinks }],
   },
 ];
 
@@ -97,14 +97,14 @@ export const footer1BackgroundImages: Footer1BackgroundImage[] = [
     src: "/img/demo/clouds-01.webp",
     width: 1400,
     height: 469,
-    alt: "Azurio Footer Background Image",
+    alt: "MINDSITE Footer Background Image",
   },
   {
     wrapperClass: "footer-background__img2",
     src: "/img/demo/clouds-02.webp",
     width: 1200,
     height: 401,
-    alt: "Azurio Footer Background Image",
+    alt: "MINDSITE Footer Background Image",
   },
 ];
 
@@ -114,6 +114,6 @@ export const footer1ForegroundImages: Footer1BackgroundImage[] = [
     src: "/img/demo/clouds-03.webp",
     width: 1200,
     height: 374,
-    alt: "Azurio Footer Foreground Image",
+    alt: "MINDSITE Footer Foreground Image",
   },
 ];

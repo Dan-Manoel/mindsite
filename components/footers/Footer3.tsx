@@ -6,7 +6,7 @@ import {
 } from "@/components/animations/CommonScrollAnimated";
 import TextScramble from "@/components/animations/TextScramble";
 import FooterBackToTop from "@/components/footers/FooterBackToTop";
-export default function Footer3({ name = "Azurio" }: { name?: string }) {
+export default function Footer3({ name = "MINDSITE" }: { name?: string }) {
   return (
     <BlurSection as="footer" className="mxd-footer">
       <div className="mxd-container grid-l-container">
@@ -83,12 +83,12 @@ export default function Footer3({ name = "Azurio" }: { name?: string }) {
                 <p className="footer-data">
                   <CommonScrollAnimated
                     className="anim-uni-slide-down"
-                    href="mailto:contato@mindsite.com.br?subject=Message%20from%20your%20site"
+                    href="mailto:ola@mindsite.com.br?subject=Message%20from%20your%20site"
                     as="a"
                     animation="slideDownLine"
                   >
                     <TextScramble className="mxd-scramble">
-                      contato@mindsite.com.br
+                      ola@mindsite.com.br
                     </TextScramble>
                   </CommonScrollAnimated>
                 </p>
@@ -130,7 +130,7 @@ export default function Footer3({ name = "Azurio" }: { name?: string }) {
                   animation="slideDownLine"
                 >
                   <span className="mxd-slide-down">
-                    Copyright Azurio. All rights reserved
+                    Copyright MINDSITE. All rights reserved
                   </span>
                 </CommonScrollAnimated>
                 <CommonScrollAnimated
@@ -138,17 +138,6 @@ export default function Footer3({ name = "Azurio" }: { name?: string }) {
                   as="p"
                   animation="slideDownLine"
                 >
-                  <span className="mxd-slide-down">
-                    React Nextjs Template by&nbsp;
-                    <a
-                      href="https://themeforest.net/user/ib-themes"
-                      target="_blank"
-                    >
-                      <TextScramble className="mxd-scramble">
-                        IB Themes
-                      </TextScramble>
-                    </a>
-                  </span>
                 </CommonScrollAnimated>
               </div>
             </div>

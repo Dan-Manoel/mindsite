@@ -9,9 +9,8 @@ import TestimonialsSticky from "@/components/homes/index-creative-agency/Testimo
 import BlogPreview from "@/components/homes/index-creative-agency/BlogPreview";
 import CTAWithMarquee from "@/components/homes/index-creative-agency/CTAWithMarquee";
 export const metadata: Metadata = {
-  title:
-    "Index Creative Agency | Azurio - Digital Agency & Portfolio NextJs Template",
-  description: "Azurio - Digital Agency & Portfolio NextJs Template",
+  title: "Agência Criativa | Mindsite - Agência Digital",
+  description: "A infraestrutura que o seu negócio precisa para escalar. Descubra como o Mindsite otimiza seu ecossistema digital do início ao fim.",
 };
 export default function IndexCreativeAgencyPage() {
   return (

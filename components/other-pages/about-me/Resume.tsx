@@ -119,7 +119,7 @@ export default function Resume() {
                       <div className="col-12 col-xl-3 mxd-grid-item">
                         <div className="mxd-resume__image">
                           <Image
-                            alt="Azurio Image"
+                            alt="MINDSITE Image"
                             src="/img/illustrations/resume01.webp"
                             width={1000}
                             height={455}
@@ -162,7 +162,7 @@ export default function Resume() {
                       <div className="col-12 col-xl-3 mxd-grid-item">
                         <div className="mxd-resume__image">
                           <Image
-                            alt="Azurio Image"
+                            alt="MINDSITE Image"
                             src="/img/illustrations/resume02.webp"
                             width={1000}
                             height={455}
@@ -215,7 +215,7 @@ export default function Resume() {
                       <div className="col-12 col-xl-3 mxd-grid-item">
                         <div className="mxd-resume__image">
                           <Image
-                            alt="Azurio Image"
+                            alt="MINDSITE Image"
                             src="/img/illustrations/resume03.webp"
                             width={1000}
                             height={455}
@@ -267,7 +267,7 @@ export default function Resume() {
                       <div className="col-12 col-xl-3 mxd-grid-item">
                         <div className="mxd-resume__image">
                           <Image
-                            alt="Azurio Image"
+                            alt="MINDSITE Image"
                             src="/img/illustrations/resume04.webp"
                             width={1000}
                             height={455}
@@ -320,7 +320,7 @@ export default function Resume() {
                       <div className="col-12 col-xl-3 mxd-grid-item">
                         <div className="mxd-resume__image">
                           <Image
-                            alt="Azurio Image"
+                            alt="MINDSITE Image"
                             src="/img/illustrations/resume05.webp"
                             width={1000}
                             height={455}
@@ -403,7 +403,7 @@ export default function Resume() {
                       <div className="col-12 col-xl-3 mxd-grid-item">
                         <div className="mxd-resume__image">
                           <Image
-                            alt="Azurio Image"
+                            alt="MINDSITE Image"
                             src="/img/illustrations/resume08.webp"
                             width={1000}
                             height={455}
@@ -455,7 +455,7 @@ export default function Resume() {
                       <div className="col-12 col-xl-3 mxd-grid-item">
                         <div className="mxd-resume__image">
                           <Image
-                            alt="Azurio Image"
+                            alt="MINDSITE Image"
                             src="/img/illustrations/resume07.webp"
                             width={1000}
                             height={455}
@@ -507,7 +507,7 @@ export default function Resume() {
                       <div className="col-12 col-xl-3 mxd-grid-item">
                         <div className="mxd-resume__image">
                           <Image
-                            alt="Azurio Image"
+                            alt="MINDSITE Image"
                             src="/img/illustrations/resume06.webp"
                             width={1000}
                             height={455}
@@ -588,7 +588,7 @@ export default function Resume() {
                           animation="slideDownLine"
                         >
                           <Image
-                            alt="Azurio Icon"
+                            alt="MINDSITE Icon"
                             src="/img/tech/icon-figma.svg"
                             width={50}
                             height={40}
@@ -620,7 +620,7 @@ export default function Resume() {
                           animation="slideDownLine"
                         >
                           <Image
-                            alt="Azurio Icon"
+                            alt="MINDSITE Icon"
                             src="/img/tech/icon-photoshop.svg"
                             width={50}
                             height={40}
@@ -652,7 +652,7 @@ export default function Resume() {
                           animation="slideDownLine"
                         >
                           <Image
-                            alt="Azurio Icon"
+                            alt="MINDSITE Icon"
                             src="/img/tech/icon-illustrator.svg"
                             width={50}
                             height={40}
@@ -684,7 +684,7 @@ export default function Resume() {
                           animation="slideDownLine"
                         >
                           <Image
-                            alt="Azurio Icon"
+                            alt="MINDSITE Icon"
                             src="/img/tech/icon-sketch.svg"
                             width={50}
                             height={40}
@@ -720,7 +720,7 @@ export default function Resume() {
                           animation="slideDownLine"
                         >
                           <Image
-                            alt="Azurio Icon"
+                            alt="MINDSITE Icon"
                             src="/img/tech/icon-blender.svg"
                             width={50}
                             height={40}
@@ -752,7 +752,7 @@ export default function Resume() {
                           animation="slideDownLine"
                         >
                           <Image
-                            alt="Azurio Icon"
+                            alt="MINDSITE Icon"
                             src="/img/tech/icon-midjourney.svg"
                             width={50}
                             height={40}
@@ -784,7 +784,7 @@ export default function Resume() {
                           animation="slideDownLine"
                         >
                           <Image
-                            alt="Azurio Icon"
+                            alt="MINDSITE Icon"
                             src="/img/tech/icon-unicorn.svg"
                             width={50}
                             height={40}
@@ -816,7 +816,7 @@ export default function Resume() {
                           animation="slideDownLine"
                         >
                           <Image
-                            alt="Azurio Icon"
+                            alt="MINDSITE Icon"
                             src="/img/tech/icon-notion.svg"
                             width={50}
                             height={40}

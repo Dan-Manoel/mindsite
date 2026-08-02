@@ -24,7 +24,7 @@ export default function ProtectsStack() {
   const introMarqueeRef = useRef<HTMLDivElement | null>(null);
   const marqueeWords = [
     "Design/",
-    "Development/",
+    "Desenvolvimento/",
     "Branding/",
     "eCommerce/",
     "Marketing/",
@@ -179,14 +179,14 @@ export default function ProtectsStack() {
                             href="/project-details"
                           >
                             <TextScramble className="btn-caption mxd-scramble">
-                              Know More
+                              Saiba Mais
                             </TextScramble>
                           </Link>
                         </div>
                       </div>
                       <Link
                         className="card__title active-cursor-permanent"
-                        data-cursor-text="View Work"
+                        data-cursor-text="Ver Projeto"
                         href="/project-details"
                       >
                         <p

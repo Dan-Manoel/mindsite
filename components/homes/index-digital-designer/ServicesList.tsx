@@ -26,7 +26,7 @@ export default function ServicesList() {
                           className="mxd-split-lines"
                           animation="splitLines"
                         >
-                          Intersection of art &amp; technology
+                          Interseção entre arte &amp; tecnologia
                         </CommonAnimatedText>
                       </div>
                     </div>
@@ -42,7 +42,7 @@ export default function ServicesList() {
                             href={`/services`}
                           >
                             <TextScramble className="btn-caption mxd-scramble">
-                              All Services
+                              Todos os Serviços
                             </TextScramble>
                           </Link>
                         </CommonScrollAnimated>
@@ -72,15 +72,15 @@ export default function ServicesList() {
                       </div>
                       <div className="col-12 col-xl-6 mxd-grid-padding">
                         <div className="mxd-services-list__title">
-                          <h3>Graphic design</h3>
+                          <h3>Design gráfico</h3>
                         </div>
                       </div>
                       <div className="col-12 col-xl-5 mxd-grid-padding">
                         <div className="mxd-services-list__descr">
                           <p className="t-medium">
-                            I create visually compelling designs that enhance
-                            user experience. I make sure your brand&apos;s
-                            visuals resonate with your audience.
+                            Crio designs visualmente atraentes que aprimoram
+                            a experiência do usuário. Garanto que o visual
+                            da sua marca se conecte com seu público.
                           </p>
                         </div>
                       </div>
@@ -104,16 +104,16 @@ export default function ServicesList() {
                       </div>
                       <div className="col-12 col-xl-6 mxd-grid-padding">
                         <div className="mxd-services-list__title">
-                          <h3>Brand identity</h3>
+                          <h3>Identidade de marca</h3>
                         </div>
                       </div>
                       <div className="col-12 col-xl-5 mxd-grid-padding">
                         <div className="mxd-services-list__descr">
                           <p className="t-medium">
-                            From logo design to comprehensive brand strategies,
-                            I ensure your business stands out with a unique
-                            visual identity and consistent messaging across all
-                            touchpoints.
+                            Desde a criação de logotipos até estratégias completas de marca,
+                            garanto que sua empresa se destaque com uma
+                            identidade visual única e mensagem consistente em
+                            todos os pontos de contato.
                           </p>
                         </div>
                       </div>
@@ -137,16 +137,16 @@ export default function ServicesList() {
                       </div>
                       <div className="col-12 col-xl-6 mxd-grid-padding">
                         <div className="mxd-services-list__title">
-                          <h3>Creative development</h3>
+                          <h3>Desenvolvimento criativo</h3>
                         </div>
                       </div>
                       <div className="col-12 col-xl-5 mxd-grid-padding">
                         <div className="mxd-services-list__descr">
                           <p className="t-medium">
-                            I build high-performance websites and applications
-                            using modern technologies. My solutions are designed
-                            to be scalable and functional for optimal
-                            performance.
+                            Desenvolvo sites e aplicações de alto desempenho
+                            usando tecnologias modernas. Minhas soluções são
+                            projetadas para serem escaláveis e funcionais para
+                            o máximo desempenho.
                           </p>
                         </div>
                       </div>
@@ -170,15 +170,15 @@ export default function ServicesList() {
                       </div>
                       <div className="col-12 col-xl-6 mxd-grid-padding">
                         <div className="mxd-services-list__title">
-                          <h3>Digital marketing</h3>
+                          <h3>Marketing digital</h3>
                         </div>
                       </div>
                       <div className="col-12 col-xl-5 mxd-grid-padding">
                         <div className="mxd-services-list__descr">
                           <p className="t-medium">
-                            SEO and content marketing, social media management
-                            and paid campaigns - I can help you reach and engage
-                            your target audience effectively.
+                            SEO e marketing de conteúdo, gestão de mídias sociais
+                            e campanhas pagas - posso ajudar você a alcançar
+                            e engajar seu público-alvo com eficácia.
                           </p>
                         </div>
                       </div>

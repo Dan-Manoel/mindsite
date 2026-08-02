@@ -23,7 +23,7 @@ export default function Hero() {
               <CommonCursorTrailImage
                 index={0}
                 className="mxd-trail-transparent-image"
-                alt="Azurio Template Cursor Trail Image"
+                alt="MINDSITE Template Cursor Trail Image"
                 src="/img/cursor-trail-transparent/01_trail.webp"
                 width={400}
                 height={521}
@@ -31,7 +31,7 @@ export default function Hero() {
               <CommonCursorTrailImage
                 index={1}
                 className="mxd-trail-transparent-image"
-                alt="Azurio Template Cursor Trail Image"
+                alt="MINDSITE Template Cursor Trail Image"
                 src="/img/cursor-trail-transparent/02_trail.webp"
                 width={412}
                 height={400}
@@ -39,7 +39,7 @@ export default function Hero() {
               <CommonCursorTrailImage
                 index={2}
                 className="mxd-trail-transparent-image"
-                alt="Azurio Template Cursor Trail Image"
+                alt="MINDSITE Template Cursor Trail Image"
                 src="/img/cursor-trail-transparent/03_trail.webp"
                 width={485}
                 height={400}
@@ -47,7 +47,7 @@ export default function Hero() {
               <CommonCursorTrailImage
                 index={3}
                 className="mxd-trail-transparent-image"
-                alt="Azurio Template Cursor Trail Image"
+                alt="MINDSITE Template Cursor Trail Image"
                 src="/img/cursor-trail-transparent/04_trail.webp"
                 width={530}
                 height={400}
@@ -55,7 +55,7 @@ export default function Hero() {
               <CommonCursorTrailImage
                 index={4}
                 className="mxd-trail-transparent-image"
-                alt="Azurio Template Cursor Trail Image"
+                alt="MINDSITE Template Cursor Trail Image"
                 src="/img/cursor-trail-transparent/05_trail.webp"
                 width={400}
                 height={520}
@@ -63,7 +63,7 @@ export default function Hero() {
               <CommonCursorTrailImage
                 index={5}
                 className="mxd-trail-transparent-image"
-                alt="Azurio Template Cursor Trail Image"
+                alt="MINDSITE Template Cursor Trail Image"
                 src="/img/cursor-trail-transparent/06_trail.webp"
                 width={407}
                 height={400}
@@ -71,7 +71,7 @@ export default function Hero() {
               <CommonCursorTrailImage
                 index={6}
                 className="mxd-trail-transparent-image"
-                alt="Azurio Template Cursor Trail Image"
+                alt="MINDSITE Template Cursor Trail Image"
                 src="/img/cursor-trail-transparent/07_trail.webp"
                 width={400}
                 height={480}
@@ -79,7 +79,7 @@ export default function Hero() {
               <CommonCursorTrailImage
                 index={7}
                 className="mxd-trail-transparent-image"
-                alt="Azurio Template Cursor Trail Image"
+                alt="MINDSITE Template Cursor Trail Image"
                 src="/img/cursor-trail-transparent/08_trail.webp"
                 width={637}
                 height={400}
@@ -87,7 +87,7 @@ export default function Hero() {
               <CommonCursorTrailImage
                 index={8}
                 className="mxd-trail-transparent-image"
-                alt="Azurio Template Cursor Trail Image"
+                alt="MINDSITE Template Cursor Trail Image"
                 src="/img/cursor-trail-transparent/09_trail.webp"
                 width={400}
                 height={992}

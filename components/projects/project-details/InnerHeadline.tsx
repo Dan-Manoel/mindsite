@@ -32,7 +32,7 @@ export default function InnerHeadline() {
                                 </TextScramble>
                               </Link>
                             </span>
-                            <span className="current-item">Azurio </span>
+                            <span className="current-item">MINDSITE </span>
                           </div>
                         </div>
                       </CommonLoadFade>
@@ -49,7 +49,7 @@ export default function InnerHeadline() {
                                   className="large loading-split"
                                   animation="splitLinesLoad"
                                 >
-                                  Azurio
+                                  MINDSITE
                                 </CommonAnimatedText>
                               </div>
                               <div className="inner-headline__subtitle">

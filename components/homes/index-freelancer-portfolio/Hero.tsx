@@ -38,7 +38,7 @@ export default function Hero() {
                       className="loading-chars"
                       animation="animCharsLoad"
                     >
-                      Alex Walker
+                      Danilo Oliveira
                     </CommonAnimatedText>
                   </div>
                   <div className="mxd-hero-09__divider" />
@@ -50,7 +50,7 @@ export default function Hero() {
                       <div className="mxd-hero__mark permanent loading-fade">
                         <span className="mark-icon" />
                         <span className="mark-text">
-                          Available for freelance
+                          Disponível para freelance
                         </span>
                       </div>
                     </CommonLoadFade>
@@ -60,10 +60,10 @@ export default function Hero() {
                         className="t-bold t-permanent loading-split"
                         animation="splitLinesLoad"
                       >
-                        I am Alex Walker.
+                        Sou Danilo Oliveira.
                         <span>
-                          I am passionate about crafting designs that tell
-                          stories, spark emotions, and make an impact.
+                          Sou apaixonado por criar designs que contam
+                          histórias, despertam emoções e causam impacto.
                         </span>
                       </CommonAnimatedText>
                     </div>
@@ -85,7 +85,7 @@ export default function Hero() {
                           href={`/project-details`}
                         >
                           <TextScramble className="btn-caption mxd-scramble">
-                            New Case
+                            Novo Projeto
                           </TextScramble>
                           {/* <i class="btn-icon ph-bold ph-arrow-right"></i> */}
                           <i className="btn-icon">
@@ -111,7 +111,7 @@ export default function Hero() {
                         targetId="about"
                       >
                         <TextScramble className="btn-caption mxd-scramble">
-                          Scroll to explore
+                          Role para explorar
                         </TextScramble>
                         <i>
                           <svg

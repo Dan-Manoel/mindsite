@@ -26,7 +26,7 @@ export default function Hero() {
                       <h1>
                         <Link
                           className="hero-10-headline__content active-cursor-accent"
-                          data-cursor-text="Let's Chat"
+                          data-cursor-text="Fale Comigo"
                           href={`/contact`}
                         >
                           <CommonAnimatedText
@@ -34,7 +34,7 @@ export default function Hero() {
                             className="loading-chars"
                             animation="animCharsLoad"
                           >
-                            Alex Walker
+                            Danilo Oliveira
                           </CommonAnimatedText>
                         </Link>
                       </h1>
@@ -49,7 +49,7 @@ export default function Hero() {
                       <div className="mxd-hero__mark loading-fade">
                         <span className="mark-icon" />
                         <span className="mark-text">
-                          Available for freelance
+                          Disponível para freelance
                         </span>
                       </div>
                     </CommonLoadFade>
@@ -59,10 +59,10 @@ export default function Hero() {
                         className="t-bold loading-split"
                         animation="splitLinesLoad"
                       >
-                        I am Alex Walker.
+                        Sou Danilo Oliveira.
                         <span>
-                          I am passionate about crafting designs that tell
-                          stories, spark emotions, and make an impact.
+                          Sou apaixonado por criar designs que contam
+                          histórias, despertam emoções e causam impacto.
                         </span>
                       </CommonAnimatedText>
                     </div>
@@ -90,7 +90,7 @@ export default function Hero() {
                           href={`/project-details`}
                         >
                           <TextScramble className="btn-caption mxd-scramble">
-                            New Case
+                            Novo Projeto
                           </TextScramble>
                           {/* <i class="btn-icon ph-bold ph-arrow-right"></i> */}
                           <i className="btn-icon">
@@ -106,17 +106,17 @@ export default function Hero() {
                       </div>
                       <div className="mxd-hero-10__video-info">
                         <div className="hero-10-video__name">
-                          <Link href={`/project-details`}>Azurio</Link>
+                          <Link href={`/project-details`}>MINDSITE</Link>
                         </div>
                         <div className="hero-10-video__tags">
                           <TextScramble className="tag tag-s tag-medium mxd-scramble">
                             Template
                           </TextScramble>
                           <TextScramble className="tag tag-s tag-medium mxd-scramble">
-                            IU/UX
+                            UI/UX
                           </TextScramble>
                           <TextScramble className="tag tag-s tag-medium mxd-scramble">
-                            Development
+                            Desenvolvimento
                           </TextScramble>
                         </div>
                       </div>
@@ -203,7 +203,7 @@ export default function Hero() {
                           targetId="works"
                         >
                           <TextScramble className="btn-caption mxd-scramble">
-                            Scroll to explore
+                            Role para explorar
                           </TextScramble>
                           <i>
                             <svg

@@ -33,14 +33,14 @@ export default function CTAWithMarquee() {
                       href={`/contact`}
                     >
                       <TextScramble className="btn-caption mxd-scramble">
-                        Write a line
+                        Fale comigo
                       </TextScramble>
                     </Link>
                   </CommonScrollAnimated>
                   <div className="mxd-promo__caption">
                     <Link
                       className="active-cursor-accent"
-                      data-cursor-text="Contact Me"
+                      data-cursor-text="Fale Comigo"
                       href={`/contact`}
                     >
                       <CommonAnimatedText
@@ -48,7 +48,7 @@ export default function CTAWithMarquee() {
                         className="reveal-type opposite"
                         animation="revealType"
                       >
-                        Let&apos;s talk about your project
+                        Vamos conversar sobre seu projeto
                       </CommonAnimatedText>
                     </Link>
                   </div>
@@ -65,7 +65,7 @@ export default function CTAWithMarquee() {
                       <div className="marquee__item item-imageblock">
                         <div className="marquee__tags">
                           <TextScramble className="tag tag-s tag-medium mxd-scramble">
-                            Photography
+                            Fotografia
                           </TextScramble>
                         </div>
                         <div className="marquee__image">
@@ -225,7 +225,7 @@ export default function CTAWithMarquee() {
                       <div className="marquee__item item-imageblock">
                         <div className="marquee__tags">
                           <TextScramble className="tag tag-s tag-medium mxd-scramble">
-                            Photography
+                            Fotografia
                           </TextScramble>
                         </div>
                         <div className="marquee__image">

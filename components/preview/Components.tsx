@@ -36,7 +36,7 @@ export default function Components() {
                 <div className="marquee__item">
                   <div className="marquee__component">
                     <Image
-                      alt="Azurio Template Image Example"
+                      alt="MINDSITE Template Image Example"
                       src="/img/demo/components/cmp-01.webp"
                       width={640}
                       height={400}
@@ -47,7 +47,7 @@ export default function Components() {
                 <div className="marquee__item">
                   <div className="marquee__component">
                     <Image
-                      alt="Azurio Template Image Example"
+                      alt="MINDSITE Template Image Example"
                       src="/img/demo/components/cmp-02.webp"
                       width={600}
                       height={375}
@@ -58,7 +58,7 @@ export default function Components() {
                 <div className="marquee__item">
                   <div className="marquee__component">
                     <Image
-                      alt="Azurio Template Image Example"
+                      alt="MINDSITE Template Image Example"
                       src="/img/demo/components/cmp-03.webp"
                       width={640}
                       height={400}
@@ -69,7 +69,7 @@ export default function Components() {
                 <div className="marquee__item">
                   <div className="marquee__component">
                     <Image
-                      alt="Azurio Template Image Example"
+                      alt="MINDSITE Template Image Example"
                       src="/img/demo/components/cmp-04.webp"
                       width={640}
                       height={400}
@@ -80,7 +80,7 @@ export default function Components() {
                 <div className="marquee__item">
                   <div className="marquee__component">
                     <Image
-                      alt="Azurio Template Image Example"
+                      alt="MINDSITE Template Image Example"
                       src="/img/demo/components/cmp-05.webp"
                       width={640}
                       height={400}
@@ -91,7 +91,7 @@ export default function Components() {
                 <div className="marquee__item">
                   <div className="marquee__component">
                     <Image
-                      alt="Azurio Template Image Example"
+                      alt="MINDSITE Template Image Example"
                       src="/img/demo/components/cmp-06.webp"
                       width={640}
                       height={400}
@@ -102,7 +102,7 @@ export default function Components() {
                 <div className="marquee__item">
                   <div className="marquee__component">
                     <Image
-                      alt="Azurio Template Image Example"
+                      alt="MINDSITE Template Image Example"
                       src="/img/demo/components/cmp-07.webp"
                       width={640}
                       height={400}
@@ -113,7 +113,7 @@ export default function Components() {
                 <div className="marquee__item">
                   <div className="marquee__component">
                     <Image
-                      alt="Azurio Template Image Example"
+                      alt="MINDSITE Template Image Example"
                       src="/img/demo/components/cmp-08.webp"
                       width={640}
                       height={400}
@@ -132,7 +132,7 @@ export default function Components() {
                 >
                   <Image
                     className="mxd-move-slow"
-                    alt="Azurio Template Decorative Image"
+                    alt="MINDSITE Template Decorative Image"
                     src="/img/demo/01_comp-img.webp"
                     width={600}
                     height={251}
@@ -145,7 +145,7 @@ export default function Components() {
                 >
                   <Image
                     className="mxd-move-slow"
-                    alt="Azurio Template Decorative Image"
+                    alt="MINDSITE Template Decorative Image"
                     src="/img/demo/02_comp-img.webp"
                     width={485}
                     height={203}
@@ -268,7 +268,7 @@ export default function Components() {
                 <div className="marquee__item">
                   <div className="marquee__component">
                     <Image
-                      alt="Azurio Template Image Example"
+                      alt="MINDSITE Template Image Example"
                       src="/img/demo/components/cmp-09.webp"
                       width={640}
                       height={400}
@@ -279,7 +279,7 @@ export default function Components() {
                 <div className="marquee__item">
                   <div className="marquee__component">
                     <Image
-                      alt="Azurio Template Image Example"
+                      alt="MINDSITE Template Image Example"
                       src="/img/demo/components/cmp-10.webp"
                       width={640}
                       height={400}
@@ -290,7 +290,7 @@ export default function Components() {
                 <div className="marquee__item">
                   <div className="marquee__component">
                     <Image
-                      alt="Azurio Template Image Example"
+                      alt="MINDSITE Template Image Example"
                       src="/img/demo/components/cmp-11.webp"
                       width={640}
                       height={400}
@@ -301,7 +301,7 @@ export default function Components() {
                 <div className="marquee__item">
                   <div className="marquee__component">
                     <Image
-                      alt="Azurio Template Image Example"
+                      alt="MINDSITE Template Image Example"
                       src="/img/demo/components/cmp-12.webp"
                       width={640}
                       height={400}
@@ -312,7 +312,7 @@ export default function Components() {
                 <div className="marquee__item">
                   <div className="marquee__component">
                     <Image
-                      alt="Azurio Template Image Example"
+                      alt="MINDSITE Template Image Example"
                       src="/img/demo/components/cmp-13.webp"
                       width={640}
                       height={400}
@@ -323,7 +323,7 @@ export default function Components() {
                 <div className="marquee__item">
                   <div className="marquee__component">
                     <Image
-                      alt="Azurio Template Image Example"
+                      alt="MINDSITE Template Image Example"
                       src="/img/demo/components/cmp-14.webp"
                       width={640}
                       height={400}
@@ -334,7 +334,7 @@ export default function Components() {
                 <div className="marquee__item">
                   <div className="marquee__component">
                     <Image
-                      alt="Azurio Template Image Example"
+                      alt="MINDSITE Template Image Example"
                       src="/img/demo/components/cmp-15.webp"
                       width={640}
                       height={400}
@@ -345,7 +345,7 @@ export default function Components() {
                 <div className="marquee__item">
                   <div className="marquee__component">
                     <Image
-                      alt="Azurio Template Image Example"
+                      alt="MINDSITE Template Image Example"
                       src="/img/demo/components/cmp-16.webp"
                       width={640}
                       height={400}

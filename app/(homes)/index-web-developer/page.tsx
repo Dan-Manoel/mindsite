@@ -9,9 +9,8 @@ import ParallaxDividerVideo from "@/components/homes/index-web-developer/Paralla
 import BlogPreview from "@/components/homes/index-web-developer/BlogPreview";
 import CTAWithMarquee from "@/components/homes/index-web-developer/CTAWithMarquee";
 export const metadata: Metadata = {
-  title:
-    "Index Web Developer | Azurio - Digital Agency & Portfolio NextJs Template",
-  description: "Azurio - Digital Agency & Portfolio NextJs Template",
+  title: "Desenvolvedor Web | Mindsite - Agência Digital",
+  description: "A infraestrutura que o seu negócio precisa para escalar. Descubra como o Mindsite otimiza seu ecossistema digital do início ao fim.",
 };
 export default function IndexWebDeveloperPage() {
   return (
@@ -22,13 +21,13 @@ export default function IndexWebDeveloperPage() {
         <ProjectsGrid />
         <AboutProcess />
         <DividerStickyCaption
-          topCtaLabel="Explore"
+          topCtaLabel="Explorar"
           topCtaHref="/services"
-          captionCursorText="I do best"
+          captionCursorText="Especialidades"
           captionHref="/services"
         >
-          From <span>pixel-perfect designs</span> to
-          <span>flawless code</span>- the highest standards of quality.
+          De <span>designs impecáveis</span> a
+          <span>código de alta performance</span> — o mais alto padrão de qualidade.
         </DividerStickyCaption>
         <ParallaxDividerVideo />
         <BlogPreview />

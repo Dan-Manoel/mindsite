@@ -39,7 +39,7 @@ export default function FeaturesCards() {
                           className="t-bold t-large mxd-split-lines"
                           animation="splitLines"
                         >
-                          Azurio packed with smooth animations, modern design
+                          MINDSITE packed with smooth animations, modern design
                           tools and clean code.{" "}
                           <span>
                             It&apos;s a flexible, future-proof template
@@ -91,7 +91,7 @@ export default function FeaturesCards() {
                         </div>
                         <div className="mxd-niche-cards__image absolute-desktop-bottom">
                           <Image
-                            alt="Azurio Template Sample Image"
+                            alt="MINDSITE Template Sample Image"
                             src="/img/demo/01_fea-img.webp"
                             width={1200}
                             height={1292}
@@ -144,7 +144,7 @@ export default function FeaturesCards() {
                               </div>
                               <div className="mxd-niche-cards__image absolute-desktop-full">
                                 <Image
-                                  alt="Azurio Template Sample Image"
+                                  alt="MINDSITE Template Sample Image"
                                   src="/img/demo/02_fea-img.webp"
                                   width={1320}
                                   height={800}
@@ -188,7 +188,7 @@ export default function FeaturesCards() {
                               </div>
                               <div className="mxd-niche-cards__image absolute-desktop-full">
                                 <Image
-                                  alt="Azurio Template Sample Image"
+                                  alt="MINDSITE Template Sample Image"
                                   src="/img/demo/03_fea-img.webp"
                                   width={1200}
                                   height={974}
@@ -232,7 +232,7 @@ export default function FeaturesCards() {
                               </div>
                               <div className="mxd-niche-cards__image absolute-desktop-aside">
                                 <Image
-                                  alt="Azurio Template Sample Image"
+                                  alt="MINDSITE Template Sample Image"
                                   src="/img/demo/04_fea-img.webp"
                                   width={800}
                                   height={927}

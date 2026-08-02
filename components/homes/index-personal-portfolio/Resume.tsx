@@ -36,7 +36,7 @@ export default function Resume() {
                       <div className="mxd-section-title__title pre-caption-extra">
                         <a
                           className="active-cursor-accent"
-                          data-cursor-text="Download CV"
+                          data-cursor-text="Baixar CV"
                           href="#0"
                         >
                           <CommonAnimatedText
@@ -44,9 +44,9 @@ export default function Resume() {
                             className="mxd-split-lines"
                             animation="splitLines"
                           >
-                            My digital
+                            Minha jornada
                             <br />
-                            journey
+                            digital
                           </CommonAnimatedText>
                         </a>
                       </div>
@@ -61,18 +61,15 @@ export default function Resume() {
                     <div className="col-12 col-xl-8 mxd-grid-item">
                       <div className="mxd-section-info__descr">
                         <p className="t-extra t-bold">
-                          <a data-cursor-text="Download CV" href="#0">
+                          <a data-cursor-text="Baixar CV" href="#0">
                             <CommonAnimatedText
                               as="span"
                               className="active-cursor-accent mxd-split-lines"
                               animation="splitLines"
                             >
-                              Web design is evolving rapidly, and I strive to
-                              stay ahead.
+                              O web design está evoluindo rapidamente e busco estar sempre na frente.
                               <span>
-                                Emerging tools and technologies enable me to
-                                create visually stunning and seamlessly
-                                functional websites.
+                                Ferramentas e tecnologias emergentes me permitem criar sites visualmente impressionantes e com funcionalidade impecável.
                               </span>
                             </CommonAnimatedText>
                           </a>
@@ -98,7 +95,7 @@ export default function Resume() {
                           animation="inUp"
                         >
                           <span className="tag tag-m meta-tag">
-                            [01] Experience
+                            [01] Experiência
                           </span>
                         </CommonScrollAnimated>
                       </div>
@@ -117,13 +114,13 @@ export default function Resume() {
                     <div className="row g-0">
                       <div className="col-12 col-xl-4 mxd-grid-item">
                         <div className="mxd-resume__title">
-                          <p>UI/UX designer</p>
+                          <p>Designer de UI/UX</p>
                         </div>
                       </div>
                       <div className="col-12 col-xl-3 mxd-grid-item">
                         <div className="mxd-resume__image">
                           <Image
-                            alt="Azurio Image"
+                            alt="MINDSITE Image"
                             src="/img/illustrations/resume01.webp"
                             width={1000}
                             height={455}
@@ -142,7 +139,7 @@ export default function Resume() {
                       </div>
                       <div className="col-12 col-xl-2 mxd-grid-item">
                         <div className="mxd-resume__date">
-                          <p>2024 - now</p>
+                          <p>2024 - atual</p>
                         </div>
                       </div>
                     </div>
@@ -154,13 +151,13 @@ export default function Resume() {
                     <div className="row g-0">
                       <div className="col-12 col-xl-4 mxd-grid-item">
                         <div className="mxd-resume__title">
-                          <p>Branding designer</p>
+                          <p>Designer de marcas</p>
                         </div>
                       </div>
                       <div className="col-12 col-xl-3 mxd-grid-item">
                         <div className="mxd-resume__image">
                           <Image
-                            alt="Azurio Image"
+                            alt="MINDSITE Image"
                             src="/img/illustrations/resume02.webp"
                             width={1000}
                             height={455}
@@ -179,7 +176,7 @@ export default function Resume() {
                       </div>
                       <div className="col-12 col-xl-2 mxd-grid-item">
                         <div className="mxd-resume__date">
-                          <p>2024 - now</p>
+                          <p>2024 - atual</p>
                         </div>
                       </div>
                     </div>
@@ -191,13 +188,13 @@ export default function Resume() {
                     <div className="row g-0">
                       <div className="col-12 col-xl-4 mxd-grid-item">
                         <div className="mxd-resume__title">
-                          <p>Creative director</p>
+                          <p>Diretor criativo</p>
                         </div>
                       </div>
                       <div className="col-12 col-xl-3 mxd-grid-item">
                         <div className="mxd-resume__image">
                           <Image
-                            alt="Azurio Image"
+                            alt="MINDSITE Image"
                             src="/img/illustrations/resume03.webp"
                             width={1000}
                             height={455}
@@ -227,13 +224,13 @@ export default function Resume() {
                     <div className="row g-0">
                       <div className="col-12 col-xl-4 mxd-grid-item">
                         <div className="mxd-resume__title">
-                          <p>Graphic designer</p>
+                          <p>Designer gráfico</p>
                         </div>
                       </div>
                       <div className="col-12 col-xl-3 mxd-grid-item">
                         <div className="mxd-resume__image">
                           <Image
-                            alt="Azurio Image"
+                            alt="MINDSITE Image"
                             src="/img/illustrations/resume04.webp"
                             width={1000}
                             height={455}
@@ -264,13 +261,13 @@ export default function Resume() {
                     <div className="row g-0">
                       <div className="col-12 col-xl-4 mxd-grid-item">
                         <div className="mxd-resume__title">
-                          <p>Illustrator</p>
+                          <p>Ilustrador</p>
                         </div>
                       </div>
                       <div className="col-12 col-xl-3 mxd-grid-item">
                         <div className="mxd-resume__image">
                           <Image
-                            alt="Azurio Image"
+                            alt="MINDSITE Image"
                             src="/img/illustrations/resume05.webp"
                             width={1000}
                             height={455}
@@ -316,7 +313,7 @@ export default function Resume() {
                           animation="inUp"
                         >
                           <span className="tag tag-m meta-tag">
-                            [02] Education
+                            [02] Formação
                           </span>
                         </CommonScrollAnimated>
                       </CommonScrollAnimated>
@@ -335,13 +332,13 @@ export default function Resume() {
                     <div className="row g-0">
                       <div className="col-12 col-xl-4 mxd-grid-item">
                         <div className="mxd-resume__title">
-                          <p>UI/UX Designer</p>
+                          <p>Designer de UI/UX</p>
                         </div>
                       </div>
                       <div className="col-12 col-xl-3 mxd-grid-item">
                         <div className="mxd-resume__image">
                           <Image
-                            alt="Azurio Image"
+                            alt="MINDSITE Image"
                             src="/img/illustrations/resume08.webp"
                             width={1000}
                             height={455}
@@ -371,13 +368,13 @@ export default function Resume() {
                     <div className="row g-0">
                       <div className="col-12 col-xl-4 mxd-grid-item">
                         <div className="mxd-resume__title">
-                          <p>Graphic design</p>
+                          <p>Design Gráfico</p>
                         </div>
                       </div>
                       <div className="col-12 col-xl-3 mxd-grid-item">
                         <div className="mxd-resume__image">
                           <Image
-                            alt="Azurio Image"
+                            alt="MINDSITE Image"
                             src="/img/illustrations/resume07.webp"
                             width={1000}
                             height={455}
@@ -407,13 +404,13 @@ export default function Resume() {
                     <div className="row g-0">
                       <div className="col-12 col-xl-4 mxd-grid-item">
                         <div className="mxd-resume__title">
-                          <p>Drawing concentration</p>
+                          <p>Especialização em Desenho</p>
                         </div>
                       </div>
                       <div className="col-12 col-xl-3 mxd-grid-item">
                         <div className="mxd-resume__image">
                           <Image
-                            alt="Azurio Image"
+                            alt="MINDSITE Image"
                             src="/img/illustrations/resume06.webp"
                             width={1000}
                             height={455}
@@ -458,7 +455,7 @@ export default function Resume() {
                           animation="inUp"
                         >
                           <span className="tag tag-m meta-tag">
-                            [03] Everyday&apos;s toolbox
+                            [03] Ferramentas do dia a dia
                           </span>
                         </CommonScrollAnimated>
                       </CommonScrollAnimated>
@@ -488,7 +485,7 @@ export default function Resume() {
                           animation="slideDownLine"
                         >
                           <Image
-                            alt="Azurio Icon"
+                            alt="MINDSITE Icon"
                             src="/img/tech/icon-figma.svg"
                             width={50}
                             height={40}
@@ -520,7 +517,7 @@ export default function Resume() {
                           animation="slideDownLine"
                         >
                           <Image
-                            alt="Azurio Icon"
+                            alt="MINDSITE Icon"
                             src="/img/tech/icon-photoshop.svg"
                             width={50}
                             height={40}
@@ -552,7 +549,7 @@ export default function Resume() {
                           animation="slideDownLine"
                         >
                           <Image
-                            alt="Azurio Icon"
+                            alt="MINDSITE Icon"
                             src="/img/tech/icon-illustrator.svg"
                             width={50}
                             height={40}
@@ -584,7 +581,7 @@ export default function Resume() {
                           animation="slideDownLine"
                         >
                           <Image
-                            alt="Azurio Icon"
+                            alt="MINDSITE Icon"
                             src="/img/tech/icon-sketch.svg"
                             width={50}
                             height={40}
@@ -620,7 +617,7 @@ export default function Resume() {
                           animation="slideDownLine"
                         >
                           <Image
-                            alt="Azurio Icon"
+                            alt="MINDSITE Icon"
                             src="/img/tech/icon-blender.svg"
                             width={50}
                             height={40}
@@ -652,7 +649,7 @@ export default function Resume() {
                           animation="slideDownLine"
                         >
                           <Image
-                            alt="Azurio Icon"
+                            alt="MINDSITE Icon"
                             src="/img/tech/icon-midjourney.svg"
                             width={50}
                             height={40}
@@ -684,7 +681,7 @@ export default function Resume() {
                           animation="slideDownLine"
                         >
                           <Image
-                            alt="Azurio Icon"
+                            alt="MINDSITE Icon"
                             src="/img/tech/icon-unicorn.svg"
                             width={50}
                             height={40}
@@ -716,7 +713,7 @@ export default function Resume() {
                           animation="slideDownLine"
                         >
                           <Image
-                            alt="Azurio Icon"
+                            alt="MINDSITE Icon"
                             src="/img/tech/icon-notion.svg"
                             width={50}
                             height={40}

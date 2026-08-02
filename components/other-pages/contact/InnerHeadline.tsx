@@ -90,15 +90,15 @@ export default function InnerHeadline() {
                   <a
                     className="fullwidth-text__content small accent active-cursor"
                     data-cursor-text="Vamos conversar"
-                    href="mailto:contato@mindsite.com.br?subject=Mensagem%20do%20site"
-                    aria-label="Send email to contato@mindsite.com.br"
+                    href="mailto:ola@mindsite.com.br?subject=Mensagem%20do%20site"
+                    aria-label="Send email to ola@mindsite.com.br"
                   >
                     <CommonAnimatedText
                       as="span"
                       className="anim-uni-chars"
                       animation="animChars"
                     >
-                      contato@mindsite.com.br
+                      ola@mindsite.com.br
                     </CommonAnimatedText>
                   </a>
                 </div>

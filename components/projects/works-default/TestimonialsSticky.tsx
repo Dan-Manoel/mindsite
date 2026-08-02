@@ -116,14 +116,14 @@ export default function TestimonialsSticky() {
                             </div>
                             <div className="mxd-testimonials-card__content">
                               <p className="mxd-testimonials-card__descr">
-                                Working with Azurio team was
+                                Working with MINDSITE team was
                                 <span>an absolute pleasure!</span>
                               </p>
                             </div>
                             <div className="mxd-testimonials-card__author">
                               <div className="mxd-testimonials-card__photo">
                                 <Image
-                                  alt="Azurio Template Example Image"
+                                  alt="MINDSITE Template Example Image"
                                   src="/img/avatars/300x300_ava-01.webp"
                                   width={300}
                                   height={300}
@@ -152,7 +152,7 @@ export default function TestimonialsSticky() {
                               animation="clipImage"
                             >
                               <Image
-                                alt="Azurio Template Example Image"
+                                alt="MINDSITE Template Example Image"
                                 src="/img/avatars/800x800_ava-01.webp"
                                 width={800}
                                 height={800}
@@ -195,7 +195,7 @@ export default function TestimonialsSticky() {
                                 </div>
                               </div>
                               <p className="mxd-testimonials-card__descr">
-                                Azurio team took the time to understand our
+                                MINDSITE team took the time to understand our
                                 business needs{" "}
                                 <span>
                                   and translated them into a beautifully
@@ -206,7 +206,7 @@ export default function TestimonialsSticky() {
                             <div className="mxd-testimonials-card__author">
                               <div className="mxd-testimonials-card__photo">
                                 <Image
-                                  alt="Azurio Template Example Image"
+                                  alt="MINDSITE Template Example Image"
                                   src="/img/avatars/300x300_ava-02.webp"
                                   width={300}
                                   height={300}
@@ -243,7 +243,7 @@ export default function TestimonialsSticky() {
                               animation="clipImage"
                             >
                               <Image
-                                alt="Azurio Template Example Image"
+                                alt="MINDSITE Template Example Image"
                                 src="/img/avatars/800x800_ava-02.webp"
                                 width={800}
                                 height={800}
@@ -286,7 +286,7 @@ export default function TestimonialsSticky() {
                             </div>
                             <div className="mxd-testimonials-card__content">
                               <p className="mxd-testimonials-card__descr">
-                                The Azurio team nailed it! They understood our
+                                The MINDSITE team nailed it! They understood our
                                 vision{" "}
                                 <span>
                                   and delivered a sleek, intuitive site that our
@@ -297,7 +297,7 @@ export default function TestimonialsSticky() {
                             <div className="mxd-testimonials-card__author">
                               <div className="mxd-testimonials-card__photo">
                                 <Image
-                                  alt="Azurio Template Example Image"
+                                  alt="MINDSITE Template Example Image"
                                   src="/img/avatars/300x300_ava-03.webp"
                                   width={300}
                                   height={300}
@@ -327,7 +327,7 @@ export default function TestimonialsSticky() {
                               animation="clipImage"
                             >
                               <Image
-                                alt="Azurio Template Example Image"
+                                alt="MINDSITE Template Example Image"
                                 src="/img/avatars/800x800_ava-03.webp"
                                 width={800}
                                 height={800}
@@ -387,7 +387,7 @@ export default function TestimonialsSticky() {
                             <div className="mxd-testimonials-card__author">
                               <div className="mxd-testimonials-card__photo">
                                 <Image
-                                  alt="Azurio Template Example Image"
+                                  alt="MINDSITE Template Example Image"
                                   src="/img/avatars/300x300_ava-04.webp"
                                   width={300}
                                   height={300}
@@ -453,7 +453,7 @@ export default function TestimonialsSticky() {
                             <div className="mxd-testimonials-card__author">
                               <div className="mxd-testimonials-card__photo">
                                 <Image
-                                  alt="Azurio Template Example Image"
+                                  alt="MINDSITE Template Example Image"
                                   src="/img/avatars/300x300_ava-05.webp"
                                   width={300}
                                   height={300}
@@ -482,7 +482,7 @@ export default function TestimonialsSticky() {
                               animation="clipImage"
                             >
                               <Image
-                                alt="Azurio Template Example Image"
+                                alt="MINDSITE Template Example Image"
                                 src="/img/avatars/800x800_ava-04.webp"
                                 width={800}
                                 height={800}

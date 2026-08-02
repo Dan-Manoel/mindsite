@@ -29,9 +29,9 @@ export default function ProjectsGrid() {
                         className="reveal-type"
                         animation="revealType"
                       >
-                        Featured case
+                        Cases em
                         <br />
-                        studies
+                        destaque
                       </CommonAnimatedText>
                     </div>
                   </div>
@@ -47,7 +47,7 @@ export default function ProjectsGrid() {
                           href={`/works-default`}
                         >
                           <TextScramble className="btn-caption mxd-scramble">
-                            All Works
+                            Todos os Projetos
                           </TextScramble>
                         </Link>
                       </CommonScrollAnimated>
@@ -57,8 +57,8 @@ export default function ProjectsGrid() {
                           className="t-bold t-large mxd-split-lines"
                           animation="splitLines"
                         >
-                          Explore a selection of projects blending
-                          <span>creativity with practical design</span>
+                          Explore uma seleção de projetos que unem
+                          <span> criatividade com design prático</span>
                         </CommonAnimatedText>
                       </div>
                     </div>
@@ -80,7 +80,7 @@ export default function ProjectsGrid() {
                   >
                     <Link
                       className="mxd-project-item__media active-cursor-permanent"
-                      data-cursor-text="View Work"
+                      data-cursor-text="Ver Projeto"
                       href={`/project-details`}
                     >
                       <MxdImgAnim
@@ -130,7 +130,7 @@ export default function ProjectsGrid() {
                           className="project-name-s"
                           href={`/project-details`}
                         >
-                          Illustrations set
+                          Conjunto de ilustrações
                         </Link>
                       </div>
                       <div className="mxd-project-item__tags">
@@ -138,10 +138,10 @@ export default function ProjectsGrid() {
                           Design
                         </TextScramble>
                         <TextScramble className="tag tag-s tag-medium mxd-scramble">
-                          Illustrations
+                          Ilustrações
                         </TextScramble>
                         <TextScramble className="tag tag-s tag-medium mxd-scramble">
-                          Packaging
+                          Embalagem
                         </TextScramble>
                         <TextScramble className="tag tag-s tag-medium mxd-scramble">
                           Marketing
@@ -156,7 +156,7 @@ export default function ProjectsGrid() {
                   >
                     <Link
                       className="mxd-project-item__media active-cursor-permanent"
-                      data-cursor-text="View Work"
+                      data-cursor-text="Ver Projeto"
                       href={`/project-details`}
                     >
                       <MxdImgAnim
@@ -206,7 +206,7 @@ export default function ProjectsGrid() {
                           className="project-name-s"
                           href={`/project-details`}
                         >
-                          Interactive concept
+                          Conceito interativo
                         </Link>
                       </div>
                       <div className="mxd-project-item__tags">
@@ -214,10 +214,10 @@ export default function ProjectsGrid() {
                           UI/UX
                         </TextScramble>
                         <TextScramble className="tag tag-s tag-medium mxd-scramble">
-                          Development
+                          Desenvolvimento
                         </TextScramble>
                         <TextScramble className="tag tag-s tag-medium mxd-scramble">
-                          Brand
+                          Branding
                         </TextScramble>
                       </div>
                     </div>
@@ -229,7 +229,7 @@ export default function ProjectsGrid() {
                   >
                     <Link
                       className="mxd-project-item__media active-cursor-permanent"
-                      data-cursor-text="View Work"
+                      data-cursor-text="Ver Projeto"
                       href={`/project-details`}
                     >
                       <MxdImgAnim
@@ -286,12 +286,12 @@ export default function ProjectsGrid() {
                           className="project-name-s"
                           href={`/project-details`}
                         >
-                          Creative studio template
+                          Template de estúdio criativo
                         </Link>
                       </div>
                       <div className="mxd-project-item__tags">
                         <TextScramble className="tag tag-s tag-medium mxd-scramble">
-                          Brand
+                          Branding
                         </TextScramble>
                         <TextScramble className="tag tag-s tag-medium mxd-scramble">
                           Marketing
@@ -309,7 +309,7 @@ export default function ProjectsGrid() {
                   >
                     <Link
                       className="mxd-project-item__media active-cursor-permanent"
-                      data-cursor-text="View Work"
+                      data-cursor-text="Ver Projeto"
                       href={`/project-details`}
                     >
                       <MxdImgAnim
@@ -373,12 +373,12 @@ export default function ProjectsGrid() {
                           className="project-name-s"
                           href={`/project-details`}
                         >
-                          Interactive concept
+                          Conceito interativo
                         </Link>
                       </div>
                       <div className="mxd-project-item__tags">
                         <TextScramble className="tag tag-s tag-medium mxd-scramble">
-                          Brand
+                          Branding
                         </TextScramble>
                         <TextScramble className="tag tag-s tag-medium mxd-scramble">
                           Marketing
@@ -396,7 +396,7 @@ export default function ProjectsGrid() {
                   >
                     <Link
                       className="mxd-project-item__media active-cursor-permanent"
-                      data-cursor-text="View Work"
+                      data-cursor-text="Ver Projeto"
                       href={`/project-details`}
                     >
                       <MxdImgAnim
@@ -453,12 +453,12 @@ export default function ProjectsGrid() {
                           className="project-name-s"
                           href={`/project-details`}
                         >
-                          Interactive concept
+                          Conceito interativo
                         </Link>
                       </div>
                       <div className="mxd-project-item__tags">
                         <TextScramble className="tag tag-s tag-medium mxd-scramble">
-                          Brand
+                          Branding
                         </TextScramble>
                         <TextScramble className="tag tag-s tag-medium mxd-scramble">
                           Marketing
@@ -476,7 +476,7 @@ export default function ProjectsGrid() {
                   >
                     <Link
                       className="mxd-project-item__media active-cursor-permanent"
-                      data-cursor-text="View Work"
+                      data-cursor-text="Ver Projeto"
                       href={`/project-details`}
                     >
                       <MxdImgAnim
@@ -540,12 +540,12 @@ export default function ProjectsGrid() {
                           className="project-name-s"
                           href={`/project-details`}
                         >
-                          Interactive concept
+                          Conceito interativo
                         </Link>
                       </div>
                       <div className="mxd-project-item__tags">
                         <TextScramble className="tag tag-s tag-medium mxd-scramble">
-                          Brand
+                          Branding
                         </TextScramble>
                         <TextScramble className="tag tag-s tag-medium mxd-scramble">
                           Marketing
@@ -575,7 +575,7 @@ export default function ProjectsGrid() {
                             >
                               <path d="M143.9,0v28.8h-28.8V0h28.8ZM143.9,28.8v28.8h28.8v-28.8h-28.8ZM172.7,57.6v28.8h28.8v-28.8h-28.8ZM230.2,115.2v-28.8h-28.8v28.8H0v28.8h201.4v28.8h28.8v-28.8h28.8v-28.8h-28.8ZM172.7,201.6h28.8v-28.8h-28.8v28.8ZM143.9,230.4h28.8v-28.8h-28.8v28.8ZM114.3,260h28.8v-28.8h-28.8v28.8Z" />
                             </svg>
-                            {/* <Image   alt="Azurio Image"    src="/img/cursor-trail-transparent/07_trail.webp" width="400" height="480" /> */}
+                            {/* <Image   alt="MINDSITE Image"    src="/img/cursor-trail-transparent/07_trail.webp" width="400" height="480" /> */}
                           </CommonScrollAnimated>
                         </div>
                         <div className="col-12 col-md-6 col-xl-4 mxd-object-link__item justify-end">
@@ -590,13 +590,13 @@ export default function ProjectsGrid() {
                                 href={`/works-default`}
                               >
                                 <TextScramble className="btn-caption mxd-scramble">
-                                  All Works
+                                  Todos os Projetos
                                 </TextScramble>
                               </Link>
                             </CommonScrollAnimated>
                             <CommonScrollAnimatedLink
                               className="mxd-object-link__media active-cursor-permanent anim-uni-in-up"
-                              data-cursor-text="All Works"
+                              data-cursor-text="Todos os Projetos"
                               href={`/works-default`}
                               animation="inUp"
                             >

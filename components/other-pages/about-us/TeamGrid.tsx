@@ -80,7 +80,7 @@ export default function TeamGrid() {
                       <div className="mxd-team-grid__media">
                         <div className="mxd-team-grid__photo">
                           <Image
-                            alt="Azurio Template Team Member Photo"
+                            alt="MINDSITE Template Team Member Photo"
                             src="/img/avatars/800x800_ava-05.webp"
                             width={800}
                             height={800}
@@ -129,7 +129,7 @@ export default function TeamGrid() {
                       <div className="mxd-team-grid__media">
                         <div className="mxd-team-grid__photo">
                           <Image
-                            alt="Azurio Template Team Member Photo"
+                            alt="MINDSITE Template Team Member Photo"
                             src="/img/avatars/800x800_ava-06.webp"
                             width={800}
                             height={800}
@@ -178,7 +178,7 @@ export default function TeamGrid() {
                       <div className="mxd-team-grid__media">
                         <div className="mxd-team-grid__photo">
                           <Image
-                            alt="Azurio Template Team Member Photo"
+                            alt="MINDSITE Template Team Member Photo"
                             src="/img/avatars/800x800_ava-07.webp"
                             width={800}
                             height={800}

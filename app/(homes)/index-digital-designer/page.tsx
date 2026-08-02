@@ -8,9 +8,8 @@ import ParallaxDividerImage from "@/components/homes/index-digital-designer/Para
 import ServicesList from "@/components/homes/index-digital-designer/ServicesList";
 import CTAWithMarquee from "@/components/homes/index-digital-designer/CTAWithMarquee";
 export const metadata: Metadata = {
-  title:
-    "Index Digital Designer | Azurio - Digital Agency & Portfolio NextJs Template",
-  description: "Azurio - Digital Agency & Portfolio NextJs Template",
+  title: "Designer Digital | Mindsite - Agência Digital",
+  description: "A infraestrutura que o seu negócio precisa para escalar. Descubra como o Mindsite otimiza seu ecossistema digital do início ao fim.",
 };
 export default function IndexDigitalDesignerPage() {
   return (

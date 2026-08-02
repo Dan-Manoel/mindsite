@@ -46,7 +46,7 @@ export default function InnerHeadline() {
                                 <div className="inner-headline__title no-sup pre-subtitle-large loading-item">
                                   <CommonHeroTyped className="large animated-type">
                                     <b>Designer UI</b>
-                                    <b>Artista 3D</b>
+                                    <b>Desenvolvedor</b>
                                     <b>Ilustrador</b>
                                   </CommonHeroTyped>
                                 </div>
@@ -59,7 +59,7 @@ export default function InnerHeadline() {
                                   data-cursor-text="Baixar CV"
                                   href="#0"
                                 >
-                                  👋 Olá! Sou Alex Walker. Sou apaixonado por
+                                  👋 Olá! Sou Danilo Oliveira. Sou apaixonado por
                                   {" "}
                                   <span>
                                     criar designs que contam histórias, despertam

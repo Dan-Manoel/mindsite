@@ -26,20 +26,20 @@ const HERO_SLIDES: HeroSlide[] = [
   {
     src: "/img/hero/1920x1200_h03.webp",
     name: "Solei",
-    description: "Interactive concept",
-    descriptionAccent: "powered by AI",
+    description: "Conceito interativo",
+    descriptionAccent: "com IA",
   },
   {
     src: "/img/hero/1920x1200_h04.webp",
-    name: "Azurio",
-    description: "Digital agency & personal portfolio",
-    descriptionAccent: "React Nextjs Template",
+    name: "MINDSITE",
+    description: "Agência digital & portfólio pessoal",
+    descriptionAccent: "Template React Nextjs",
   },
   {
     src: "/img/hero/1920x1200_h05.webp",
     name: "Sunset",
     description: "Editorial Midjourney",
-    descriptionAccent: "illustrations set",
+    descriptionAccent: "conjunto de ilustrações",
   },
 ];
 
@@ -93,10 +93,10 @@ export default function Hero() {
       snap:
         slideCount > 1
           ? {
-              snapTo: 1 / (slideCount - 1),
-              duration: { min: 0.2, max: 0.6 },
-              ease: "none",
-            }
+            snapTo: 1 / (slideCount - 1),
+            duration: { min: 0.2, max: 0.6 },
+            ease: "none",
+          }
           : undefined,
       onUpdate: (self) => {
         const sliderWidth = slider.offsetWidth;
@@ -181,7 +181,7 @@ export default function Hero() {
                       href={`/works-grid`}
                     >
                       <TextScramble className="btn-caption mxd-scramble">
-                        All Work
+                        Todos os Projetos
                       </TextScramble>
                     </Link>
                   </div>
@@ -193,7 +193,7 @@ export default function Hero() {
                       targetId="about"
                     >
                       <TextScramble className="btn-caption mxd-scramble">
-                        Scroll to explore
+                        Role para explorar
                       </TextScramble>
                       <i>
                         <svg
@@ -242,7 +242,7 @@ export default function Hero() {
                     >
                       <div className="mxd-hero-04__media">
                         <Image
-                          alt="Azurio Template Sample Image"
+                          alt="MINDSITE Template Sample Image"
                           src={slide.src}
                           width={1920}
                           height={1200}
@@ -257,7 +257,7 @@ export default function Hero() {
                         <CommonLoadFade index={1}>
                           <Link
                             className="mxd-hero-04__title active-cursor-accent loading-fade"
-                            data-cursor-text="View Work"
+                            data-cursor-text="Ver Projeto"
                             href={`/project-details`}
                           >
                             <div className="mxd-hero-04__name mxd-grid-item">
@@ -290,7 +290,7 @@ export default function Hero() {
                       ) : (
                         <Link
                           className="mxd-hero-04__title active-cursor-accent"
-                          data-cursor-text="View Work"
+                          data-cursor-text="Ver Projeto"
                           href={`/project-details`}
                         >
                           <div className="mxd-hero-04__name mxd-grid-item">

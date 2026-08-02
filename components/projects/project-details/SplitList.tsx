@@ -29,7 +29,7 @@ export default function SplitList() {
                           className="manifest manifest-s mxd-split-lines"
                           animation="splitLines"
                         >
-                          Stand out and express your uniqueness with Azurio - a
+                          Stand out and express your uniqueness with MINDSITE - a
                           vibrant and minimal React Nextjs Template for
                           creatives, studios and freelancers.
                           <span>
@@ -85,7 +85,7 @@ export default function SplitList() {
                             >
                               Name:
                               <span>
-                                Azurio - digital agency &amp; personal portfolio
+                                MINDSITE - digital agency &amp; personal portfolio
                                 React Nextjs Template
                               </span>
                             </CommonScrollAnimated>

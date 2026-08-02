@@ -26,14 +26,14 @@ export default function CTA() {
                         href={`/contact`}
                       >
                         <TextScramble className="btn-caption mxd-scramble">
-                          Write a line
+                          Fale conosco
                         </TextScramble>
                       </Link>
                     </CommonScrollAnimated>
                     <div className="mxd-promo__caption">
                       <Link
                         className="active-cursor-permanent"
-                        data-cursor-text="Contact Us"
+                        data-cursor-text="Fale Conosco"
                         href={`/contact`}
                       >
                         <CommonAnimatedText
@@ -41,7 +41,7 @@ export default function CTA() {
                           className="mxd-split-lines permanent"
                           animation="splitLines"
                         >
-                          Let&apos;s talk about your project
+                          Vamos conversar sobre seu projeto
                         </CommonAnimatedText>
                       </Link>
                     </div>

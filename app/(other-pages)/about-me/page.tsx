@@ -8,8 +8,8 @@ import ParallaxDividerImage2 from "@/components/other-pages/about-me/ParallaxDiv
 import TestimonialsSlider from "@/components/other-pages/about-me/TestimonialsSlider";
 import CTAWithMarquee from "@/components/other-pages/about-me/CTAWithMarquee";
 export const metadata: Metadata = {
-  title: "About Me | Azurio - Digital Agency & Portfolio NextJs Template",
-  description: "Azurio - Digital Agency & Portfolio NextJs Template",
+  title: "About Me | Mindsite - Agencia digital",
+  description: "A infraestrutura que o seu negócio precisa para escalar. Descubra como o Mindsite otimiza seu ecossistema digital do início ao fim.",
 };
 export default function AboutMePage() {
   return (

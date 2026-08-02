@@ -33,14 +33,14 @@ export default function CTAWithMarquee() {
                       href={`/contact`}
                     >
                       <TextScramble className="btn-caption mxd-scramble">
-                        Write a line
+                        Envie uma mensagem
                       </TextScramble>
                     </Link>
                   </CommonScrollAnimated>
                   <div className="mxd-promo__caption">
                     <Link
                       className="active-cursor-accent"
-                      data-cursor-text="Contact Me"
+                      data-cursor-text="Fale Comigo"
                       href={`/contact`}
                     >
                       <CommonAnimatedText
@@ -48,7 +48,7 @@ export default function CTAWithMarquee() {
                         className="mxd-split-lines opposite"
                         animation="splitLines"
                       >
-                        Let&apos;s talk about your project
+                        Vamos falar sobre o seu projeto
                       </CommonAnimatedText>
                     </Link>
                   </div>
@@ -65,7 +65,7 @@ export default function CTAWithMarquee() {
                       <div className="marquee__item item-imageblock">
                         <div className="marquee__tags">
                           <TextScramble className="tag tag-s tag-medium mxd-scramble">
-                            Photography
+                            Fotografia
                           </TextScramble>
                         </div>
                         <div className="marquee__image">
@@ -81,7 +81,7 @@ export default function CTAWithMarquee() {
                       <div className="marquee__item item-imageblock">
                         <div className="marquee__tags">
                           <TextScramble className="tag tag-s tag-medium mxd-scramble">
-                            3D Models
+                            Modelos 3D
                           </TextScramble>
                         </div>
                         <div className="marquee__image">
@@ -97,7 +97,7 @@ export default function CTAWithMarquee() {
                       <div className="marquee__item item-imageblock">
                         <div className="marquee__tags">
                           <TextScramble className="tag tag-s tag-medium mxd-scramble">
-                            Development
+                            Desenvolvimento
                           </TextScramble>
                         </div>
                         <div className="marquee__image">
@@ -113,7 +113,7 @@ export default function CTAWithMarquee() {
                       <div className="marquee__item item-imageblock">
                         <div className="marquee__tags">
                           <TextScramble className="tag tag-s tag-medium mxd-scramble">
-                            Illustrations
+                            Ilustrações
                           </TextScramble>
                         </div>
                         <div className="marquee__image">
@@ -129,7 +129,7 @@ export default function CTAWithMarquee() {
                       <div className="marquee__item item-imageblock">
                         <div className="marquee__tags">
                           <TextScramble className="tag tag-s tag-medium mxd-scramble">
-                            Fashion
+                            Moda
                           </TextScramble>
                         </div>
                         <div className="marquee__image">
@@ -145,7 +145,7 @@ export default function CTAWithMarquee() {
                       <div className="marquee__item item-imageblock">
                         <div className="marquee__tags">
                           <TextScramble className="tag tag-s tag-medium mxd-scramble">
-                            Digital Art
+                            Arte Digital
                           </TextScramble>
                         </div>
                         <div className="marquee__image">
@@ -161,7 +161,7 @@ export default function CTAWithMarquee() {
                       <div className="marquee__item item-imageblock">
                         <div className="marquee__tags">
                           <TextScramble className="tag tag-s tag-medium mxd-scramble">
-                            Packaging
+                            Embalagens
                           </TextScramble>
                         </div>
                         <div className="marquee__image">
@@ -193,7 +193,7 @@ export default function CTAWithMarquee() {
                       <div className="marquee__item item-imageblock">
                         <div className="marquee__tags">
                           <TextScramble className="tag tag-s tag-medium mxd-scramble">
-                            Illustrations
+                            Ilustrações
                           </TextScramble>
                         </div>
                         <div className="marquee__image">
@@ -209,7 +209,7 @@ export default function CTAWithMarquee() {
                       <div className="marquee__item item-imageblock">
                         <div className="marquee__tags">
                           <TextScramble className="tag tag-s tag-medium mxd-scramble">
-                            Video Production
+                            Produção de Vídeo
                           </TextScramble>
                         </div>
                         <div className="marquee__image">
@@ -225,7 +225,7 @@ export default function CTAWithMarquee() {
                       <div className="marquee__item item-imageblock">
                         <div className="marquee__tags">
                           <TextScramble className="tag tag-s tag-medium mxd-scramble">
-                            Photography
+                            Fotografia
                           </TextScramble>
                         </div>
                         <div className="marquee__image">
@@ -241,7 +241,7 @@ export default function CTAWithMarquee() {
                       <div className="marquee__item item-imageblock">
                         <div className="marquee__tags">
                           <TextScramble className="tag tag-s tag-medium mxd-scramble">
-                            3D Models
+                            Modelos 3D
                           </TextScramble>
                         </div>
                         <div className="marquee__image">
@@ -257,7 +257,7 @@ export default function CTAWithMarquee() {
                       <div className="marquee__item item-imageblock">
                         <div className="marquee__tags">
                           <TextScramble className="tag tag-s tag-medium mxd-scramble">
-                            Development
+                            Desenvolvimento
                           </TextScramble>
                         </div>
                         <div className="marquee__image">
@@ -273,7 +273,7 @@ export default function CTAWithMarquee() {
                       <div className="marquee__item item-imageblock">
                         <div className="marquee__tags">
                           <TextScramble className="tag tag-s tag-medium mxd-scramble">
-                            Illustrations
+                            Ilustrações
                           </TextScramble>
                         </div>
                         <div className="marquee__image">
@@ -289,7 +289,7 @@ export default function CTAWithMarquee() {
                       <div className="marquee__item item-imageblock">
                         <div className="marquee__tags">
                           <TextScramble className="tag tag-s tag-medium mxd-scramble">
-                            Fashion
+                            Moda
                           </TextScramble>
                         </div>
                         <div className="marquee__image">

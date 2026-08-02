@@ -191,7 +191,7 @@ export default function BlogArticle() {
                           </span>
                         </p>
                         <p className="quote__cite">
-                          <cite>/ Alex Walker</cite>
+                          <cite>/ Danilo Oliveira</cite>
                         </p>
                       </blockquote>
                     </div>

@@ -36,18 +36,15 @@ export default function StatisticsLines() {
                     <div className="col-12 col-xl-8 col-xxl-7 mxd-grid-item">
                       {/* Manifest Start */}
                       <div className="mxd-section-title__manifest title-manifest-s no-padding-mobile">
-                        <Link data-cursor-text="About me" href={`/about-me`}>
+                        <Link data-cursor-text="Sobre mim" href={`/about-me`}>
                           <CommonAnimatedText
                             as="span"
                             className="manifest manifest-s mxd-split-lines active-cursor-accent"
                             animation="splitLines"
                           >
-                            Web design is evolving rapidly, and I strive to stay
-                            ahead.
+                            O web design está evoluindo rapidamente e busco estar sempre na frente.
                             <span>
-                              Emerging tools and technologies enable me to
-                              create visually stunning and seamlessly functional
-                              websites.
+                              Ferramentas e tecnologias emergentes me permitem criar sites visualmente impressionantes e com funcionalidade impecável.
                             </span>
                           </CommonAnimatedText>
                         </Link>
@@ -61,7 +58,7 @@ export default function StatisticsLines() {
                             <p id="stats-counter-1">40+</p>
                           </div>
                           <div className="mxd-stats-lines__caption">
-                            <p>Happy clients who trust my work</p>
+                            <p>Clientes satisfeitos que confiam no meu trabalho</p>
                           </div>
                         </MxdStatsLineItem>
                         {/* statistics single item */}
@@ -70,7 +67,7 @@ export default function StatisticsLines() {
                             <p id="stats-counter-2">86%</p>
                           </div>
                           <div className="mxd-stats-lines__caption">
-                            <p>Clients come back for a new projects</p>
+                            <p>Clientes que retornam para novos projetos</p>
                           </div>
                         </MxdStatsLineItem>
                         {/* statistics single item */}
@@ -79,7 +76,7 @@ export default function StatisticsLines() {
                             <p id="stats-counter-3">3+</p>
                           </div>
                           <div className="mxd-stats-lines__caption">
-                            <p>Years of professional experience</p>
+                            <p>Anos de experiência profissional</p>
                           </div>
                         </MxdStatsLineItem>
                         {/* statistics single item */}
@@ -88,7 +85,7 @@ export default function StatisticsLines() {
                             <p id="stats-counter-4">50+</p>
                           </div>
                           <div className="mxd-stats-lines__caption">
-                            <p>Successfully completed projects</p>
+                            <p>Projetos concluídos com sucesso</p>
                           </div>
                         </MxdStatsLineItem>
                       </div>

@@ -5,8 +5,8 @@ import ParallaxDividerVideo from "@/components/projects/works-grid/ParallaxDivid
 import TestimonialsSticky from "@/components/projects/works-grid/TestimonialsSticky";
 import CTAWithMarquee from "@/components/projects/works-grid/CTAWithMarquee";
 export const metadata: Metadata = {
-  title: "Works Grid | Azurio - Digital Agency & Portfolio NextJs Template",
-  description: "Azurio - Digital Agency & Portfolio NextJs Template",
+  title: "Works Grid | Mindsite - Agencia digital",
+  description: "A infraestrutura que o seu negócio precisa para escalar. Descubra como o Mindsite otimiza seu ecossistema digital do início ao fim.",
 };
 export default function WorksGridPage() {
   return (

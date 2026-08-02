@@ -1,37 +1,37 @@
 import type { ProjectShowcaseItem, ProjectStackItem } from "@/types/project";
 
-const commonTags = ["Design", "Illustrations", "Packaging", "marketing"];
-const showcaseCommonTags = ["Design", "Illustrations", "Packaging", "Marketing"];
+const commonTags = ["Design", "Ilustrações", "Embalagem", "Marketing"];
+const showcaseCommonTags = ["Design", "Ilustrações", "Embalagem", "Marketing"];
 
 export const brandingStudioProjects: ProjectStackItem[] = [
   {
-    title: "NFT project branding",
+    title: "Identidade visual para projeto NFT",
     imageSrc: "/img/works/showcase-stack/pr03.webp",
-    imageAlt: "Project Preview Image",
+    imageAlt: "Preview do Projeto",
     imageWidth: 1920,
     imageHeight: 1180,
     tags: commonTags,
   },
   {
-    title: "Interactive app concept",
+    title: "Conceito de aplicativo interativo",
     imageSrc: "/img/works/showcase-stack/pr02.webp",
-    imageAlt: "Project Preview Image",
+    imageAlt: "Preview do Projeto",
     imageWidth: 2200,
     imageHeight: 1240,
     tags: commonTags,
   },
   {
-    title: "Editorial illustrations set",
+    title: "Coleção de ilustrações editoriais",
     imageSrc: "/img/works/showcase-stack/pr01.webp",
-    imageAlt: "Project Preview Image",
+    imageAlt: "Preview do Projeto",
     imageWidth: 1920,
     imageHeight: 1180,
     tags: commonTags,
   },
   {
-    title: "Creative studio template",
+    title: "Template de estúdio criativo",
     imageSrc: "/img/works/showcase-stack/pr04.webp",
-    imageAlt: "Project Preview Image",
+    imageAlt: "Preview do Projeto",
     imageWidth: 1920,
     imageHeight: 1180,
     coverClassName: "cover-darken",
@@ -41,29 +41,29 @@ export const brandingStudioProjects: ProjectStackItem[] = [
 
 export const digitalDesignerProjectsShowcase: ProjectShowcaseItem[] = [
   {
-    titleLines: ["Editorial", "illustrations set"],
+    titleLines: ["Ilustrações", "Editoriais"],
     bgImageSrc: "/img/works/1920x1280_pr01.webp",
     cardImageSrc: "/img/works/700x700_pr01.webp",
-    cardImageAlt: "Editorial illustrations project preview",
-    cursorText: "View Work",
+    cardImageAlt: "Preview de ilustrações editoriais",
+    cursorText: "Ver Projeto",
     href: "/project-details",
     tags: showcaseCommonTags,
   },
   {
-    titleLines: ["Interactive", "concept"],
+    titleLines: ["Conceito", "Interativo"],
     bgImageSrc: "/img/works/1920x1280_pr02.webp",
     cardImageSrc: "/img/works/700x700_pr02.webp",
-    cardImageAlt: "Interactive concept project preview",
+    cardImageAlt: "Preview de conceito interativo",
     cursorText: "Behance",
     href: "/project-details",
-    tags: ["UI/UX", "Development", "Brand", "Web App"],
+    tags: ["UI/UX", "Desenvolvimento", "Marca", "Web App"],
   },
   {
-    titleLines: ["Creative", "studio template"],
+    titleLines: ["Estúdio", "Criativo"],
     bgImageSrc: "/img/works/1920x1280_pr03.webp",
     cardImageSrc: "/img/works/700x700_pr03.webp",
-    cardImageAlt: "Creative studio template project preview",
-    cursorText: "View Work",
+    cardImageAlt: "Preview de template criativo",
+    cursorText: "Ver Projeto",
     href: "/project-details",
     tags: showcaseCommonTags,
   },

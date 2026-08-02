@@ -70,7 +70,7 @@ export default function NextProjectLink() {
                     externalRAF={false}
                   >
                     <Image
-                      alt="Azurio Template Sample Image"
+                      alt="MINDSITE Template Sample Image"
                       src="/img/works/project-details/next01.webp"
                       width={1920}
                       height={1200}

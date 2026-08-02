@@ -62,7 +62,7 @@ export default function TeamList() {
                       <div className="mxd-team-list__data">
                         <div className="mxd-team-list__photo">
                           <Image
-                            alt="Azurio Template Sample Image"
+                            alt="MINDSITE Template Sample Image"
                             src="/img/avatars/300x300_ava-04.webp"
                             width={300}
                             height={300}
@@ -109,7 +109,7 @@ export default function TeamList() {
                       <div className="mxd-team-list__data">
                         <div className="mxd-team-list__photo">
                           <Image
-                            alt="Azurio Template Sample Image"
+                            alt="MINDSITE Template Sample Image"
                             src="/img/avatars/300x300_ava-06.webp"
                             width={300}
                             height={300}
@@ -152,7 +152,7 @@ export default function TeamList() {
                       <div className="mxd-team-list__data">
                         <div className="mxd-team-list__photo">
                           <Image
-                            alt="Azurio Template Sample Image"
+                            alt="MINDSITE Template Sample Image"
                             src="/img/avatars/300x300_ava-02.webp"
                             width={300}
                             height={300}
@@ -192,7 +192,7 @@ export default function TeamList() {
                       <div className="mxd-team-list__data">
                         <div className="mxd-team-list__photo">
                           <Image
-                            alt="Azurio Template Sample Image"
+                            alt="MINDSITE Template Sample Image"
                             src="/img/avatars/300x300_ava-03.webp"
                             width={300}
                             height={300}
@@ -232,7 +232,7 @@ export default function TeamList() {
                       <div className="mxd-team-list__data">
                         <div className="mxd-team-list__photo">
                           <Image
-                            alt="Azurio Template Sample Image"
+                            alt="MINDSITE Template Sample Image"
                             src="/img/avatars/300x300_ava-01.webp"
                             width={300}
                             height={300}

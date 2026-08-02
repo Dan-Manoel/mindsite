@@ -3,8 +3,8 @@ import InnerHeadline from "@/components/blogs/blog-standard/InnerHeadline";
 import Blog from "@/components/blogs/blog-standard/Blog";
 import CTAWithMarquee from "@/components/blogs/blog-standard/CTAWithMarquee";
 export const metadata: Metadata = {
-  title: "Blog Standard | Azurio - Digital Agency & Portfolio NextJs Template",
-  description: "Azurio - Digital Agency & Portfolio NextJs Template",
+  title: "Blog Standard | Mindsite - Agencia digital",
+  description: "A infraestrutura que o seu negócio precisa para escalar. Descubra como o Mindsite otimiza seu ecossistema digital do início ao fim.",
 };
 export default function BlogStandardPage() {
   return (

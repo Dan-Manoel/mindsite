@@ -93,11 +93,11 @@ export default function SectionTitle() {
                               animation="inUp"
                             >
                               <a
-                                href="mailto:contato@mindsite.com.br?subject=Mensagem%20do%20site"
+                                href="mailto:ola@mindsite.com.br?subject=Mensagem%20do%20site"
                                 className="tag tag-s-mobile"
                               >
                                 <TextScramble className="mxd-scramble">
-                                  contato@mindsite.com.br
+                                  ola@mindsite.com.br
                                 </TextScramble>
                               </a>
                             </CommonScrollAnimated>
@@ -154,11 +154,11 @@ export default function SectionTitle() {
                               animation="inUp"
                             >
                               <a
-                                href="mailto:contato@mindsite.com.br?subject=Mensagem%20do%20site"
+                                href="mailto:ola@mindsite.com.br?subject=Mensagem%20do%20site"
                                 className="tag tag-s-mobile"
                               >
                                 <TextScramble className="mxd-scramble">
-                                  contato@mindsite.com.br
+                                  ola@mindsite.com.br
                                 </TextScramble>
                               </a>
                             </CommonScrollAnimated>
