@@ -2,12 +2,13 @@ import BlurSection from "@/components/animations/BlurSection";
 import CommonAnimatedText from "@/components/animations/CommonAnimatedText";
 import { CommonScrollAnimated } from "@/components/animations/CommonScrollAnimated";
 import TextScramble from "@/components/animations/TextScramble";
+
 export default function SplitList() {
   return (
     <>
       <BlurSection id="overview" className="mxd-section padding-top-subtitle padding-bottom-default">
         <div className="mxd-container grid-l-container">
-          {/* Block - Split List v01 Start */}
+          {/* Bloco - Início da Lista Dividida v01 */}
           <div className="mxd-block">
             <div className="mxd-block-split">
               <div className="container-fluid p-0">
@@ -20,7 +21,7 @@ export default function SplitList() {
                           as="p"
                           animation="inUp"
                         >
-                          <span>/ Overview</span>
+                          <span>/ Visão Geral</span>
                         </CommonScrollAnimated>
                       </div>
                       <div className="mxd-block-split__manifest">
@@ -29,12 +30,12 @@ export default function SplitList() {
                           className="manifest manifest-s mxd-split-lines"
                           animation="splitLines"
                         >
-                          Stand out and express your uniqueness with MINDSITE - a
-                          vibrant and minimal React Nextjs Template for
-                          creatives, studios and freelancers.
+                          Destaque-se e expresse sua singularidade com o MINDSITE - um
+                          template React Next.js vibrante e minimalista para
+                          criativos, estúdios e freelancers.
                           <span>
-                            Impress your website visitors with a clean, stylish
-                            layout and stunning visuals.
+                            Impressione os visitantes do seu site com um layout limpo,
+                            estiloso e visuais deslumbrantes.
                           </span>
                         </CommonAnimatedText>
                         <CommonScrollAnimated
@@ -44,7 +45,7 @@ export default function SplitList() {
                           animation="inUp"
                         >
                           <TextScramble className="btn-caption mxd-scramble">
-                            See it live
+                            Ver ao vivo
                           </TextScramble>
                           {/* <i class="btn-icon ph-bold ph-arrow-right"></i> */}
                           <i className="btn-icon">
@@ -69,12 +70,12 @@ export default function SplitList() {
                           as="p"
                           animation="inUp"
                         >
-                          <span>/ Project Details</span>
+                          <span>/ Detalhes do Projeto</span>
                         </CommonScrollAnimated>
                       </div>
-                      {/* split info list */}
+                      {/* Lista de informações divididas */}
                       <div className="mxd-block-split__info">
-                        {/* split info item */}
+                        {/* Item de informação dividida */}
                         <div className="split-info__item">
                           <div className="split-info__divider divider-top" />
                           <div className="split-info__details">
@@ -83,16 +84,16 @@ export default function SplitList() {
                               as="p"
                               animation="inUp"
                             >
-                              Name:
+                              Nome:
                               <span>
-                                MINDSITE - digital agency &amp; personal portfolio
-                                React Nextjs Template
+                                MINDSITE - agência digital &amp; portfólio pessoal
+                                Template React Next.js
                               </span>
                             </CommonScrollAnimated>
                           </div>
                           <div className="split-info__divider divider-bottom" />
                         </div>
-                        {/* split info item */}
+                        {/* Item de informação dividida */}
                         <div className="split-info__item">
                           <div className="split-info__divider divider-top" />
                           <div className="split-info__details">
@@ -101,13 +102,13 @@ export default function SplitList() {
                               as="p"
                               animation="inUp"
                             >
-                              Client:
+                              Cliente:
                               <span>IB Themes</span>
                             </CommonScrollAnimated>
                           </div>
                           <div className="split-info__divider divider-bottom" />
                         </div>
-                        {/* split info item */}
+                        {/* Item de informação dividida */}
                         <div className="split-info__item">
                           <div className="split-info__divider divider-top" />
                           <div className="split-info__details">
@@ -116,13 +117,13 @@ export default function SplitList() {
                               as="p"
                               animation="inUp"
                             >
-                              Industries:
-                              <span>React Nextjs Template</span>
+                              Indústrias:
+                              <span>Template React Next.js</span>
                             </CommonScrollAnimated>
                           </div>
                           <div className="split-info__divider divider-bottom" />
                         </div>
-                        {/* split info item */}
+                        {/* Item de informação dividida */}
                         <div className="split-info__item">
                           <div className="split-info__divider divider-top" />
                           <div className="split-info__details">
@@ -131,13 +132,13 @@ export default function SplitList() {
                               as="p"
                               animation="inUp"
                             >
-                              Date:
-                              <span>October 2025 - January 2026</span>
+                              Data:
+                              <span>Outubro 2025 - Janeiro 2026</span>
                             </CommonScrollAnimated>
                           </div>
                           <div className="split-info__divider divider-bottom" />
                         </div>
-                        {/* split info item */}
+                        {/* Item de informação dividida */}
                         <div className="split-info__item">
                           <div className="split-info__divider divider-top" />
                           <div className="split-info__details">
@@ -146,7 +147,7 @@ export default function SplitList() {
                               as="p"
                               animation="inUp"
                             >
-                              Project page:
+                              Página do projeto:
                               <span>
                                 <a href="#0">ibthemes.dev</a>
                               </span>
@@ -161,7 +162,7 @@ export default function SplitList() {
               </div>
             </div>
           </div>
-          {/* Block - Split List v01 End */}
+          {/* Bloco - Fim da Lista Dividida v01 */}
         </div>
       </BlurSection>
     </>

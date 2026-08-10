@@ -12,18 +12,18 @@ import {
 } from "@/lib/template/stackCardsEffects";
 
 const MARQUEE_WORDS = [
-  "Projects/",
+  "Projetos/",
   "Cases/",
-  "Works/",
+  "Trabalhos/",
   "Editorial/",
-  "Experiments/",
+  "Experimentos/",
 ] as const;
 
 const WORK_TAGS = [
   "Design",
-  "Illustrations",
-  "Packaging",
-  "marketing",
+  "Ilustrações",
+  "Embalagem",
+  "Marketing",
 ] as const;
 
 type VideoSources = { type: string; src: string }[];
@@ -50,7 +50,7 @@ type WorksDefaultProjectCard =
 const WORKS_DEFAULT_PROJECT_CARDS: WorksDefaultProjectCard[] = [
   {
     key: "nft-branding",
-    title: "NFT project branding",
+    title: "Branding de projeto NFT",
     media: "video",
     poster: "video/1280x720_video-05.webp",
     sources: [
@@ -60,7 +60,7 @@ const WORKS_DEFAULT_PROJECT_CARDS: WorksDefaultProjectCard[] = [
   },
   {
     key: "interactive-app",
-    title: "Interactive app concept",
+    title: "Conceito de aplicativo interativo",
     media: "image",
     imageSrc: "/img/works/showcase-stack/pr02.webp",
     imageWidth: 2200,
@@ -68,7 +68,7 @@ const WORKS_DEFAULT_PROJECT_CARDS: WorksDefaultProjectCard[] = [
   },
   {
     key: "editorial",
-    title: "Editorial illustrations set",
+    title: "Conjunto de ilustrações editoriais",
     media: "image",
     imageSrc: "/img/works/showcase-stack/pr01.webp",
     imageWidth: 1920,
@@ -76,7 +76,7 @@ const WORKS_DEFAULT_PROJECT_CARDS: WorksDefaultProjectCard[] = [
   },
   {
     key: "studio-template",
-    title: "Creative studio template",
+    title: "Template para estúdio criativo",
     media: "image",
     imageSrc: "/img/works/showcase-stack/pr04.webp",
     imageWidth: 1920,
@@ -118,7 +118,7 @@ export default function ProjectsStack() {
     <>
       <div id="portfolio" className="mxd-section">
         <div className="mxd-container fullwidth-container">
-          {/* Block - Progects Stack Start */}
+          {/* Bloco - Início da Pilha de Projetos */}
           <div className="mxd-block">
             <div className="mxd-stack-cards">
               {WORKS_DEFAULT_PROJECT_CARDS.map((card, index) => (
@@ -246,14 +246,14 @@ export default function ProjectsStack() {
                             href="/project-details"
                           >
                             <TextScramble className="btn-caption mxd-scramble">
-                              Know More
+                              Saiba mais
                             </TextScramble>
                           </Link>
                         </div>
                       </div>
                       <Link
                         className="card__title active-cursor-permanent"
-                        data-cursor-text="View Work"
+                        data-cursor-text="Ver Trabalho"
                         href="/project-details"
                       >
                         <p
@@ -287,7 +287,7 @@ export default function ProjectsStack() {
                       ) : (
                         <Image
                           className="card__media"
-                          alt="Project Preview Image"
+                          alt="Imagem de Pré-visualização do Projeto"
                           src={card.imageSrc}
                           width={card.imageWidth}
                           height={card.imageHeight}
@@ -310,7 +310,7 @@ export default function ProjectsStack() {
               ))}
             </div>
           </div>
-          {/* Block - Progects Stack End */}
+          {/* Bloco - Fim da Pilha de Projetos */}
         </div>
       </div>
     </>

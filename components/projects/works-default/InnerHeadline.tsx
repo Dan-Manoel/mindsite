@@ -17,15 +17,16 @@ export default function InnerHeadline() {
         <PinnedSection className="mxd-section">
           <PinnedSection.Inner>
             <div className="mxd-container fullwidth-container">
-              {/* Block - Inner Headline v03 Start */}
+              {/* Bloco - Início do Cabeçalho Interno v03 */}
               <div className="mxd-block loading-wrap">
                 <div className="inner-headline fullheight">
                   <div className="inner-headline__bg">
                     <Image
-                      alt="MINDSITE Template Sample Image"
+                      alt="Imagem de Exemplo do Template MINDSITE"
                       src="/img/backgrounds/1920x1280_bg02.webp"
                       width={1920}
                       height={1280}
+                      priority
                     />
                     <div className="inner-headline__cover" />
                   </div>
@@ -33,18 +34,18 @@ export default function InnerHeadline() {
                     <div className="container-fluid p-0">
                       <div className="row g-0">
                         <div className="col-12 mxd-grid-item">
-                          {/* breadcrumbs */}
+                          {/* Trilha de navegação (Breadcrumbs) */}
                           <CommonLoadFade index={0}>
                             <div className="inner-headline__breadcrumbs loading-fade">
                               <div className="breadcrumbs__nav permanent">
                                 <span>
                                   <Link href={`/`}>
                                     <TextScramble className="mxd-scramble">
-                                      Home
+                                      Início
                                     </TextScramble>
                                   </Link>
                                 </span>
-                                <span className="current-item">Works </span>
+                                <span className="current-item">Trabalhos </span>
                               </div>
                             </div>
                           </CommonLoadFade>
@@ -52,13 +53,13 @@ export default function InnerHeadline() {
                       </div>
                     </div>
                   </div>
-                  {/* bottom positioned headline */}
+                  {/* Cabeçalho posicionado na parte inferior */}
                   <div className="inner-headline__bottom">
                     <div className="mxd-container grid-l-container">
                       <div className="container-fluid p-0">
                         <div className="row g-0">
                           <div className="col-12">
-                            {/* content */}
+                            {/* Conteúdo principal */}
                             <div className="inner-headline__content has-medium-title">
                               <div className="container-fluid p-0">
                                 <div className="row g-0">
@@ -70,7 +71,7 @@ export default function InnerHeadline() {
                                           targetId="portfolio"
                                         >
                                           <TextScramble className="btn-caption mxd-scramble">
-                                            Portfolio
+                                            Portfólio
                                           </TextScramble>
                                         </SmoothAnchorLink>
                                       </div>
@@ -81,7 +82,7 @@ export default function InnerHeadline() {
                                         className="medium permanent loading-split"
                                         animation="splitLinesLoad"
                                       >
-                                        Where bold ideas <span>take shape</span>
+                                        Onde ideias audaciosas <span>ganham forma</span>
                                       </CommonAnimatedText>
                                     </div>
                                   </div>
@@ -93,7 +94,7 @@ export default function InnerHeadline() {
                                           targetId="portfolio"
                                         >
                                           <TextScramble className="btn-caption mxd-scramble">
-                                            Scroll to explore
+                                            Rolar para explorar
                                           </TextScramble>
                                           <i>
                                             <svg
@@ -118,7 +119,7 @@ export default function InnerHeadline() {
                   </div>
                 </div>
               </div>
-              {/* Block - Inner Headline v03 End */}
+              {/* Bloco - Fim do Cabeçalho Interno v03 */}
             </div>
             <PinnedSection.Trigger />
           </PinnedSection.Inner>

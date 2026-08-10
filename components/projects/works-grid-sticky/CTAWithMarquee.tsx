@@ -8,20 +8,23 @@ import Image from "next/image";
 import { useLayoutEffect, useRef } from "react";
 import { CommonScrollAnimated } from "@/components/animations/CommonScrollAnimated";
 import TextScramble from "@/components/animations/TextScramble";
+
 export default function CTAWithMarquee() {
   const marqueeTrackRef = useRef<HTMLDivElement | null>(null);
+
   useLayoutEffect(() => {
     return initCtaMarqueeToLeft(marqueeTrackRef.current);
   }, []);
+
   return (
     <>
       <BlurSection className="mxd-section bg-color-opposite">
         <div className="mxd-container fullwidth-container">
-          {/* Block - CTA with Matter.js Objects Start */}
+          {/* Bloco - Início da Chamada para Ação com Objetos Matter.js */}
           <div className="mxd-block">
             <div className="mxd-promo transparent">
               <div className="mxd-promo__wrap auto-height">
-                {/* content */}
+                {/* Conteúdo */}
                 <div className="mxd-promo__content">
                   <CommonScrollAnimated
                     className="mxd-promo__btngroup anim-uni-in-up"
@@ -33,14 +36,14 @@ export default function CTAWithMarquee() {
                       href={`/contact`}
                     >
                       <TextScramble className="btn-caption mxd-scramble">
-                        Write a line
+                        Escreva uma linha
                       </TextScramble>
                     </Link>
                   </CommonScrollAnimated>
                   <div className="mxd-promo__caption">
                     <Link
                       className="active-cursor-accent"
-                      data-cursor-text="Contact Us"
+                      data-cursor-text="Fale Conosco"
                       href={`/contact`}
                     >
                       <CommonAnimatedText
@@ -48,24 +51,24 @@ export default function CTAWithMarquee() {
                         className="opposite mxd-split-lines"
                         animation="splitLines"
                       >
-                        Let&apos;s talk about your project
+                        Vamos conversar sobre o seu projeto
                       </CommonAnimatedText>
                     </Link>
                   </div>
                 </div>
-                {/* marquee */}
+                {/* Marquee */}
                 <div className="mxd-promo__marquee">
-                  {/* Marquee Divider Start */}
+                  {/* Início do Divisor Marquee */}
                   <div className="marquee marquee-left--gsap">
                     <div
                       className="marquee__toleft marquee__images"
                       ref={marqueeTrackRef}
                     >
-                      {/* single item */}
+                      {/* Item único */}
                       <div className="marquee__item item-imageblock">
                         <div className="marquee__tags">
                           <TextScramble className="tag tag-s tag-medium mxd-scramble">
-                            Photography
+                            Fotografia
                           </TextScramble>
                         </div>
                         <div className="marquee__image">
@@ -77,11 +80,11 @@ export default function CTAWithMarquee() {
                           />
                         </div>
                       </div>
-                      {/* single item */}
+                      {/* Item único */}
                       <div className="marquee__item item-imageblock">
                         <div className="marquee__tags">
                           <TextScramble className="tag tag-s tag-medium mxd-scramble">
-                            3D Models
+                            Modelos 3D
                           </TextScramble>
                         </div>
                         <div className="marquee__image">
@@ -93,11 +96,11 @@ export default function CTAWithMarquee() {
                           />
                         </div>
                       </div>
-                      {/* single item */}
+                      {/* Item único */}
                       <div className="marquee__item item-imageblock">
                         <div className="marquee__tags">
                           <TextScramble className="tag tag-s tag-medium mxd-scramble">
-                            Development
+                            Desenvolvimento
                           </TextScramble>
                         </div>
                         <div className="marquee__image">
@@ -109,11 +112,11 @@ export default function CTAWithMarquee() {
                           />
                         </div>
                       </div>
-                      {/* single item */}
+                      {/* Item único */}
                       <div className="marquee__item item-imageblock">
                         <div className="marquee__tags">
                           <TextScramble className="tag tag-s tag-medium mxd-scramble">
-                            Illustrations
+                            Ilustrações
                           </TextScramble>
                         </div>
                         <div className="marquee__image">
@@ -125,11 +128,11 @@ export default function CTAWithMarquee() {
                           />
                         </div>
                       </div>
-                      {/* single item */}
+                      {/* Item único */}
                       <div className="marquee__item item-imageblock">
                         <div className="marquee__tags">
                           <TextScramble className="tag tag-s tag-medium mxd-scramble">
-                            Fashion
+                            Moda
                           </TextScramble>
                         </div>
                         <div className="marquee__image">
@@ -141,11 +144,11 @@ export default function CTAWithMarquee() {
                           />
                         </div>
                       </div>
-                      {/* single item */}
+                      {/* Item único */}
                       <div className="marquee__item item-imageblock">
                         <div className="marquee__tags">
                           <TextScramble className="tag tag-s tag-medium mxd-scramble">
-                            Digital Art
+                            Arte Digital
                           </TextScramble>
                         </div>
                         <div className="marquee__image">
@@ -157,11 +160,11 @@ export default function CTAWithMarquee() {
                           />
                         </div>
                       </div>
-                      {/* single item */}
+                      {/* Item único */}
                       <div className="marquee__item item-imageblock">
                         <div className="marquee__tags">
                           <TextScramble className="tag tag-s tag-medium mxd-scramble">
-                            Packaging
+                            Embalagem
                           </TextScramble>
                         </div>
                         <div className="marquee__image">
@@ -173,7 +176,7 @@ export default function CTAWithMarquee() {
                           />
                         </div>
                       </div>
-                      {/* single item */}
+                      {/* Item único */}
                       <div className="marquee__item item-imageblock">
                         <div className="marquee__tags">
                           <TextScramble className="tag tag-s tag-medium mxd-scramble">
@@ -189,11 +192,11 @@ export default function CTAWithMarquee() {
                           />
                         </div>
                       </div>
-                      {/* single item */}
+                      {/* Item único */}
                       <div className="marquee__item item-imageblock">
                         <div className="marquee__tags">
                           <TextScramble className="tag tag-s tag-medium mxd-scramble">
-                            Illustrations
+                            Ilustrações
                           </TextScramble>
                         </div>
                         <div className="marquee__image">
@@ -205,11 +208,11 @@ export default function CTAWithMarquee() {
                           />
                         </div>
                       </div>
-                      {/* single item */}
+                      {/* Item único */}
                       <div className="marquee__item item-imageblock">
                         <div className="marquee__tags">
                           <TextScramble className="tag tag-s tag-medium mxd-scramble">
-                            Video Production
+                            Produção de Vídeo
                           </TextScramble>
                         </div>
                         <div className="marquee__image">
@@ -221,11 +224,11 @@ export default function CTAWithMarquee() {
                           />
                         </div>
                       </div>
-                      {/* single item */}
+                      {/* Item único */}
                       <div className="marquee__item item-imageblock">
                         <div className="marquee__tags">
                           <TextScramble className="tag tag-s tag-medium mxd-scramble">
-                            Photography
+                            Fotografia
                           </TextScramble>
                         </div>
                         <div className="marquee__image">
@@ -237,11 +240,11 @@ export default function CTAWithMarquee() {
                           />
                         </div>
                       </div>
-                      {/* single item */}
+                      {/* Item único */}
                       <div className="marquee__item item-imageblock">
                         <div className="marquee__tags">
                           <TextScramble className="tag tag-s tag-medium mxd-scramble">
-                            3D Models
+                            Modelos 3D
                           </TextScramble>
                         </div>
                         <div className="marquee__image">
@@ -253,11 +256,11 @@ export default function CTAWithMarquee() {
                           />
                         </div>
                       </div>
-                      {/* single item */}
+                      {/* Item único */}
                       <div className="marquee__item item-imageblock">
                         <div className="marquee__tags">
                           <TextScramble className="tag tag-s tag-medium mxd-scramble">
-                            Development
+                            Desenvolvimento
                           </TextScramble>
                         </div>
                         <div className="marquee__image">
@@ -269,11 +272,11 @@ export default function CTAWithMarquee() {
                           />
                         </div>
                       </div>
-                      {/* single item */}
+                      {/* Item único */}
                       <div className="marquee__item item-imageblock">
                         <div className="marquee__tags">
                           <TextScramble className="tag tag-s tag-medium mxd-scramble">
-                            Illustrations
+                            Ilustrações
                           </TextScramble>
                         </div>
                         <div className="marquee__image">
@@ -285,11 +288,11 @@ export default function CTAWithMarquee() {
                           />
                         </div>
                       </div>
-                      {/* single item */}
+                      {/* Item único */}
                       <div className="marquee__item item-imageblock">
                         <div className="marquee__tags">
                           <TextScramble className="tag tag-s tag-medium mxd-scramble">
-                            Fashion
+                            Moda
                           </TextScramble>
                         </div>
                         <div className="marquee__image">
@@ -303,12 +306,12 @@ export default function CTAWithMarquee() {
                       </div>
                     </div>
                   </div>
-                  {/* Marquee Divider End */}
+                  {/* Fim do Divisor Marquee */}
                 </div>
               </div>
             </div>
           </div>
-          {/* Block - CTA with Matter.js Objects End */}
+          {/* Bloco - Fim da Chamada para Ação com Objetos Matter.js */}
         </div>
       </BlurSection>
     </>

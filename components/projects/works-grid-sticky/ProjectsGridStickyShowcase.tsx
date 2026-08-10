@@ -1,3 +1,5 @@
+"use client";
+
 import AutoplayLoopVideo from "@/components/media/AutoplayLoopVideo";
 import BlurSection from "@/components/animations/BlurSection";
 import Link from "next/link";
@@ -8,13 +10,14 @@ import CommonLoadAnimation, {
 import { CommonCardBatchAnimated } from "@/components/animations/CommonScrollAnimated";
 import TextScramble from "@/components/animations/TextScramble";
 import MxdImgAnim from "@/components/animations/MxdImgAnim";
+
 export default function ProjectsGridStickyShowcase() {
   return (
     <CommonLoadAnimation>
       <>
         <BlurSection className="mxd-section padding-bottom-projects">
           <div className="mxd-container grid-l-container">
-            {/* Block - Projects Grid Sticky Showcase Start */}
+            {/* Bloco - Início da Exibição em Grade Fixa de Projetos */}
             <div className="mxd-block">
               <CommonLoadFade index={0}>
                 <div className="mxd-projects-grid loading-fade">
@@ -27,14 +30,14 @@ export default function ProjectsGridStickyShowcase() {
                       >
                         <Link
                           className="mxd-project-item__media active-cursor-permanent"
-                          data-cursor-text="View Work"
+                          data-cursor-text="Ver Trabalho"
                           href={`/project-details`}
                         >
                           <MxdImgAnim
                             main={
                               <Image
                                 className="centered-y"
-                                alt="Project Preview Image"
+                                alt="Imagem de Pré-visualização do Projeto"
                                 src="/img/works/showcase-sticky/pr01-01.webp"
                                 width={1280}
                                 height={722}
@@ -44,7 +47,7 @@ export default function ProjectsGridStickyShowcase() {
                               <Image
                                 key="pr01-02"
                                 className="centered-y"
-                                alt="Project Preview Image"
+                                alt="Imagem de Pré-visualização do Projeto"
                                 src="/img/works/showcase-sticky/pr01-02.webp"
                                 width={1280}
                                 height={722}
@@ -52,7 +55,7 @@ export default function ProjectsGridStickyShowcase() {
                               <Image
                                 key="pr01-03"
                                 className="centered-y"
-                                alt="Project Preview Image"
+                                alt="Imagem de Pré-visualização do Projeto"
                                 src="/img/works/showcase-sticky/pr01-03.webp"
                                 width={1280}
                                 height={722}
@@ -60,7 +63,7 @@ export default function ProjectsGridStickyShowcase() {
                               <Image
                                 key="pr01-04"
                                 className="centered-y"
-                                alt="Project Preview Image"
+                                alt="Imagem de Pré-visualização do Projeto"
                                 src="/img/works/showcase-sticky/pr01-04.webp"
                                 width={1280}
                                 height={722}
@@ -68,7 +71,7 @@ export default function ProjectsGridStickyShowcase() {
                               <Image
                                 key="pr01-05"
                                 className="centered-y"
-                                alt="Project Preview Image"
+                                alt="Imagem de Pré-visualização do Projeto"
                                 src="/img/works/showcase-sticky/pr01-05.webp"
                                 width={1280}
                                 height={722}
@@ -76,7 +79,7 @@ export default function ProjectsGridStickyShowcase() {
                               <Image
                                 key="pr01-06"
                                 className="centered-y"
-                                alt="Project Preview Image"
+                                alt="Imagem de Pré-visualização do Projeto"
                                 src="/img/works/showcase-sticky/pr01-06.webp"
                                 width={1280}
                                 height={722}
@@ -86,7 +89,7 @@ export default function ProjectsGridStickyShowcase() {
                             <div className="mxd-cover mxd-cover-06" />
                             <div className="mxd-project-item__logowrap">
                               <Image
-                                alt="Client's Logo"
+                                alt="Logotipo do Cliente"
                                 src="/img/works/showcase-sticky/clients/01.svg"
                                 width={370}
                                 height={67}
@@ -100,7 +103,7 @@ export default function ProjectsGridStickyShowcase() {
                               className="project-name-s"
                               href={`/project-details`}
                             >
-                              Interactive concept
+                              Conceito interativo
                             </Link>
                           </div>
                           <div className="mxd-project-item__tags">
@@ -108,7 +111,7 @@ export default function ProjectsGridStickyShowcase() {
                               UI/UX
                             </TextScramble>
                             <TextScramble className="tag tag-s tag-medium mxd-scramble">
-                              Development
+                              Desenvolvimento
                             </TextScramble>
                             <TextScramble className="tag tag-s tag-medium mxd-scramble">
                               Brand
@@ -124,11 +127,11 @@ export default function ProjectsGridStickyShowcase() {
                       >
                         <Link
                           className="mxd-project-item__media active-cursor-permanent"
-                          data-cursor-text="View Work"
+                          data-cursor-text="Ver Trabalho"
                           href={`/project-details`}
                         >
                           <Image
-                            alt="Project Preview Image"
+                            alt="Imagem de Pré-visualização do Projeto"
                             src="/img/works/showcase-sticky/pr02-01.webp"
                             width={1500}
                             height={1000}
@@ -136,7 +139,7 @@ export default function ProjectsGridStickyShowcase() {
                           <div className="mxd-cover mxd-cover-06" />
                           <div className="mxd-project-item__logowrap">
                             <Image
-                              alt="Client's Logo"
+                              alt="Logotipo do Cliente"
                               src="/img/works/showcase-sticky/clients/02.svg"
                               width={393}
                               height={49}
@@ -165,7 +168,7 @@ export default function ProjectsGridStickyShowcase() {
                               className="project-name-s"
                               href={`/project-details`}
                             >
-                              Creative studio template
+                              Template para estúdio criativo
                             </Link>
                           </div>
                           <div className="mxd-project-item__tags">
@@ -190,11 +193,11 @@ export default function ProjectsGridStickyShowcase() {
                       >
                         <Link
                           className="mxd-project-item__media active-cursor-permanent"
-                          data-cursor-text="View Work"
+                          data-cursor-text="Ver Trabalho"
                           href={`/project-details`}
                         >
                           <Image
-                            alt="Project Preview Image"
+                            alt="Imagem de Pré-visualização do Projeto"
                             src="/img/works/showcase-sticky/pr03-01.webp"
                             width={1500}
                             height={1125}
@@ -202,7 +205,7 @@ export default function ProjectsGridStickyShowcase() {
                           <div className="mxd-cover mxd-cover-03" />
                           <div className="mxd-project-item__logowrap">
                             <Image
-                              alt="Client's Logo"
+                              alt="Logotipo do Cliente"
                               src="/img/works/showcase-sticky/clients/03.svg"
                               width={300}
                               height={216}
@@ -231,7 +234,7 @@ export default function ProjectsGridStickyShowcase() {
                               className="project-name-s"
                               href={`/project-details`}
                             >
-                              Creative studio template
+                              Template para estúdio criativo
                             </Link>
                           </div>
                           <div className="mxd-project-item__tags">
@@ -255,13 +258,13 @@ export default function ProjectsGridStickyShowcase() {
                       >
                         <Link
                           className="mxd-project-item__media active-cursor-permanent"
-                          data-cursor-text="View Work"
+                          data-cursor-text="Ver Trabalho"
                           href={`/project-details`}
                         >
                           <MxdImgAnim
                             main={
                               <Image
-                                alt="Project Preview Image"
+                                alt="Imagem de Pré-visualização do Projeto"
                                 src="/img/works/showcase-grid-x3/pr02-01.webp"
                                 width={1280}
                                 height={843}
@@ -270,28 +273,28 @@ export default function ProjectsGridStickyShowcase() {
                             absolutes={[
                               <Image
                                 key="pr02-04"
-                                alt="Project Preview Image"
+                                alt="Imagem de Pré-visualização do Projeto"
                                 src="/img/works/showcase-grid-x3/pr02-04.webp"
                                 width={1280}
                                 height={843}
                               />,
                               <Image
                                 key="pr02-05"
-                                alt="Project Preview Image"
+                                alt="Imagem de Pré-visualização do Projeto"
                                 src="/img/works/showcase-grid-x3/pr02-05.webp"
                                 width={1280}
                                 height={843}
                               />,
                               <Image
                                 key="pr02-03"
-                                alt="Project Preview Image"
+                                alt="Imagem de Pré-visualização do Projeto"
                                 src="/img/works/showcase-grid-x3/pr02-03.webp"
                                 width={1280}
                                 height={843}
                               />,
                               <Image
                                 key="pr02-02"
-                                alt="Project Preview Image"
+                                alt="Imagem de Pré-visualização do Projeto"
                                 src="/img/works/showcase-grid-x3/pr02-02.webp"
                                 width={1280}
                                 height={843}
@@ -301,7 +304,7 @@ export default function ProjectsGridStickyShowcase() {
                             <div className="mxd-cover mxd-cover-03" />
                             <div className="mxd-project-item__logowrap">
                               <Image
-                                alt="Client's Logo"
+                                alt="Logotipo do Cliente"
                                 src="/img/works/showcase-sticky/clients/04.svg"
                                 width={376}
                                 height={29}
@@ -315,7 +318,7 @@ export default function ProjectsGridStickyShowcase() {
                               className="project-name-s"
                               href={`/project-details`}
                             >
-                              Interactive concept
+                              Conceito interativo
                             </Link>
                           </div>
                           <div className="mxd-project-item__tags">
@@ -323,7 +326,7 @@ export default function ProjectsGridStickyShowcase() {
                               UI/UX
                             </TextScramble>
                             <TextScramble className="tag tag-s tag-medium mxd-scramble">
-                              Development
+                              Desenvolvimento
                             </TextScramble>
                             <TextScramble className="tag tag-s tag-medium mxd-scramble">
                               Brand
@@ -336,7 +339,7 @@ export default function ProjectsGridStickyShowcase() {
                 </div>
               </CommonLoadFade>
             </div>
-            {/* Block - Projects Grid Sticky Showcase End */}
+            {/* Bloco - Fim da Exibição em Grade Fixa de Projetos */}
           </div>
         </BlurSection>
       </>

@@ -3,16 +3,17 @@ import Image from "next/image";
 import { CommonScrollAnimated } from "@/components/animations/CommonScrollAnimated";
 import CommonAnimatedText from "@/components/animations/CommonAnimatedText";
 import TextScramble from "@/components/animations/TextScramble";
+
 export default function TestimonialsSticky() {
   return (
     <>
-      <BlurSection className="mxd-section padding-top-title padding-bottom-default">
+      <BlurSection id="testimonials" className="mxd-section padding-top-title padding-bottom-default">
         <div className="mxd-container grid-l-container">
-          {/* Block - Testimonials Sticky Start */}
+          {/* Bloco - Início dos Depoimentos Fixos */}
           <div className="mxd-testimonials-sticky">
             <div className="mxd-testimonials-sticky__static">
               <div className="mxd-testimonials-sticky__title">
-                {/* Block - Section Title Standalone Start */}
+                {/* Bloco - Início do Título de Seção Isolado */}
                 <div className="mxd-block">
                   <div className="mxd-section-title">
                     <div className="container-fluid p-0">
@@ -24,7 +25,7 @@ export default function TestimonialsSticky() {
                               className="reveal-type"
                               animation="revealType"
                             >
-                              Clients approve
+                              Os clientes aprovam
                             </CommonAnimatedText>
                           </div>
                           <CommonScrollAnimated
@@ -36,7 +37,7 @@ export default function TestimonialsSticky() {
                               className="mxd-section-title__image-link"
                               href="https://clutch.co/"
                               target="_blank"
-                              aria-label="Clutch Link"
+                              aria-label="Link do Clutch"
                             >
                               <svg
                                 xmlns="http://www.w3.org/2000/svg"
@@ -69,18 +70,18 @@ export default function TestimonialsSticky() {
                     </div>
                   </div>
                 </div>
-                {/* Block - Section Title Standalone End */}
+                {/* Bloco - Fim do Título de Seção Isolado */}
               </div>
             </div>
             <div className="mxd-testimonials-sticky__scroll">
-              {/* Block - Testimonials Cards Start */}
+              {/* Bloco - Início dos Cartões de Depoimentos */}
               <div className="mxd-block">
                 <div className="mxd-testimonials-sticky__cards">
                   <div className="mxd-testimonials-sticky__row">
                     <div className="container-fluid p-0">
                       <div className="row g-0">
                         <div className="col-12 col-xl-7 mxd-grid-item mxd-testimonials-sticky__column margin-bottom-mobile">
-                          {/* testimonial card */}
+                          {/* Cartão de depoimento */}
                           <div className="mxd-testimonials-card">
                             <div className="mxd-testimonials-card__controls">
                               <div className="mxd-testimonials-card__quote">
@@ -98,7 +99,7 @@ export default function TestimonialsSticky() {
                                   href="#0"
                                 >
                                   <TextScramble className="btn-caption mxd-scramble">
-                                    Project Page
+                                    Página do Projeto
                                   </TextScramble>
                                   <i>
                                     <svg
@@ -114,14 +115,14 @@ export default function TestimonialsSticky() {
                             </div>
                             <div className="mxd-testimonials-card__content">
                               <p className="mxd-testimonials-card__descr">
-                                Working with MINDSITE team was
-                                <span>an absolute pleasure!</span>
+                                Trabalhar com a equipe do MINDSITE foi
+                                <span>um prazer absoluto!</span>
                               </p>
                             </div>
                             <div className="mxd-testimonials-card__author">
                               <div className="mxd-testimonials-card__photo">
                                 <Image
-                                  alt="MINDSITE Template Example Image"
+                                  alt="Imagem de Exemplo do Template MINDSITE"
                                   src="/img/avatars/300x300_ava-01.webp"
                                   width={300}
                                   height={300}
@@ -132,7 +133,7 @@ export default function TestimonialsSticky() {
                                   John Lemon
                                 </p>
                                 <p className="mxd-testimonials-card__position">
-                                  Brand manager in
+                                  Gerente de marca na
                                   <a href="#">
                                     <TextScramble className="mxd-scramble">
                                       Instant design
@@ -142,7 +143,7 @@ export default function TestimonialsSticky() {
                               </div>
                             </div>
                           </div>
-                          {/* image card */}
+                          {/* Cartão de imagem */}
                           <div className="mxd-testimonials-image justify-end has-padding-top">
                             <CommonScrollAnimated
                               className="mxd-testimonials-image__wrap mxd-clip-image"
@@ -150,7 +151,7 @@ export default function TestimonialsSticky() {
                               animation="clipImage"
                             >
                               <Image
-                                alt="MINDSITE Template Example Image"
+                                alt="Imagem de Exemplo do Template MINDSITE"
                                 src="/img/avatars/800x800_ava-01.webp"
                                 width={800}
                                 height={800}
@@ -159,7 +160,7 @@ export default function TestimonialsSticky() {
                           </div>
                         </div>
                         <div className="col-12 col-xl-5 mxd-grid-item mxd-testimonials-sticky__column">
-                          {/* testimonial card */}
+                          {/* Cartão de depoimento */}
                           <div className="mxd-testimonials-card fullheight">
                             <div className="mxd-testimonials-card__content">
                               <div className="mxd-testimonials-card__controls">
@@ -178,7 +179,7 @@ export default function TestimonialsSticky() {
                                     href="#0"
                                   >
                                     <TextScramble className="btn-caption mxd-scramble">
-                                      Project Page
+                                      Página do Projeto
                                     </TextScramble>
                                     <i>
                                       <svg
@@ -193,18 +194,16 @@ export default function TestimonialsSticky() {
                                 </div>
                               </div>
                               <p className="mxd-testimonials-card__descr">
-                                MINDSITE team took the time to understand our
-                                business needs{" "}
+                                A equipe do MINDSITE dedicou tempo para entender as necessidades do nosso negócio{" "}
                                 <span>
-                                  and translated them into a beautifully
-                                  designed, user-friendly website.
+                                  e as traduziu em um site lindamente desenhado e intuitivo.
                                 </span>
                               </p>
                             </div>
                             <div className="mxd-testimonials-card__author">
                               <div className="mxd-testimonials-card__photo">
                                 <Image
-                                  alt="MINDSITE Template Example Image"
+                                  alt="Imagem de Exemplo do Template MINDSITE"
                                   src="/img/avatars/300x300_ava-02.webp"
                                   width={300}
                                   height={300}
@@ -215,7 +214,7 @@ export default function TestimonialsSticky() {
                                   Ashley Cherry
                                 </p>
                                 <p className="mxd-testimonials-card__position">
-                                  SEO in
+                                  SEO na
                                   <a href="#">
                                     <TextScramble className="mxd-scramble">
                                       Eye Candy
@@ -233,7 +232,7 @@ export default function TestimonialsSticky() {
                     <div className="container-fluid p-0">
                       <div className="row g-0">
                         <div className="col-12 col-xl-3 mxd-grid-item mxd-testimonials-sticky__column margin-bottom-mobile">
-                          {/* image card */}
+                          {/* Cartão de imagem */}
                           <div className="mxd-testimonials-image justify-end">
                             <CommonScrollAnimated
                               className="mxd-testimonials-image__wrap mxd-clip-image"
@@ -241,7 +240,7 @@ export default function TestimonialsSticky() {
                               animation="clipImage"
                             >
                               <Image
-                                alt="MINDSITE Template Example Image"
+                                alt="Imagem de Exemplo do Template MINDSITE"
                                 src="/img/avatars/800x800_ava-02.webp"
                                 width={800}
                                 height={800}
@@ -250,7 +249,7 @@ export default function TestimonialsSticky() {
                           </div>
                         </div>
                         <div className="col-12 col-xl-6 mxd-grid-item mxd-testimonials-sticky__column">
-                          {/* testimonial card */}
+                          {/* Cartão de depoimento */}
                           <div className="mxd-testimonials-card">
                             <div className="mxd-testimonials-card__controls">
                               <div className="mxd-testimonials-card__quote">
@@ -268,7 +267,7 @@ export default function TestimonialsSticky() {
                                   href="#0"
                                 >
                                   <TextScramble className="btn-caption mxd-scramble">
-                                    Project Page
+                                    Página do Projeto
                                   </TextScramble>
                                   <i>
                                     <svg
@@ -284,18 +283,16 @@ export default function TestimonialsSticky() {
                             </div>
                             <div className="mxd-testimonials-card__content">
                               <p className="mxd-testimonials-card__descr">
-                                The MINDSITE team nailed it! They understood our
-                                vision{" "}
+                                A equipe do MINDSITE acertou em cheio! Eles entenderam nossa visão{" "}
                                 <span>
-                                  and delivered a sleek, intuitive site that our
-                                  clients love.
+                                  e entregaram um site elegante e intuitivo que nossos clientes adoram.
                                 </span>
                               </p>
                             </div>
                             <div className="mxd-testimonials-card__author">
                               <div className="mxd-testimonials-card__photo">
                                 <Image
-                                  alt="MINDSITE Template Example Image"
+                                  alt="Imagem de Exemplo do Template MINDSITE"
                                   src="/img/avatars/300x300_ava-03.webp"
                                   width={300}
                                   height={300}
@@ -306,7 +303,7 @@ export default function TestimonialsSticky() {
                                   Lea Tomato
                                 </p>
                                 <p className="mxd-testimonials-card__position">
-                                  Senior designer in
+                                  Designer sênior na
                                   <a href="#">
                                     <TextScramble className="mxd-scramble">
                                       The Way
@@ -325,7 +322,7 @@ export default function TestimonialsSticky() {
                               animation="clipImage"
                             >
                               <Image
-                                alt="MINDSITE Template Example Image"
+                                alt="Imagem de Exemplo do Template MINDSITE"
                                 src="/img/avatars/800x800_ava-03.webp"
                                 width={800}
                                 height={800}
@@ -340,7 +337,7 @@ export default function TestimonialsSticky() {
                     <div className="container-fluid p-0">
                       <div className="row g-0">
                         <div className="col-12 col-xl-6 mxd-grid-item mxd-testimonials-sticky__column margin-bottom-mobile has-padding-bottom">
-                          {/* testimonial card */}
+                          {/* Cartão de depoimento */}
                           <div className="mxd-testimonials-card fullheight">
                             <div className="mxd-testimonials-card__content">
                               <div className="mxd-testimonials-card__controls">
@@ -359,7 +356,7 @@ export default function TestimonialsSticky() {
                                     href="#0"
                                   >
                                     <TextScramble className="btn-caption mxd-scramble">
-                                      Project Page
+                                      Página do Projeto
                                     </TextScramble>
                                     <i>
                                       <svg
@@ -374,18 +371,16 @@ export default function TestimonialsSticky() {
                                 </div>
                               </div>
                               <p className="mxd-testimonials-card__descr">
-                                The team attention to detail, creativity, and
-                                technical expertise exceeded our expectations.
+                                A atenção aos detalhes, a criatividade e a expertise técnica da equipe superaram nossas expectativas.
                                 <span>
-                                  We have received so much positive feedback
-                                  from our customers already.
+                                  Já recebemos muitos feedbacks positivos dos nossos clientes.
                                 </span>
                               </p>
                             </div>
                             <div className="mxd-testimonials-card__author">
                               <div className="mxd-testimonials-card__photo">
                                 <Image
-                                  alt="MINDSITE Template Example Image"
+                                  alt="Imagem de Exemplo do Template MINDSITE"
                                   src="/img/avatars/300x300_ava-04.webp"
                                   width={300}
                                   height={300}
@@ -396,7 +391,7 @@ export default function TestimonialsSticky() {
                                   Patrick Pineapple
                                 </p>
                                 <p className="mxd-testimonials-card__position">
-                                  SEO in
+                                  SEO na
                                   <a href="#">
                                     <TextScramble className="mxd-scramble">
                                       Instant design
@@ -408,7 +403,7 @@ export default function TestimonialsSticky() {
                           </div>
                         </div>
                         <div className="col-12 col-xl-6 mxd-grid-item mxd-testimonials-sticky__column has-padding-top">
-                          {/* testimonial card */}
+                          {/* Cartão de depoimento */}
                           <div className="mxd-testimonials-card">
                             <div className="mxd-testimonials-card__controls">
                               <div className="mxd-testimonials-card__quote">
@@ -426,7 +421,7 @@ export default function TestimonialsSticky() {
                                   href="#0"
                                 >
                                   <TextScramble className="btn-caption mxd-scramble">
-                                    Project Page
+                                    Página do Projeto
                                   </TextScramble>
                                   <i>
                                     <svg
@@ -442,16 +437,16 @@ export default function TestimonialsSticky() {
                             </div>
                             <div className="mxd-testimonials-card__content">
                               <p className="mxd-testimonials-card__descr">
-                                Amazing experience!
+                                Experiência incrível!
                                 <span>
-                                  Our new website truly reflects our brand.
+                                  Nosso novo site realmente reflete a nossa marca.
                                 </span>
                               </p>
                             </div>
                             <div className="mxd-testimonials-card__author">
                               <div className="mxd-testimonials-card__photo">
                                 <Image
-                                  alt="MINDSITE Template Example Image"
+                                  alt="Imagem de Exemplo do Template MINDSITE"
                                   src="/img/avatars/300x300_ava-05.webp"
                                   width={300}
                                   height={300}
@@ -462,7 +457,7 @@ export default function TestimonialsSticky() {
                                   Mary Cucumber
                                 </p>
                                 <p className="mxd-testimonials-card__position">
-                                  Brand manager in
+                                  Gerente de marca na
                                   <a href="#">
                                     <TextScramble className="mxd-scramble">
                                       Hyper
@@ -472,7 +467,7 @@ export default function TestimonialsSticky() {
                               </div>
                             </div>
                           </div>
-                          {/* image card */}
+                          {/* Cartão de imagem */}
                           <div className="mxd-testimonials-image justify-start has-padding-top">
                             <CommonScrollAnimated
                               className="mxd-testimonials-image__wrap mxd-clip-image"
@@ -480,7 +475,7 @@ export default function TestimonialsSticky() {
                               animation="clipImage"
                             >
                               <Image
-                                alt="MINDSITE Template Example Image"
+                                alt="Imagem de Exemplo do Template MINDSITE"
                                 src="/img/avatars/800x800_ava-04.webp"
                                 width={800}
                                 height={800}
@@ -493,10 +488,10 @@ export default function TestimonialsSticky() {
                   </div>
                 </div>
               </div>
-              {/* Block - Testimonials Cards End */}
+              {/* Bloco - Fim dos Cartões de Depoimentos */}
             </div>
           </div>
-          {/* Block - Testimonials Sticky End */}
+          {/* Bloco - Fim dos Depoimentos Fixos */}
         </div>
       </BlurSection>
     </>

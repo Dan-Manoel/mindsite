@@ -1,12 +1,13 @@
 import BlurSection from "@/components/animations/BlurSection";
 import CommonAnimatedText from "@/components/animations/CommonAnimatedText";
 import { CommonScrollAnimated } from "@/components/animations/CommonScrollAnimated";
+
 export default function SplitList2() {
   return (
     <>
       <BlurSection className="mxd-section padding-top-subtitle padding-bottom-default">
         <div className="mxd-container grid-l-container">
-          {/* Block - Split List v02 Start */}
+          {/* Bloco - Início da Lista Dividida v02 */}
           <div className="mxd-block">
             <div className="mxd-block-split">
               <div className="container-fluid p-0">
@@ -19,7 +20,7 @@ export default function SplitList2() {
                           as="p"
                           animation="inUp"
                         >
-                          <span>/ Challenge</span>
+                          <span>/ Desafio</span>
                         </CommonScrollAnimated>
                       </div>
                       <div className="mxd-block-split__manifest">
@@ -28,13 +29,12 @@ export default function SplitList2() {
                           className="manifest manifest-s mxd-split-lines"
                           animation="splitLines"
                         >
-                          The challenge was to create a template that feels bold
-                          and contemporary without overwhelming content or
-                          performance.
+                          O desafio era criar um template que pareça audacioso
+                          e contemporâneo sem sobrecarregar o conteúdo ou a performance.
                           <span>
-                            It needed to serve a wide range of creatives while
-                            remaining flexible and easy to customize for
-                            different project types and personal styles.
+                            Ele precisava atender a uma ampla gama de criativos,
+                            mantendo-se flexível e fácil de personalizar para
+                            diferentes tipos de projetos e estilos pessoais.
                           </span>
                         </CommonAnimatedText>
                       </div>
@@ -48,12 +48,12 @@ export default function SplitList2() {
                           as="p"
                           animation="inUp"
                         >
-                          <span>/ Provided Services</span>
+                          <span>/ Serviços Prestados</span>
                         </CommonScrollAnimated>
                       </div>
-                      {/* split data list */}
+                      {/* Lista de dados divididos */}
                       <div className="mxd-block-split__data">
-                        {/* split data item */}
+                        {/* Item de dados divididos */}
                         <div className="split-data__item">
                           <div className="split-data__divider divider-top" />
                           <div className="split-data__name">
@@ -62,7 +62,7 @@ export default function SplitList2() {
                               as="p"
                               animation="inUp"
                             >
-                              Art direction
+                              Direção de arte
                             </CommonScrollAnimated>
                           </div>
                           <div className="split-data__descr">
@@ -71,15 +71,15 @@ export default function SplitList2() {
                               as="p"
                               animation="inUp"
                             >
-                              Visual decisions were guided by a strong creative
-                              framework built around clarity and balance.
-                              Layout, typography, and motion work together to
-                              create a consistent and engaging experience.
+                              As decisões visuais foram guiadas por uma forte estrutura
+                              criativa construída em torno da clareza e do equilíbrio.
+                              Layout, tipografia e movimento trabalham juntos para
+                              criar uma experiência consistente e envolvente.
                             </CommonScrollAnimated>
                           </div>
                           <div className="split-data__divider divider-bottom" />
                         </div>
-                        {/* split data item */}
+                        {/* Item de dados divididos */}
                         <div className="split-data__item">
                           <div className="split-data__divider divider-top" />
                           <div className="split-data__name">
@@ -97,15 +97,15 @@ export default function SplitList2() {
                               as="p"
                               animation="inUp"
                             >
-                              The project relies on a minimal yet expressive
-                              identity that highlights MINDSITE&apos;s character.
-                              Carefully selected colors, type, and graphic
-                              accents reinforce recognition and visual cohesion.
+                              O projeto baseia-se em uma identidade minimalista, porém
+                              expressiva, que destaca o caráter do MINDSITE. Cores, 
+                              tipografia e acentos gráficos cuidadosamente selecionados 
+                              reforçam o reconhecimento e a coesão visual.
                             </CommonScrollAnimated>
                           </div>
                           <div className="split-data__divider divider-bottom" />
                         </div>
-                        {/* split data item */}
+                        {/* Item de dados divididos */}
                         <div className="split-data__item">
                           <div className="split-data__divider divider-top" />
                           <div className="split-data__name">
@@ -114,7 +114,7 @@ export default function SplitList2() {
                               as="p"
                               animation="inUp"
                             >
-                              Web development
+                              Desenvolvimento web
                             </CommonScrollAnimated>
                           </div>
                           <div className="split-data__descr">
@@ -123,10 +123,10 @@ export default function SplitList2() {
                               as="p"
                               animation="inUp"
                             >
-                              Implementation focused on modern front-end
-                              standards and performance. Clear structure, smooth
-                              interactions and clean code provide flexibility
-                              and long-term maintainability.
+                              A implementação focou em padrões modernos de front-end
+                              e performance. Estrutura clara, interações suaves
+                              e código limpo fornecem flexibilidade e manutenibilidade
+                              a longo prazo.
                             </CommonScrollAnimated>
                           </div>
                           <div className="split-data__divider divider-bottom" />
@@ -138,7 +138,7 @@ export default function SplitList2() {
               </div>
             </div>
           </div>
-          {/* Block - Split List v02 End */}
+          {/* Bloco - Fim da Lista Dividida v02 */}
         </div>
       </BlurSection>
     </>

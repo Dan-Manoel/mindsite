@@ -6,6 +6,7 @@ import { CommonScrollAnimated } from "@/components/animations/CommonScrollAnimat
 import CommonAnimatedText from "@/components/animations/CommonAnimatedText";
 import TextScramble from "@/components/animations/TextScramble";
 import SmoothAnchorLink from "@/components/common/SmoothAnchorLink";
+
 export default function ProjectsList() {
   return (
     <>
@@ -15,7 +16,7 @@ export default function ProjectsList() {
       >
         <PinnedSection.Inner>
           <div className="mxd-container grid-l-container">
-            {/* Block - Section Title v03 Start */}
+            {/* Bloco - Início do Título da Seção v03 */}
             <div className="mxd-block">
               <div className="mxd-section-title pre-grid">
                 <div className="container-fluid p-0">
@@ -27,7 +28,7 @@ export default function ProjectsList() {
                           className="reveal-type"
                           animation="revealType"
                         >
-                          Projects archive
+                          Arquivo de projetos
                         </CommonAnimatedText>
                       </div>
                     </div>
@@ -43,7 +44,7 @@ export default function ProjectsList() {
                             targetId="testimonials"
                           >
                             <TextScramble className="btn-caption mxd-scramble">
-                              Clients Approve
+                              Aprovação dos Clientes
                             </TextScramble>
                           </SmoothAnchorLink>
                         </CommonScrollAnimated>
@@ -53,15 +54,16 @@ export default function ProjectsList() {
                 </div>
               </div>
             </div>
-            {/* Block - Section Title v03 End */}
-            {/* Block - Projects List Start */}
+            {/* Bloco - Fim do Título da Seção v03 */}
+            
+            {/* Bloco - Início da Lista de Projetos */}
             <div className="mxd-block">
-              {/* projects list */}
+              {/* Lista de projetos */}
               <div className="mxd-projects-list no-margin-bottom">
                 <Link
                   className="mxd-projects-list__item active-cursor-image active-cursor-permanent"
                   data-cursor-image="/img/works/showcase-archive/500x500_pr01.webp"
-                  data-cursor-text="View Work"
+                  data-cursor-text="Ver Trabalho"
                   href={`/project-details`}
                 >
                   <div className="mxd-projects-list__divider top" />
@@ -77,11 +79,11 @@ export default function ProjectsList() {
                       <div className="col-12 col-xl-6 mxd-grid-padding">
                         <div className="mxd-projects-list__title">
                           <h3>
-                            Creative{" "}
+                            Template para{" "}
                             <span>
-                              studio
+                              estúdio
                               <br />
-                              template
+                              criativo
                             </span>
                           </h3>
                         </div>
@@ -102,7 +104,7 @@ export default function ProjectsList() {
                       <div className="col-6 col-md-6 col-xl-2 mxd-grid-padding">
                         <div className="mxd-projects-list__date">
                           <TextScramble className="meta-date mxd-scramble">
-                            January
+                            Janeiro
                           </TextScramble>
                           <TextScramble className="meta-date mxd-scramble">
                             2026
@@ -113,10 +115,11 @@ export default function ProjectsList() {
                   </div>
                   <div className="mxd-projects-list__divider bottom" />
                 </Link>
+                
                 <Link
                   className="mxd-projects-list__item active-cursor-image active-cursor-permanent"
                   data-cursor-image="/img/works/showcase-archive/500x500_pr02.webp"
-                  data-cursor-text="View Work"
+                  data-cursor-text="Ver Trabalho"
                   href={`/project-details`}
                 >
                   <div className="mxd-projects-list__divider top" />
@@ -125,16 +128,16 @@ export default function ProjectsList() {
                       <div className="col-12 col-xl-2 mxd-grid-padding">
                         <div className="mxd-projects-list__niche">
                           <TextScramble className="meta-niche mxd-scramble">
-                            Fashion
+                            Moda
                           </TextScramble>
                         </div>
                       </div>
                       <div className="col-12 col-xl-6 mxd-grid-padding">
                         <div className="mxd-projects-list__title">
                           <h3>
-                            Editorial
+                            Conjunto de ilustrações
                             <br />
-                            <span>illustrations set</span>
+                            <span>editoriais</span>
                           </h3>
                         </div>
                       </div>
@@ -144,7 +147,7 @@ export default function ProjectsList() {
                             Midjourney
                           </TextScramble>
                           <TextScramble className="meta-tag mxd-scramble">
-                            Illustrations
+                            Ilustrações
                           </TextScramble>
                           <TextScramble className="meta-tag mxd-scramble">
                             Design
@@ -154,7 +157,7 @@ export default function ProjectsList() {
                       <div className="col-6 col-md-6 col-xl-2 mxd-grid-padding">
                         <div className="mxd-projects-list__date">
                           <TextScramble className="meta-date mxd-scramble">
-                            November
+                            Novembro
                           </TextScramble>
                           <TextScramble className="meta-date mxd-scramble">
                             2025
@@ -165,10 +168,11 @@ export default function ProjectsList() {
                   </div>
                   <div className="mxd-projects-list__divider bottom" />
                 </Link>
+
                 <Link
                   className="mxd-projects-list__item active-cursor-image active-cursor-permanent"
                   data-cursor-image="/img/works/showcase-archive/500x500_pr03.webp"
-                  data-cursor-text="View Work"
+                  data-cursor-text="Ver Trabalho"
                   href={`/project-details`}
                 >
                   <div className="mxd-projects-list__divider top" />
@@ -184,11 +188,11 @@ export default function ProjectsList() {
                       <div className="col-12 col-xl-6 mxd-grid-padding">
                         <div className="mxd-projects-list__title">
                           <h3>
-                            Interactive{" "}
+                            Conceito de mídia{" "}
                             <span>
-                              media
+                              interativa
                               <br />
-                              concept
+                              digital
                             </span>
                           </h3>
                         </div>
@@ -209,7 +213,7 @@ export default function ProjectsList() {
                       <div className="col-6 col-md-6 col-xl-2 mxd-grid-padding">
                         <div className="mxd-projects-list__date">
                           <TextScramble className="meta-date mxd-scramble">
-                            October
+                            Outubro
                           </TextScramble>
                           <TextScramble className="meta-date mxd-scramble">
                             2025
@@ -220,10 +224,11 @@ export default function ProjectsList() {
                   </div>
                   <div className="mxd-projects-list__divider bottom" />
                 </Link>
+
                 <Link
                   className="mxd-projects-list__item active-cursor-image active-cursor-permanent"
                   data-cursor-image="/img/works/showcase-archive/500x500_pr04.webp"
-                  data-cursor-text="View Work"
+                  data-cursor-text="Ver Trabalho"
                   href={`/project-details`}
                 >
                   <div className="mxd-projects-list__divider top" />
@@ -239,11 +244,11 @@ export default function ProjectsList() {
                       <div className="col-12 col-xl-6 mxd-grid-padding">
                         <div className="mxd-projects-list__title">
                           <h3>
-                            Mobile{" "}
+                            Design de{" "}
                             <span>
-                              app
+                              aplicativo
                               <br />
-                              design
+                              mobile
                             </span>
                           </h3>
                         </div>
@@ -264,7 +269,7 @@ export default function ProjectsList() {
                       <div className="col-6 col-md-6 col-xl-2 mxd-grid-padding">
                         <div className="mxd-projects-list__date">
                           <TextScramble className="meta-date mxd-scramble">
-                            September
+                            Setembro
                           </TextScramble>
                           <TextScramble className="meta-date mxd-scramble">
                             2025
@@ -275,10 +280,11 @@ export default function ProjectsList() {
                   </div>
                   <div className="mxd-projects-list__divider bottom" />
                 </Link>
+
                 <Link
                   className="mxd-projects-list__item active-cursor-image active-cursor-permanent"
                   data-cursor-image="/img/works/showcase-archive/500x500_pr05.webp"
-                  data-cursor-text="View Work"
+                  data-cursor-text="Ver Trabalho"
                   href={`/project-details`}
                 >
                   <div className="mxd-projects-list__divider top" />
@@ -294,11 +300,11 @@ export default function ProjectsList() {
                       <div className="col-12 col-xl-6 mxd-grid-padding">
                         <div className="mxd-projects-list__title">
                           <h3>
-                            Illustrations{" "}
+                            Conjunto de ilustrações{" "}
                             <span>
-                              set
+                              para impressão
                               <br />
-                              for print
+                              gráfica
                             </span>
                           </h3>
                         </div>
@@ -319,7 +325,7 @@ export default function ProjectsList() {
                       <div className="col-6 col-md-6 col-xl-2 mxd-grid-padding">
                         <div className="mxd-projects-list__date">
                           <TextScramble className="meta-date mxd-scramble">
-                            August
+                            Agosto
                           </TextScramble>
                           <TextScramble className="meta-date mxd-scramble">
                             2025
@@ -332,7 +338,7 @@ export default function ProjectsList() {
                 </Link>
               </div>
             </div>
-            {/* Block - Projects List End */}
+            {/* Bloco - Fim da Lista de Projetos */}
           </div>
           <PinnedSection.Trigger />
         </PinnedSection.Inner>

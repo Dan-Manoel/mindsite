@@ -2,12 +2,13 @@ import UkiyoParallax from "@/components/animations/UkiyoParallax";
 import BlurSection from "@/components/animations/BlurSection";
 import CommonAnimatedText from "@/components/animations/CommonAnimatedText";
 import Image from "next/image";
+
 export default function NextProjectLink() {
   return (
     <>
       <BlurSection className="mxd-section padding-top-title">
         <div className="mxd-container fullwidth-container">
-          {/* Block - Next Project Start */}
+          {/* Bloco - Início do Próximo Projeto */}
           <div className="mxd-block">
             <div className="mxd-next-prj">
               <a
@@ -22,7 +23,7 @@ export default function NextProjectLink() {
                       className="mxd-split-lines"
                       animation="splitLines"
                     >
-                      Next project
+                      Próximo projeto
                     </CommonAnimatedText>
                   </div>
                   <div className="mxd-next-prj__name">
@@ -31,7 +32,7 @@ export default function NextProjectLink() {
                       className="mxd-split-lines"
                       animation="splitLines"
                     >
-                      Solei - interactive concept <span>powered by AI</span>
+                      Solei - conceito interativo <span>impulsionado por IA</span>
                     </CommonAnimatedText>
                   </div>
                 </div>
@@ -70,7 +71,7 @@ export default function NextProjectLink() {
                     externalRAF={false}
                   >
                     <Image
-                      alt="MINDSITE Template Sample Image"
+                      alt="Imagem de Exemplo do Template MINDSITE"
                       src="/img/works/project-details/next01.webp"
                       width={1920}
                       height={1200}
@@ -80,7 +81,7 @@ export default function NextProjectLink() {
               </a>
             </div>
           </div>
-          {/* Block - Next Project End */}
+          {/* Bloco - Fim do Próximo Projeto */}
         </div>
       </BlurSection>
     </>

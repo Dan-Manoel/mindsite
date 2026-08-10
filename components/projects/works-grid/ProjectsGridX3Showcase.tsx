@@ -9,6 +9,7 @@ import CommonLoadAnimation, {
 import { CommonCardBatchAnimated } from "@/components/animations/CommonScrollAnimated";
 import TextScramble from "@/components/animations/TextScramble";
 import MxdImgAnim from "@/components/animations/MxdImgAnim";
+
 export default function ProjectsGridX3Showcase() {
   return (
     <CommonLoadAnimation>
@@ -19,7 +20,7 @@ export default function ProjectsGridX3Showcase() {
         >
           <PinnedSection.Inner>
             <div className="mxd-container grid-l-container">
-              {/* Block - Projects Grid x3 Showcase Start */}
+              {/* Bloco - Início da Exibição em Grade x3 de Projetos */}
               <CommonLoadFade index={0}>
                 <div className="mxd-block loading-fade">
                   <div className="mxd-projects-grid">
@@ -32,13 +33,13 @@ export default function ProjectsGridX3Showcase() {
                         >
                           <Link
                             className="mxd-project-item__media active-cursor-permanent"
-                            data-cursor-text="View Work"
+                            data-cursor-text="Ver Trabalho"
                             href={`/project-details`}
                           >
                             <MxdImgAnim
                               main={
                                 <Image
-                                  alt="Project Preview Image"
+                                  alt="Imagem de Pré-visualização do Projeto"
                                   src="/img/works/showcase-grid-x3/pr01-01.webp"
                                   width={853}
                                   height={1280}
@@ -47,28 +48,28 @@ export default function ProjectsGridX3Showcase() {
                               absolutes={[
                                 <Image
                                   key="pr01-05"
-                                  alt="Project Preview Image"
+                                  alt="Imagem de Pré-visualização do Projeto"
                                   src="/img/works/showcase-grid-x3/pr01-05.webp"
                                   width={853}
                                   height={1280}
                                 />,
                                 <Image
                                   key="pr01-04"
-                                  alt="Project Preview Image"
+                                  alt="Imagem de Pré-visualização do Projeto"
                                   src="/img/works/showcase-grid-x3/pr01-04.webp"
                                   width={853}
                                   height={1280}
                                 />,
                                 <Image
                                   key="pr01-03"
-                                  alt="Project Preview Image"
+                                  alt="Imagem de Pré-visualização do Projeto"
                                   src="/img/works/showcase-grid-x3/pr01-03.webp"
                                   width={853}
                                   height={1280}
                                 />,
                                 <Image
                                   key="pr01-02"
-                                  alt="Project Preview Image"
+                                  alt="Imagem de Pré-visualização do Projeto"
                                   src="/img/works/showcase-grid-x3/pr01-02.webp"
                                   width={853}
                                   height={1280}
@@ -82,7 +83,7 @@ export default function ProjectsGridX3Showcase() {
                                 className="project-name-s"
                                 href={`/project-details`}
                               >
-                                Illustrations set
+                                Conjunto de ilustrações
                               </Link>
                             </div>
                             <div className="mxd-project-item__tags">
@@ -90,10 +91,10 @@ export default function ProjectsGridX3Showcase() {
                                 Design
                               </TextScramble>
                               <TextScramble className="tag tag-s tag-medium mxd-scramble">
-                                Illustrations
+                                Ilustrações
                               </TextScramble>
                               <TextScramble className="tag tag-s tag-medium mxd-scramble">
-                                Packaging
+                                Embalagem
                               </TextScramble>
                               <TextScramble className="tag tag-s tag-medium mxd-scramble">
                                 Marketing
@@ -101,6 +102,7 @@ export default function ProjectsGridX3Showcase() {
                             </div>
                           </div>
                         </CommonCardBatchAnimated>
+
                         <CommonCardBatchAnimated
                           className="col-12 col-md-6 col-xl-4 mxd-project-item animate-card-3"
                           as="div"
@@ -108,13 +110,13 @@ export default function ProjectsGridX3Showcase() {
                         >
                           <Link
                             className="mxd-project-item__media active-cursor-permanent"
-                            data-cursor-text="View Work"
+                            data-cursor-text="Ver Trabalho"
                             href={`/project-details`}
                           >
                             <MxdImgAnim
                               main={
                                 <Image
-                                  alt="Project Preview Image"
+                                  alt="Imagem de Pré-visualização do Projeto"
                                   src="/img/works/showcase-grid-x3/pr02-01.webp"
                                   width={1280}
                                   height={843}
@@ -123,28 +125,28 @@ export default function ProjectsGridX3Showcase() {
                               absolutes={[
                                 <Image
                                   key="pr02-04"
-                                  alt="Project Preview Image"
+                                  alt="Imagem de Pré-visualização do Projeto"
                                   src="/img/works/showcase-grid-x3/pr02-04.webp"
                                   width={1280}
                                   height={843}
                                 />,
                                 <Image
                                   key="pr02-05"
-                                  alt="Project Preview Image"
+                                  alt="Imagem de Pré-visualização do Projeto"
                                   src="/img/works/showcase-grid-x3/pr02-05.webp"
                                   width={1280}
                                   height={843}
                                 />,
                                 <Image
                                   key="pr02-03"
-                                  alt="Project Preview Image"
+                                  alt="Imagem de Pré-visualização do Projeto"
                                   src="/img/works/showcase-grid-x3/pr02-03.webp"
                                   width={1280}
                                   height={843}
                                 />,
                                 <Image
                                   key="pr02-02"
-                                  alt="Project Preview Image"
+                                  alt="Imagem de Pré-visualização do Projeto"
                                   src="/img/works/showcase-grid-x3/pr02-02.webp"
                                   width={1280}
                                   height={843}
@@ -158,7 +160,7 @@ export default function ProjectsGridX3Showcase() {
                                 className="project-name-s"
                                 href={`/project-details`}
                               >
-                                Interactive concept
+                                Conceito interativo
                               </Link>
                             </div>
                             <div className="mxd-project-item__tags">
@@ -166,7 +168,7 @@ export default function ProjectsGridX3Showcase() {
                                 UI/UX
                               </TextScramble>
                               <TextScramble className="tag tag-s tag-medium mxd-scramble">
-                                Development
+                                Desenvolvimento
                               </TextScramble>
                               <TextScramble className="tag tag-s tag-medium mxd-scramble">
                                 Brand
@@ -174,6 +176,7 @@ export default function ProjectsGridX3Showcase() {
                             </div>
                           </div>
                         </CommonCardBatchAnimated>
+
                         <CommonCardBatchAnimated
                           className="col-12 col-md-6 col-xl-4 mxd-project-item animate-card-3"
                           as="div"
@@ -181,13 +184,13 @@ export default function ProjectsGridX3Showcase() {
                         >
                           <Link
                             className="mxd-project-item__media active-cursor-permanent"
-                            data-cursor-text="View Work"
+                            data-cursor-text="Ver Trabalho"
                             href={`/project-details`}
                           >
                             <MxdImgAnim
                               main={
                                 <Image
-                                  alt="Project Preview Image"
+                                  alt="Imagem de Pré-visualização do Projeto"
                                   src="/img/works/showcase-grid-x3/pr03-01.webp"
                                   width={1280}
                                   height={1280}
@@ -196,35 +199,35 @@ export default function ProjectsGridX3Showcase() {
                               absolutes={[
                                 <Image
                                   key="pr03-06"
-                                  alt="Project Preview Image"
+                                  alt="Imagem de Pré-visualização do Projeto"
                                   src="/img/works/showcase-grid-x3/pr03-06.webp"
                                   width={1280}
                                   height={1280}
                                 />,
                                 <Image
                                   key="pr03-02"
-                                  alt="Project Preview Image"
+                                  alt="Imagem de Pré-visualização do Projeto"
                                   src="/img/works/showcase-grid-x3/pr03-02.webp"
                                   width={1280}
                                   height={1280}
                                 />,
                                 <Image
                                   key="pr03-05"
-                                  alt="Project Preview Image"
+                                  alt="Imagem de Pré-visualização do Projeto"
                                   src="/img/works/showcase-grid-x3/pr03-05.webp"
                                   width={1280}
                                   height={1280}
                                 />,
                                 <Image
                                   key="pr03-04"
-                                  alt="Project Preview Image"
+                                  alt="Imagem de Pré-visualização do Projeto"
                                   src="/img/works/showcase-grid-x3/pr03-04.webp"
                                   width={1280}
                                   height={1280}
                                 />,
                                 <Image
                                   key="pr03-03"
-                                  alt="Project Preview Image"
+                                  alt="Imagem de Pré-visualização do Projeto"
                                   src="/img/works/showcase-grid-x3/pr03-03.webp"
                                   width={1280}
                                   height={1280}
@@ -238,7 +241,7 @@ export default function ProjectsGridX3Showcase() {
                                 className="project-name-s"
                                 href={`/project-details`}
                               >
-                                Creative studio template
+                                Template para estúdio criativo
                               </Link>
                             </div>
                             <div className="mxd-project-item__tags">
@@ -254,6 +257,7 @@ export default function ProjectsGridX3Showcase() {
                             </div>
                           </div>
                         </CommonCardBatchAnimated>
+
                         <CommonCardBatchAnimated
                           className="col-12 col-md-6 col-xl-4 mxd-project-item animate-card-3"
                           as="div"
@@ -261,13 +265,13 @@ export default function ProjectsGridX3Showcase() {
                         >
                           <Link
                             className="mxd-project-item__media active-cursor-permanent"
-                            data-cursor-text="View Work"
+                            data-cursor-text="Ver Trabalho"
                             href={`/project-details`}
                           >
                             <MxdImgAnim
                               main={
                                 <Image
-                                  alt="Project Preview Image"
+                                  alt="Imagem de Pré-visualização do Projeto"
                                   src="/img/works/showcase-grid-x3/pr04-01.webp"
                                   width={1280}
                                   height={853}
@@ -276,42 +280,42 @@ export default function ProjectsGridX3Showcase() {
                               absolutes={[
                                 <Image
                                   key="pr04-02"
-                                  alt="Project Preview Image"
+                                  alt="Imagem de Pré-visualização do Projeto"
                                   src="/img/works/showcase-grid-x3/pr04-02.webp"
                                   width={1280}
                                   height={853}
                                 />,
                                 <Image
                                   key="pr04-03"
-                                  alt="Project Preview Image"
+                                  alt="Imagem de Pré-visualização do Projeto"
                                   src="/img/works/showcase-grid-x3/pr04-03.webp"
                                   width={1280}
                                   height={853}
                                 />,
                                 <Image
                                   key="pr04-04"
-                                  alt="Project Preview Image"
+                                  alt="Imagem de Pré-visualização do Projeto"
                                   src="/img/works/showcase-grid-x3/pr04-04.webp"
                                   width={1280}
                                   height={853}
                                 />,
                                 <Image
                                   key="pr04-05"
-                                  alt="Project Preview Image"
+                                  alt="Imagem de Pré-visualização do Projeto"
                                   src="/img/works/showcase-grid-x3/pr04-05.webp"
                                   width={1280}
                                   height={853}
                                 />,
                                 <Image
                                   key="pr04-06"
-                                  alt="Project Preview Image"
+                                  alt="Imagem de Pré-visualização do Projeto"
                                   src="/img/works/showcase-grid-x3/pr04-06.webp"
                                   width={1280}
                                   height={853}
                                 />,
                                 <Image
                                   key="pr04-07"
-                                  alt="Project Preview Image"
+                                  alt="Imagem de Pré-visualização do Projeto"
                                   src="/img/works/showcase-grid-x3/pr04-07.webp"
                                   width={1280}
                                   height={853}
@@ -325,7 +329,7 @@ export default function ProjectsGridX3Showcase() {
                                 className="project-name-s"
                                 href={`/project-details`}
                               >
-                                Interactive concept
+                                Conceito interativo
                               </Link>
                             </div>
                             <div className="mxd-project-item__tags">
@@ -341,6 +345,7 @@ export default function ProjectsGridX3Showcase() {
                             </div>
                           </div>
                         </CommonCardBatchAnimated>
+
                         <CommonCardBatchAnimated
                           className="col-12 col-md-6 col-xl-4 mxd-project-item animate-card-3"
                           as="div"
@@ -348,13 +353,13 @@ export default function ProjectsGridX3Showcase() {
                         >
                           <Link
                             className="mxd-project-item__media active-cursor-permanent"
-                            data-cursor-text="View Work"
+                            data-cursor-text="Ver Trabalho"
                             href={`/project-details`}
                           >
                             <MxdImgAnim
                               main={
                                 <Image
-                                  alt="Project Preview Image"
+                                  alt="Imagem de Pré-visualização do Projeto"
                                   src="/img/works/showcase-grid-x3/pr05-01.webp"
                                   width={853}
                                   height={1280}
@@ -363,35 +368,35 @@ export default function ProjectsGridX3Showcase() {
                               absolutes={[
                                 <Image
                                   key="pr05-04"
-                                  alt="Project Preview Image"
+                                  alt="Imagem de Pré-visualização do Projeto"
                                   src="/img/works/showcase-grid-x3/pr05-04.webp"
                                   width={853}
                                   height={1280}
                                 />,
                                 <Image
                                   key="pr05-05"
-                                  alt="Project Preview Image"
+                                  alt="Imagem de Pré-visualização do Projeto"
                                   src="/img/works/showcase-grid-x3/pr05-05.webp"
                                   width={853}
                                   height={1280}
                                 />,
                                 <Image
                                   key="pr05-06"
-                                  alt="Project Preview Image"
+                                  alt="Imagem de Pré-visualização do Projeto"
                                   src="/img/works/showcase-grid-x3/pr05-06.webp"
                                   width={853}
                                   height={1280}
                                 />,
                                 <Image
                                   key="pr05-03"
-                                  alt="Project Preview Image"
+                                  alt="Imagem de Pré-visualização do Projeto"
                                   src="/img/works/showcase-grid-x3/pr05-03.webp"
                                   width={853}
                                   height={1280}
                                 />,
                                 <Image
                                   key="pr05-02"
-                                  alt="Project Preview Image"
+                                  alt="Imagem de Pré-visualização do Projeto"
                                   src="/img/works/showcase-grid-x3/pr05-02.webp"
                                   width={853}
                                   height={1280}
@@ -405,7 +410,7 @@ export default function ProjectsGridX3Showcase() {
                                 className="project-name-s"
                                 href={`/project-details`}
                               >
-                                Interactive concept
+                                Conceito interativo
                               </Link>
                             </div>
                             <div className="mxd-project-item__tags">
@@ -421,6 +426,7 @@ export default function ProjectsGridX3Showcase() {
                             </div>
                           </div>
                         </CommonCardBatchAnimated>
+
                         <CommonCardBatchAnimated
                           className="col-12 col-md-6 col-xl-4 mxd-project-item animate-card-3"
                           as="div"
@@ -428,13 +434,13 @@ export default function ProjectsGridX3Showcase() {
                         >
                           <Link
                             className="mxd-project-item__media active-cursor-permanent"
-                            data-cursor-text="View Work"
+                            data-cursor-text="Ver Trabalho"
                             href={`/project-details`}
                           >
                             <MxdImgAnim
                               main={
                                 <Image
-                                  alt="Project Preview Image"
+                                  alt="Imagem de Pré-visualização do Projeto"
                                   src="/img/works/showcase-grid-x3/pr06-01.webp"
                                   width={1280}
                                   height={1280}
@@ -443,42 +449,42 @@ export default function ProjectsGridX3Showcase() {
                               absolutes={[
                                 <Image
                                   key="pr06-07"
-                                  alt="Project Preview Image"
+                                  alt="Imagem de Pré-visualização do Projeto"
                                   src="/img/works/showcase-grid-x3/pr06-07.webp"
                                   width={1280}
                                   height={1280}
                                 />,
                                 <Image
                                   key="pr06-06"
-                                  alt="Project Preview Image"
+                                  alt="Imagem de Pré-visualização do Projeto"
                                   src="/img/works/showcase-grid-x3/pr06-06.webp"
                                   width={1280}
                                   height={1280}
                                 />,
                                 <Image
                                   key="pr06-05"
-                                  alt="Project Preview Image"
+                                  alt="Imagem de Pré-visualização do Projeto"
                                   src="/img/works/showcase-grid-x3/pr06-05.webp"
                                   width={1280}
                                   height={1280}
                                 />,
                                 <Image
                                   key="pr06-04"
-                                  alt="Project Preview Image"
+                                  alt="Imagem de Pré-visualização do Projeto"
                                   src="/img/works/showcase-grid-x3/pr06-04.webp"
                                   width={1280}
                                   height={1280}
                                 />,
                                 <Image
                                   key="pr06-03"
-                                  alt="Project Preview Image"
+                                  alt="Imagem de Pré-visualização do Projeto"
                                   src="/img/works/showcase-grid-x3/pr06-03.webp"
                                   width={1280}
                                   height={1280}
                                 />,
                                 <Image
                                   key="pr06-02"
-                                  alt="Project Preview Image"
+                                  alt="Imagem de Pré-visualização do Projeto"
                                   src="/img/works/showcase-grid-x3/pr06-02.webp"
                                   width={1280}
                                   height={1280}
@@ -492,7 +498,7 @@ export default function ProjectsGridX3Showcase() {
                                 className="project-name-s"
                                 href={`/project-details`}
                               >
-                                Interactive concept
+                                Conceito interativo
                               </Link>
                             </div>
                             <div className="mxd-project-item__tags">
@@ -513,7 +519,7 @@ export default function ProjectsGridX3Showcase() {
                   </div>
                 </div>
               </CommonLoadFade>
-              {/* Block - Projects Grid x3 Showcase End */}
+              {/* Bloco - Fim da Exibição em Grade x3 de Projetos */}
             </div>
             <PinnedSection.Trigger />
           </PinnedSection.Inner>

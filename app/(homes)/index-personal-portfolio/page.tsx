@@ -33,7 +33,7 @@ export default function IndexPersonalPortfolioPage() {
         <BlogPreview />
         <CTA />
       </>
-      <Footer3 name="Walker" />
+      <Footer3 name="Mindsite" />
     </>
   );
 }

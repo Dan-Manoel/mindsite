@@ -9,26 +9,27 @@ import CommonLoadAnimation, {
 import CommonAnimatedText from "@/components/animations/CommonAnimatedText";
 import TextScramble from "@/components/animations/TextScramble";
 import SmoothAnchorLink from "@/components/common/SmoothAnchorLink";
+
 export default function InnerHeadline() {
   return (
     <CommonLoadAnimation>
       <>
         <BlurSection className="mxd-section">
           <div className="mxd-container grid-l-container">
-            {/* Block - Inner Headline v07 Start */}
+            {/* Bloco - Início do Cabeçalho Interno v07 */}
             <div className="mxd-block loading-wrap">
               <div className="inner-headline margin-bottom-details">
                 <div className="container-fluid p-0">
                   <div className="row g-0">
                     <div className="col-12 mxd-grid-item">
-                      {/* breadcrumbs */}
+                      {/* Trilha de navegação (Breadcrumbs) */}
                       <CommonLoadFade index={0}>
                         <div className="inner-headline__breadcrumbs loading-fade">
                           <div className="breadcrumbs__nav">
                             <span>
                               <Link href={`/works-default`}>
                                 <TextScramble className="mxd-scramble">
-                                  Works
+                                  Trabalhos
                                 </TextScramble>
                               </Link>
                             </span>
@@ -38,7 +39,7 @@ export default function InnerHeadline() {
                       </CommonLoadFade>
                     </div>
                     <div className="col-12">
-                      {/* content */}
+                      {/* Conteúdo principal */}
                       <div className="inner-headline__content has-large-title">
                         <div className="container-fluid p-0">
                           <div className="row g-0">
@@ -58,30 +59,30 @@ export default function InnerHeadline() {
                                   className="loading-split"
                                   animation="splitLinesLoad"
                                 >
-                                  Digital agency &amp; personal portfolio
-                                  <span>React Nextjs Template</span>
+                                  Agência digital &amp; portfólio pessoal
+                                  <span>Template React Next.js</span>
                                 </CommonAnimatedText>
                               </div>
                               <div className="inner-headline__columns">
                                 <div className="tags-column">
                                   <CommonLoadItem index={0}>
                                     <TextScramble className="tag tag-m mxd-scramble loading-item">
-                                      Website
+                                      Site
                                     </TextScramble>
                                   </CommonLoadItem>
                                   <CommonLoadItem index={1}>
                                     <TextScramble className="tag tag-m mxd-scramble loading-item">
-                                      UI/UX Design
+                                      Design UI/UX
                                     </TextScramble>
                                   </CommonLoadItem>
                                   <CommonLoadItem index={2}>
                                     <TextScramble className="tag tag-m mxd-scramble loading-item">
-                                      Development
+                                      Desenvolvimento
                                     </TextScramble>
                                   </CommonLoadItem>
                                   <CommonLoadItem index={3}>
                                     <TextScramble className="tag tag-m mxd-scramble loading-item">
-                                      Promotions
+                                      Promoções
                                     </TextScramble>
                                   </CommonLoadItem>
                                 </div>
@@ -93,7 +94,7 @@ export default function InnerHeadline() {
                                   </CommonLoadItem>
                                   <CommonLoadItem index={5}>
                                     <TextScramble className="tag tag-m mxd-scramble loading-item">
-                                      art Direction
+                                      Direção de Arte
                                     </TextScramble>
                                   </CommonLoadItem>
                                   <CommonLoadItem index={6}>
@@ -112,7 +113,7 @@ export default function InnerHeadline() {
                                     targetId="overview"
                                   >
                                     <TextScramble className="btn-caption mxd-scramble">
-                                      Scroll to explore
+                                      Rolar para explorar
                                     </TextScramble>
                                     <i>
                                       <svg
@@ -135,7 +136,7 @@ export default function InnerHeadline() {
                 </div>
               </div>
             </div>
-            {/* Block - Inner Headline v07 End */}
+            {/* Bloco - Fim do Cabeçalho Interno v07 */}
           </div>
         </BlurSection>
       </>

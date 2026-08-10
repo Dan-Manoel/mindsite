@@ -1,12 +1,13 @@
 import BlurSection from "@/components/animations/BlurSection";
 import CommonAnimatedText from "@/components/animations/CommonAnimatedText";
 import { CommonScrollAnimated } from "@/components/animations/CommonScrollAnimated";
+
 export default function SplitList3() {
   return (
     <>
       <BlurSection className="mxd-section padding-top-subtitle padding-bottom-default">
         <div className="mxd-container grid-l-container">
-          {/* Block - Split List v02 Start */}
+          {/* Bloco - Início da Lista Dividida v03 */}
           <div className="mxd-block">
             <div className="mxd-block-split">
               <div className="container-fluid p-0">
@@ -19,7 +20,7 @@ export default function SplitList3() {
                           as="p"
                           animation="inUp"
                         >
-                          <span>/ Solution</span>
+                          <span>/ Solução</span>
                         </CommonScrollAnimated>
                       </div>
                       <div className="mxd-block-split__manifest">
@@ -28,12 +29,12 @@ export default function SplitList3() {
                           className="manifest manifest-s mxd-split-lines"
                           animation="splitLines"
                         >
-                          MINDSITE was built using modern web technologies with a
-                          focus on flexibility.
+                          O MINDSITE foi construído utilizando tecnologias web modernas com foco
+                          em flexibilidade.
                           <span>
-                            Clean React Nextjs structure, scalable CSS
-                            architecture and GSAP-powered animations create
-                            smooth interactions without sacrificing speed.
+                            Uma estrutura limpa em React Next.js, arquitetura CSS
+                            escalável e animações impulsionadas por GSAP criam
+                            interações fluidas sem sacrificar a velocidade.
                           </span>
                         </CommonAnimatedText>
                       </div>
@@ -47,12 +48,12 @@ export default function SplitList3() {
                           as="p"
                           animation="inUp"
                         >
-                          <span>/ Tech stack</span>
+                          <span>/ Stack Tecnológica</span>
                         </CommonScrollAnimated>
                       </div>
-                      {/* split data list */}
+                      {/* Lista de dados divididos */}
                       <div className="mxd-block-split__data">
-                        {/* split data item */}
+                        {/* Item de dados divididos */}
                         <div className="split-data__item">
                           <div className="split-data__divider divider-top" />
                           <div className="split-data__name">
@@ -70,15 +71,15 @@ export default function SplitList3() {
                               as="p"
                               animation="inUp"
                             >
-                              At the core of the project lies a semantic html
-                              structure paired with modern css techniques.
-                              Flexible layouts, responsive behavior and clean
-                              styles ensure consistency across devices.
+                              No núcleo do projeto reside uma estrutura HTML semântica
+                              combinada com técnicas modernas de CSS.
+                              Layouts flexíveis, comportamento responsivo e estilos
+                              limpos garantem consistência entre os dispositivos.
                             </CommonScrollAnimated>
                           </div>
                           <div className="split-data__divider divider-bottom" />
                         </div>
-                        {/* split data item */}
+                        {/* Item de dados divididos */}
                         <div className="split-data__item">
                           <div className="split-data__divider divider-top" />
                           <div className="split-data__name">
@@ -96,15 +97,15 @@ export default function SplitList3() {
                               as="p"
                               animation="inUp"
                             >
-                              A simple build environment was used to manage
-                              dependencies and streamline development. Npm
-                              packages support tooling, workflow automation and
-                              easier project maintenance.
+                              Um ambiente de build simplificado foi utilizado para gerenciar
+                              dependências e otimizar o desenvolvimento. Os pacotes npm
+                              suportam ferramentas, automação de fluxo de trabalho e
+                              manutenção facilitada do projeto.
                             </CommonScrollAnimated>
                           </div>
                           <div className="split-data__divider divider-bottom" />
                         </div>
-                        {/* split data item */}
+                        {/* Item de dados divididos */}
                         <div className="split-data__item">
                           <div className="split-data__divider divider-top" />
                           <div className="split-data__name">
@@ -122,10 +123,10 @@ export default function SplitList3() {
                               as="p"
                               animation="inUp"
                             >
-                              Animations are powered by gsap to create smooth,
-                              precise motion throughout the interface.
-                              Scroll-based effects and micro-interactions
-                              enhance usability.
+                              As animações são impulsionadas pelo GSAP para criar movimentos
+                              suaves e precisos por toda a interface.
+                              Efeitos baseados em rolagem e micro-interações
+                              aprimoram a usabilidade.
                             </CommonScrollAnimated>
                           </div>
                           <div className="split-data__divider divider-bottom" />
@@ -137,7 +138,7 @@ export default function SplitList3() {
               </div>
             </div>
           </div>
-          {/* Block - Split List v02 End */}
+          {/* Bloco - Fim da Lista Dividida v03 */}
         </div>
       </BlurSection>
     </>
