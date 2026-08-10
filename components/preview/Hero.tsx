@@ -106,15 +106,13 @@ export default function Hero() {
                           targetId="demo"
                         >
                           <TextScramble className="btn-caption mxd-scramble">
-                            Next-gen template
+                            Template de nova geração
                           </TextScramble>
                         </SmoothAnchorLink>
                       </div>
                     </CommonLoadItem>
                     <div className="mxd-hero-landing__title">
                       <SmoothAnchorLink
-                        className="active-cursor-accent"
-                        data-cursor-text="View Demo"
                         targetId="demo"
                       >
                         <CommonAnimatedText
@@ -122,7 +120,7 @@ export default function Hero() {
                           className="medium permanent loading-split"
                           animation="splitLinesLoad"
                         >
-                          Make your work stand out
+                          Faça seu trabalho se destacar
                         </CommonAnimatedText>
                       </SmoothAnchorLink>
                     </div>

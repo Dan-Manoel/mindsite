@@ -72,13 +72,13 @@ export default function Header1({ initialTheme }: Header1Props) {
             {onPurchaseHome ? (
               <a
                 className="btn mxd-header__link slide-right"
-                href="https://themeforest.net/item/MINDSITE-digital-agency-personal-portfolio-nextjs-template/63087539?s_rank=1"
-                aria-label="Comprar MINDSITE no ThemeForest"
+                href="/pricing"
+                aria-label="Adiquira MINDSITE"
                 target="_blank"
                 rel="noopener noreferrer"
               >
                 <span className="btn-caption">
-                  <TextScramble className="mxd-scramble">Comprar</TextScramble>
+                  <TextScramble className="mxd-scramble">Adiquira já</TextScramble>
                 </span>
                 <i>
                   <svg

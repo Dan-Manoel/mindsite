@@ -161,9 +161,9 @@ export default function Components() {
                     className="mxd-split-lines"
                     animation="splitLines"
                   >
-                    Functional
+                    Componentes
                     <br />
-                    components
+                    funcionais
                   </CommonAnimatedText>
                 </CommonScrollAnimated>
               </div>
@@ -174,7 +174,7 @@ export default function Components() {
                     as="span"
                     animation="inUp"
                   >
-                    Cards Stack
+                    Pilha de Cards
                   </CommonScrollAnimated>
                   <CommonScrollAnimated
                     className="tag tag-s tag-medium mxd-scramble anim-uni-in-up"
@@ -195,7 +195,7 @@ export default function Components() {
                     as="span"
                     animation="inUp"
                   >
-                    Phisics
+                    Física
                   </CommonScrollAnimated>
                   <CommonScrollAnimated
                     className="tag tag-s tag-medium mxd-scramble anim-uni-in-up"
@@ -209,7 +209,7 @@ export default function Components() {
                     as="span"
                     animation="inUp"
                   >
-                    Image Cursor
+                    Cursor de Imagem
                   </CommonScrollAnimated>
                 </div>
                 <div className="tags-column">
@@ -225,21 +225,21 @@ export default function Components() {
                     as="span"
                     animation="inUp"
                   >
-                    Video Preview
+                    Preview de Vídeo
                   </CommonScrollAnimated>
                   <CommonScrollAnimated
                     className="tag tag-s tag-medium mxd-scramble anim-uni-in-up"
                     as="span"
                     animation="inUp"
                   >
-                    Services Stack
+                    Pilha de Serviços
                   </CommonScrollAnimated>
                   <CommonScrollAnimated
                     className="tag tag-s tag-medium mxd-scramble anim-uni-in-up"
                     as="span"
                     animation="inUp"
                   >
-                    Zoom Video
+                    Zoom de Vídeo
                   </CommonScrollAnimated>
                   <CommonScrollAnimated
                     className="tag tag-s tag-medium mxd-scramble anim-uni-in-up"
@@ -253,7 +253,7 @@ export default function Components() {
                     as="span"
                     animation="inUp"
                   >
-                    Perspective
+                    Perspectiva
                   </CommonScrollAnimated>
                 </div>
               </div>

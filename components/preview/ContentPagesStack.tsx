@@ -34,54 +34,54 @@ export default function ContentPagesStack() {
                                     animation="inUp"
                                   >
                                     <TextScramble className="mxd-scramble">
-                                      01 / Content pages
+                                      01 / Páginas de Conteúdo
                                     </TextScramble>
                                   </CommonScrollAnimated>
                                   <div className="demo-card__title">
                                     <Link
                                       className="active-cursor-accent"
-                                      data-cursor-text="See More"
+                                      data-cursor-text="Ver Mais"
                                       href={`/blog-creative`}
                                       target="_blank"
                                     >
-                                      <p>Blog pages</p>
+                                      <p>Páginas de Blog</p>
                                     </Link>
                                   </div>
                                   <div className="demo-card__tags">
-                                    <div className="tags-column">
+<div className="tags-column">
                                       <TextScramble className="tag tag-s-mobile mxd-scramble">
-                                        Creative
+                                        Criativo
                                       </TextScramble>
                                       <TextScramble className="tag tag-s-mobile mxd-scramble">
-                                        Full screen
+                                        Tela Cheia
                                       </TextScramble>
                                       <TextScramble className="tag tag-s-mobile mxd-scramble">
-                                        Posts preview
+                                        Prévia de Posts
                                       </TextScramble>
                                       <TextScramble className="tag tag-s-mobile mxd-scramble">
-                                        Cursor images
+                                        Imagens no Cursor
                                       </TextScramble>
                                     </div>
                                     <div className="tags-column">
                                       <TextScramble className="tag tag-s-mobile mxd-scramble">
-                                        Ads
+                                        Anúncios
                                       </TextScramble>
                                       <TextScramble className="tag tag-s-mobile mxd-scramble">
-                                        Archive
+                                        Acervo
                                       </TextScramble>
                                       <TextScramble className="tag tag-s-mobile mxd-scramble">
                                         Grid
                                       </TextScramble>
                                       <TextScramble className="tag tag-s-mobile mxd-scramble">
-                                        Posts list
+                                        Listagem de Posts
                                       </TextScramble>
                                     </div>
                                   </div>
                                 </div>
                                 <p className="t-extra t-bold t-120 demo-card__descr">
-                                  A blog that looks good, reads better,{" "}
+                                  Um blog que é bonito, tem ótima leitura,{" "}
                                   <span>
-                                    and brings your stories to life beautifully.
+                                    e dá vida às suas histórias perfeitamente.
                                   </span>
                                 </p>
                               </div>
@@ -139,51 +139,51 @@ export default function ContentPagesStack() {
                                     animation="inUp"
                                   >
                                     <TextScramble className="mxd-scramble">
-                                      02 / Content pages
+                                      02 / Páginas de Conteúdo
                                     </TextScramble>
                                   </CommonScrollAnimated>
                                   <div className="demo-card__title">
                                     <Link
                                       className="active-cursor-accent"
-                                      data-cursor-text="See More"
+                                      data-cursor-text="Ver Mais"
                                       href={`/works-default`}
                                       target="_blank"
                                     >
-                                      <p>Portfolio</p>
+                                      <p>Portfólio</p>
                                     </Link>
                                   </div>
                                   <div className="demo-card__tags">
                                     <div className="tags-column">
                                       <TextScramble className="tag tag-s-mobile mxd-scramble">
-                                        Stack cards
+                                        Cards Empilhados
                                       </TextScramble>
                                       <TextScramble className="tag tag-s-mobile mxd-scramble">
-                                        zoom video
+                                        Vídeo em Zoom
                                       </TextScramble>
                                       <TextScramble className="tag tag-s-mobile mxd-scramble">
-                                        sticky grid
+                                        Grid Fixo
                                       </TextScramble>
                                       <TextScramble className="tag tag-s-mobile mxd-scramble">
-                                        hover slideshow
+                                        Slideshow no Hover
                                       </TextScramble>
                                     </div>
                                     <div className="tags-column">
                                       <TextScramble className="tag tag-s-mobile mxd-scramble">
-                                        Horizontal showcase
+                                        Vitrine Horizontal
                                       </TextScramble>
                                       <TextScramble className="tag tag-s-mobile mxd-scramble">
-                                        clip-path gallery
+                                        Galeria Clip-Path
                                       </TextScramble>
                                       <TextScramble className="tag tag-s-mobile mxd-scramble">
-                                        Cursor image
+                                        Imagem no Cursor
                                       </TextScramble>
                                     </div>
                                   </div>
                                 </div>
                                 <p className="t-extra t-bold t-120 demo-card__descr">
-                                  Bring your work to life with stunning layouts{" "}
+                                  Dê vida ao seu trabalho com layouts incríveis{" "}
                                   <span>
-                                    and brings your stories to life beautifully.
+                                    e apresente seus produtos e serviços de forma brilhante.
                                   </span>
                                 </p>
                               </div>

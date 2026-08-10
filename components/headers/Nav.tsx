@@ -116,8 +116,8 @@ export default function Nav({
               </svg>
               {/* logo text */}
               <div className="menu-logo__text">
-                <span ref={headerSlots[0]}>MINDSITE</span>
-                <span ref={headerSlots[1]}>Template</span>
+                <span ref={headerSlots[0]}>MIND</span>
+                <span ref={headerSlots[1]}>SITE</span>
               </div>
             </Link>
           </div>
@@ -394,14 +394,14 @@ export default function Nav({
                         <a
                           ref={contactSlots[3]}
                           className="tag tag-m"
-                          href="https://dribbble.com/"
+                          href="https://vercel.com/"
                           target="_blank"
                         >
                           <TextScramble
                             ref={contactRevealSlots[3]}
                             className="mxd-scramble"
                           >
-                            Dribbble
+                            Vercel
                           </TextScramble>
                         </a>
                       </li>
@@ -409,14 +409,14 @@ export default function Nav({
                         <a
                           ref={contactSlots[4]}
                           className="tag tag-m"
-                          href="https://www.behance.net/"
+                          href="https://supabase.com/"
                           target="_blank"
                         >
                           <TextScramble
                             ref={contactRevealSlots[4]}
                             className="mxd-scramble"
                           >
-                            Behance
+                            Supabase
                           </TextScramble>
                         </a>
                       </li>
@@ -454,14 +454,14 @@ export default function Nav({
                         <a
                           ref={contactSlots[7]}
                           className="tag tag-m"
-                          href="https://codepen.io/"
+                          href="https://react.dev/"
                           target="_blank"
                         >
                           <TextScramble
                             ref={contactRevealSlots[7]}
                             className="mxd-scramble"
                           >
-                            Codepen
+                            React
                           </TextScramble>
                         </a>
                       </li>
@@ -486,11 +486,11 @@ export default function Nav({
                     por{" "}
                     <a
                       ref={footerSlots[1]}
-                      href="https://themeforest.net/user/ib-themes"
+                      href="/about-us"
                       target="_blank"
                     >
                       <TextScramble className="mxd-scramble">
-                        IB Themes
+                        MINDSITE
                       </TextScramble>
                     </a>
                   </p>

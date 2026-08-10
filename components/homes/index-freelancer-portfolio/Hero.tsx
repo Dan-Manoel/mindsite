@@ -38,7 +38,7 @@ export default function Hero() {
                       className="loading-chars"
                       animation="animCharsLoad"
                     >
-                      Danilo Oliveira
+                      SEU NOME
                     </CommonAnimatedText>
                   </div>
                   <div className="mxd-hero-09__divider" />
@@ -50,7 +50,7 @@ export default function Hero() {
                       <div className="mxd-hero__mark permanent loading-fade">
                         <span className="mark-icon" />
                         <span className="mark-text">
-                          Disponível para freelance
+                          Disponível para contratação
                         </span>
                       </div>
                     </CommonLoadFade>
@@ -60,7 +60,7 @@ export default function Hero() {
                         className="t-bold t-permanent loading-split"
                         animation="splitLinesLoad"
                       >
-                        Sou Danilo Oliveira.
+                        Sou SEU NOME.
                         <span>
                           Sou apaixonado por criar designs que contam
                           histórias, despertam emoções e causam impacto.

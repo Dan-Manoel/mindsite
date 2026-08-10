@@ -24,7 +24,7 @@ const INNER_PAGES_SLIDES = [
     imageAlt: "MINDSITE Template Image - Services Page Link",
     imageWidth: 1000,
     imageHeight: 1413,
-    label: "Services",
+    label: "Serviços",
   },
   {
     id: "pricing",
@@ -33,7 +33,7 @@ const INNER_PAGES_SLIDES = [
     imageAlt: "MINDSITE Template Image - Pricing Page Link",
     imageWidth: 1000,
     imageHeight: 1413,
-    label: "Pricing Plans",
+    label: "Planos de Preço",
   },
   {
     id: "team",
@@ -42,7 +42,7 @@ const INNER_PAGES_SLIDES = [
     imageAlt: "MINDSITE Template Image - Team Page Link",
     imageWidth: 1000,
     imageHeight: 1413,
-    label: "Our Team",
+    label: "Nossa Equipe",
   },
   {
     id: "about-me",
@@ -51,7 +51,7 @@ const INNER_PAGES_SLIDES = [
     imageAlt: "MINDSITE Template Image - About Me Page Link",
     imageWidth: 1000,
     imageHeight: 1413,
-    label: "About Me",
+    label: "Sobre Mim",
   },
   {
     id: "about-us",
@@ -60,7 +60,7 @@ const INNER_PAGES_SLIDES = [
     imageAlt: "MINDSITE Template Image - About Us Page Link",
     imageWidth: 1000,
     imageHeight: 1413,
-    label: "About Us",
+    label: "Sobre Nós",
   },
   {
     id: "404",
@@ -69,7 +69,7 @@ const INNER_PAGES_SLIDES = [
     imageAlt: "MINDSITE Template Image - 404 Error Page Link",
     imageWidth: 1000,
     imageHeight: 563,
-    label: "404 Error",
+    label: "Erro 404",
   },
   {
     id: "faq",
@@ -78,7 +78,7 @@ const INNER_PAGES_SLIDES = [
     imageAlt: "MINDSITE Template Image - FAQ Page Link",
     imageWidth: 1000,
     imageHeight: 1413,
-    label: "FAQ Page",
+    label: "Página de FAQ",
   },
   {
     id: "contact",
@@ -87,7 +87,7 @@ const INNER_PAGES_SLIDES = [
     imageAlt: "MINDSITE Template Image - Contact Page Link",
     imageWidth: 1000,
     imageHeight: 1413,
-    label: "Contact",
+    label: "Contato",
   },
 ] as const;
 
@@ -195,7 +195,7 @@ export default function InnerPagesSlider() {
                         <PrevArrowIcon />
                       </i>
                       <TextScramble className="btn-caption mxd-scramble">
-                        Prev
+                        Anterior
                       </TextScramble>
                     </a>
                   </div>
@@ -206,7 +206,7 @@ export default function InnerPagesSlider() {
                       aria-label="Next Slide"
                     >
                       <TextScramble className="btn-caption mxd-scramble">
-                        Next
+                        Próximo
                       </TextScramble>
                       <i>
                         <ArrowOutIcon />

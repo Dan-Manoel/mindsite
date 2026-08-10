@@ -18,7 +18,7 @@ export default function FeaturesCards() {
                     <div className="mxd-section-title__title pre-caption">
                       <Link
                         className="active-cursor-accent"
-                        data-cursor-text="See more"
+                        data-cursor-text="Ver mais"
                         href={`/index-branding-studio`}
                       >
                         <CommonAnimatedText
@@ -26,7 +26,7 @@ export default function FeaturesCards() {
                           className="mxd-split-lines"
                           animation="splitLines"
                         >
-                          Top-notch features, build for you
+                          Recursos de primeira, criados para você
                         </CommonAnimatedText>
                       </Link>
                     </div>
@@ -39,11 +39,11 @@ export default function FeaturesCards() {
                           className="t-bold t-large mxd-split-lines"
                           animation="splitLines"
                         >
-                          MINDSITE packed with smooth animations, modern design
-                          tools and clean code.{" "}
+                          Desenvolvimento repleto de animações fluidas, ferramentas de design
+                          moderno e código limpo.{" "}
                           <span>
-                            It&apos;s a flexible, future-proof template
-                            that&apos;s easy to customize and a joy to use.
+                            É tecnologia flexível, preparada para o futuro,
+                            fácil de personalizar e agradável de usar.
                           </span>
                         </CommonAnimatedText>
                       </div>
@@ -69,24 +69,24 @@ export default function FeaturesCards() {
                       <div className="mxd-niche-cards__inner">
                         <div className="mxd-niche-cards__title">
                           <div className="mxd-niche-cards__name">
-                            <p>Day / night mode</p>
+                            <p>Modo Dia / Noite</p>
                           </div>
                           <div className="mxd-niche-cards__tags">
                             <TextScramble className="tag tag-m tag-medium mxd-scramble">
-                              Theme Choice
+                              Escolha de Tema
                             </TextScramble>
                             <TextScramble className="tag tag-m tag-medium mxd-scramble">
-                              Interactive
+                              Interativo
                             </TextScramble>
                             <TextScramble className="tag tag-m tag-medium mxd-scramble">
-                              Experience
+                              Experiência
                             </TextScramble>
                           </div>
                         </div>
                         <div className="mxd-niche-cards__descr wide">
                           <p className="t-bold t-medium">
-                            Switch effortlessly between light and dark modes
-                            <span>for a user-friendly experience.</span>
+                            Alterne facilmente entre os modos claro e escuro
+                            <span> para uma experiência ainda mais agradável.</span>
                           </p>
                         </div>
                         <div className="mxd-niche-cards__image absolute-desktop-bottom">
@@ -113,7 +113,7 @@ export default function FeaturesCards() {
                             <div className="mxd-niche-cards__inner fixed-height-desktop space-between-desktop">
                               <div className="mxd-niche-cards__title">
                                 <div className="mxd-niche-cards__name">
-                                  <p>Dynamic &amp; stylish design</p>
+                                  <p>Design dinâmico &amp; elegante</p>
                                 </div>
                                 <div className="mxd-niche-cards__tags">
                                   <TextScramble className="tag tag-m tag-medium mxd-scramble">
@@ -123,22 +123,21 @@ export default function FeaturesCards() {
                                     Layouts
                                   </TextScramble>
                                   <TextScramble className="tag tag-m tag-medium mxd-scramble">
-                                    Visuals
+                                    Visual
                                   </TextScramble>
                                   <TextScramble className="tag tag-m tag-medium mxd-scramble">
-                                    Components
+                                    Componentes
                                   </TextScramble>
                                   <TextScramble className="tag tag-m tag-medium mxd-scramble">
-                                    Showcase
+                                    Vitrine
                                   </TextScramble>
                                 </div>
                               </div>
                               <div className="mxd-niche-cards__descr wide">
                                 <p className="t-bold t-medium">
-                                  Modern, eye-catching layouts crafted{" "}
+                                  Layouts modernos e cativantes criados{" "}
                                   <span>
-                                    to make your brand stand out and keep
-                                    visitors engaged.
+                                    para destacar sua marca e manter os visitantes engajados.
                                   </span>
                                 </p>
                               </div>
@@ -163,26 +162,25 @@ export default function FeaturesCards() {
                             <div className="mxd-niche-cards__inner permanent fixed-height-desktop space-between-desktop">
                               <div className="mxd-niche-cards__title">
                                 <div className="mxd-niche-cards__name">
-                                  <p className="permanent">Code excellence</p>
+                                  <p className="permanent">Excelência em código</p>
                                 </div>
                                 <div className="mxd-niche-cards__tags">
                                   <TextScramble className="tag tag-m tag-permanent mxd-scramble">
-                                    Clean
+                                    Limpo
                                   </TextScramble>
                                   <TextScramble className="tag tag-m tag-permanent mxd-scramble">
-                                    Reliable
+                                    Confiável
                                   </TextScramble>
                                   <TextScramble className="tag tag-m tag-permanent mxd-scramble">
-                                    Validated
+                                    Validado
                                   </TextScramble>
                                 </div>
                               </div>
                               <div className="mxd-niche-cards__descr wide">
                                 <p className="t-bold t-medium t-permanent">
-                                  Built with clean, well-structured code{" "}
+                                  Feito com código limpo e bem estruturado{" "}
                                   <span>
-                                    that&apos;s fast, secure, and easy to
-                                    maintain.
+                                    que é rápido, seguro e fácil de manter.
                                   </span>
                                 </p>
                               </div>
@@ -207,26 +205,25 @@ export default function FeaturesCards() {
                             <div className="mxd-niche-cards__inner fixed-height-desktop space-between-desktop">
                               <div className="mxd-niche-cards__title">
                                 <div className="mxd-niche-cards__name">
-                                  <p>GSAP-powered animations</p>
+                                  <p>Animações com GSAP</p>
                                 </div>
                                 <div className="mxd-niche-cards__tags">
                                   <TextScramble className="tag tag-m tag-medium mxd-scramble">
-                                    Motion
+                                    Movimento
                                   </TextScramble>
                                   <TextScramble className="tag tag-m tag-medium mxd-scramble">
-                                    Smooth
+                                    Suave
                                   </TextScramble>
                                   <TextScramble className="tag tag-m tag-medium mxd-scramble">
-                                    Interactive
+                                    Interativo
                                   </TextScramble>
                                 </div>
                               </div>
                               <div className="mxd-niche-cards__descr short">
                                 <p className="t-bold t-medium">
-                                  Adding unique movement,{" "}
+                                  Adicionando movimento único,{" "}
                                   <span>
-                                    scroll magic, and creative depth to your
-                                    pages.
+                                    efeitos mágicos de rolagem e profundidade criativa às suas páginas.
                                   </span>
                                 </p>
                               </div>

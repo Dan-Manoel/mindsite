@@ -21,7 +21,7 @@ export default function IndexFreelancerPortfolioPage() {
         <BlogPreview />
         <CTA />
       </>
-      <Footer2 name="Walker" />
+      <Footer2 name="SEU NOME" />
     </>
   );
 }

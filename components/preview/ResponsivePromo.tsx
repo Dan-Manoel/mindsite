@@ -38,11 +38,11 @@ export default function ResponsivePromo() {
                               className="mxd-split-lines"
                               animation="splitLines"
                             >
-                              Fully responsive and pixel-perfect Rayo looks
-                              great on any device.
+                              Totalmente responsivo e perfeito nos mínimos
+                              detalhes, fica ótimo em qualquer dispositivo.
                               <span>
-                                Your site stays stunning and functional
-                                everywhere.
+                                Seu site se mantém deslumbrante e funcional em
+                                todas as telas.
                               </span>
                             </CommonAnimatedText>
                           </CommonScrollAnimated>
@@ -55,7 +55,7 @@ export default function ResponsivePromo() {
                               <div className="demo-icons__icon transparent">
                                 <i className="ph-thin ph-device-mobile-camera" />
                               </div>
-                              <p className="demo-icons__caption">Phone</p>
+                              <p className="demo-icons__caption">Celular</p>
                             </CommonCardBatchAnimated>
                             <CommonCardBatchAnimated
                               className="demo-icons__item animate-card-4"
@@ -75,7 +75,7 @@ export default function ResponsivePromo() {
                               <div className="demo-icons__icon transparent">
                                 <i className="ph-thin ph-laptop" />
                               </div>
-                              <p className="demo-icons__caption">Laptop</p>
+                              <p className="demo-icons__caption">Notebook</p>
                             </CommonCardBatchAnimated>
                             <CommonCardBatchAnimated
                               className="demo-icons__item animate-card-4"
@@ -122,27 +122,27 @@ export default function ResponsivePromo() {
                 <div className="marquee__toright" ref={marqueeTrackRef}>
                   {/* single item */}
                   <div className="marquee__item item-regular text">
-                    <p className="marquee__text text-with-gliph">Inner/</p>
+                    <p className="marquee__text text-with-gliph">Páginas/</p>
                   </div>
                   {/* single item */}
                   <div className="marquee__item item-regular text">
-                    <p className="marquee__text text-with-gliph">Pages/</p>
+                    <p className="marquee__text text-with-gliph">Internas/</p>
                   </div>
                   {/* single item */}
                   <div className="marquee__item item-regular text">
-                    <p className="marquee__text text-with-gliph">Inner/</p>
+                    <p className="marquee__text text-with-gliph">Páginas/</p>
                   </div>
                   {/* single item */}
                   <div className="marquee__item item-regular text">
-                    <p className="marquee__text text-with-gliph">Pages/</p>
+                    <p className="marquee__text text-with-gliph">Internas/</p>
                   </div>
                   {/* single item */}
                   <div className="marquee__item item-regular text">
-                    <p className="marquee__text text-with-gliph">Inner/</p>
+                    <p className="marquee__text text-with-gliph">Páginas/</p>
                   </div>
                   {/* single item */}
                   <div className="marquee__item item-regular text">
-                    <p className="marquee__text text-with-gliph">Pages/</p>
+                    <p className="marquee__text text-with-gliph">Internas/</p>
                   </div>
                 </div>
               </div>

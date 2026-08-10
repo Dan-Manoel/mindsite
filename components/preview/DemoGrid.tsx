@@ -34,7 +34,7 @@ export default function DemoGrid() {
                       >
                         <Link
                           className="mxd-demo-grid__image active-cursor-permanent"
-                          data-cursor-text="View Demo"
+                          data-cursor-text="Ver Demo"
                           href={`/index-branding-studio`}
                           target="_blank"
                         >
@@ -53,18 +53,18 @@ export default function DemoGrid() {
                               href={`/index-branding-studio`}
                               target="_blank"
                             >
-                              Branding studio
+                              Estúdio de Branding
                             </Link>
                           </div>
                           <div className="mxd-demo-grid__tags">
                             <TextScramble className="tag tag-s tag-medium mxd-scramble">
-                              Cards Stack
+                              Pilha de Cartões
                             </TextScramble>
                             <TextScramble className="tag tag-s tag-medium mxd-scramble">
                               Slideshow
                             </TextScramble>
                             <TextScramble className="tag tag-s tag-medium mxd-scramble">
-                              Split Text
+                              Texto Dividido
                             </TextScramble>
                           </div>
                         </div>
@@ -77,7 +77,7 @@ export default function DemoGrid() {
                       >
                         <Link
                           className="mxd-demo-grid__image active-cursor-permanent"
-                          data-cursor-text="View Demo"
+                          data-cursor-text="Ver Demo"
                           href={`/index-software-development-company`}
                           target="_blank"
                         >
@@ -95,18 +95,18 @@ export default function DemoGrid() {
                               className="project-name-s"
                               href={`/index-software-development-company`}
                             >
-                              Software development company
+                              Desenvolvimento de Software
                             </Link>
                           </div>
                           <div className="mxd-demo-grid__tags">
                             <TextScramble className="tag tag-s tag-medium mxd-scramble">
-                              Zoom Video
+                              Vídeo com Zoom
                             </TextScramble>
                             <TextScramble className="tag tag-s tag-medium mxd-scramble">
                               Bento
                             </TextScramble>
                             <TextScramble className="tag tag-s tag-medium mxd-scramble">
-                              Perspective
+                              Perspectiva
                             </TextScramble>
                           </div>
                         </div>
@@ -119,7 +119,7 @@ export default function DemoGrid() {
                       >
                         <Link
                           className="mxd-demo-grid__image active-cursor-permanent"
-                          data-cursor-text="View Demo"
+                          data-cursor-text="Ver Demo"
                           href={`/index-creative-agency`}
                           target="_blank"
                         >
@@ -137,18 +137,18 @@ export default function DemoGrid() {
                               className="project-name-s"
                               href={`/index-creative-agency`}
                             >
-                              Creative agency
+                              Agência Criativa
                             </Link>
                           </div>
                           <div className="mxd-demo-grid__tags">
                             <TextScramble className="tag tag-s tag-medium mxd-scramble">
-                              cursor Trail
+                              Rastro de Cursor
                             </TextScramble>
                             <TextScramble className="tag tag-s tag-medium mxd-scramble">
-                              Video Preview
+                              Prévia de Vídeo
                             </TextScramble>
                             <TextScramble className="tag tag-s tag-medium mxd-scramble">
-                              Services Stack
+                              Pilha de Serviços
                             </TextScramble>
                           </div>
                         </div>
@@ -161,7 +161,7 @@ export default function DemoGrid() {
                       >
                         <Link
                           className="mxd-demo-grid__image active-cursor-permanent"
-                          data-cursor-text="View Demo"
+                          data-cursor-text="Ver Demo"
                           href={`/index-freelancer-portfolio`}
                           target="_blank"
                         >
@@ -179,18 +179,18 @@ export default function DemoGrid() {
                               className="project-name-s"
                               href={`/index-freelancer-portfolio`}
                             >
-                              Freelancer portfolio
+                              Portfólio Freelancer
                             </Link>
                           </div>
                           <div className="mxd-demo-grid__tags">
                             <TextScramble className="tag tag-s tag-medium mxd-scramble">
-                              Image Cursor
+                              Cursor de Imagem
                             </TextScramble>
                             <TextScramble className="tag tag-s tag-medium mxd-scramble">
-                              Zoom Slides
+                              Slides com Zoom
                             </TextScramble>
                             <TextScramble className="tag tag-s tag-medium mxd-scramble">
-                              Phisics
+                              Física
                             </TextScramble>
                           </div>
                         </div>
@@ -203,7 +203,7 @@ export default function DemoGrid() {
                       >
                         <Link
                           className="mxd-demo-grid__image active-cursor-permanent"
-                          data-cursor-text="View Demo"
+                          data-cursor-text="Ver Demo"
                           href={`/index-design-studio`}
                           target="_blank"
                         >
@@ -221,18 +221,18 @@ export default function DemoGrid() {
                               className="project-name-s"
                               href={`/index-design-studio`}
                             >
-                              Design studio
+                              Estúdio de Design
                             </Link>
                           </div>
                           <div className="mxd-demo-grid__tags">
                             <TextScramble className="tag tag-s tag-medium mxd-scramble">
-                              Hover Slideshow
+                              Slideshow com Hover
                             </TextScramble>
                             <TextScramble className="tag tag-s tag-medium mxd-scramble">
                               Marquee
                             </TextScramble>
                             <TextScramble className="tag tag-s tag-medium mxd-scramble">
-                              Phisics
+                              Física
                             </TextScramble>
                           </div>
                         </div>
@@ -245,7 +245,7 @@ export default function DemoGrid() {
                       >
                         <Link
                           className="mxd-demo-grid__image active-cursor-permanent"
-                          data-cursor-text="View Demo"
+                          data-cursor-text="Ver Demo"
                           href={`/index-web-developer`}
                           target="_blank"
                         >
@@ -263,18 +263,18 @@ export default function DemoGrid() {
                               className="project-name-s"
                               href={`/index-web-developer`}
                             >
-                              Web developer
+                              Desenvolvedor Web
                             </Link>
                           </div>
                           <div className="mxd-demo-grid__tags">
                             <TextScramble className="tag tag-s tag-medium mxd-scramble">
-                              Sticky Block
+                              Bloco Fixo
                             </TextScramble>
                             <TextScramble className="tag tag-s tag-medium mxd-scramble">
                               Slideshow
                             </TextScramble>
                             <TextScramble className="tag tag-s tag-medium mxd-scramble">
-                              Image Cursor
+                              Cursor de Imagem
                             </TextScramble>
                           </div>
                         </div>
@@ -287,7 +287,7 @@ export default function DemoGrid() {
                       >
                         <Link
                           className="mxd-demo-grid__image active-cursor-permanent"
-                          data-cursor-text="View Demo"
+                          data-cursor-text="Ver Demo"
                           href={`/index-personal-portfolio`}
                           target="_blank"
                         >
@@ -305,18 +305,18 @@ export default function DemoGrid() {
                               className="project-name-s"
                               href={`/index-personal-portfolio`}
                             >
-                              Personal portfolio
+                              Portfólio Pessoal
                             </Link>
                           </div>
                           <div className="mxd-demo-grid__tags">
                             <TextScramble className="tag tag-s tag-medium mxd-scramble">
-                              Perspective
+                              Perspectiva
                             </TextScramble>
                             <TextScramble className="tag tag-s tag-medium mxd-scramble">
-                              Resume
+                              Currículo
                             </TextScramble>
                             <TextScramble className="tag tag-s tag-medium mxd-scramble">
-                              Phisics
+                              Física
                             </TextScramble>
                           </div>
                         </div>
@@ -329,7 +329,7 @@ export default function DemoGrid() {
                       >
                         <Link
                           className="mxd-demo-grid__image active-cursor-permanent"
-                          data-cursor-text="View Demo"
+                          data-cursor-text="Ver Demo"
                           href={`/index-digital-agency`}
                           target="_blank"
                         >
@@ -347,18 +347,18 @@ export default function DemoGrid() {
                               className="project-name-s"
                               href={`/index-digital-agency`}
                             >
-                              Digital agency
+                              Agência Digital
                             </Link>
                           </div>
                           <div className="mxd-demo-grid__tags">
                             <TextScramble className="tag tag-s tag-medium mxd-scramble">
-                              3D Images
+                              Imagens 3D
                             </TextScramble>
                             <TextScramble className="tag tag-s tag-medium mxd-scramble">
-                              Fullscreen Carousel
+                              Carrossel Tela Cheia
                             </TextScramble>
                             <TextScramble className="tag tag-s tag-medium mxd-scramble">
-                              Cursor Trail
+                              Rastro de Cursor
                             </TextScramble>
                           </div>
                         </div>
@@ -371,7 +371,7 @@ export default function DemoGrid() {
                       >
                         <Link
                           className="mxd-demo-grid__image active-cursor-permanent"
-                          data-cursor-text="View Demo"
+                          data-cursor-text="Ver Demo"
                           href={`/index-web-studio`}
                           target="_blank"
                         >
@@ -389,18 +389,18 @@ export default function DemoGrid() {
                               className="project-name-s"
                               href={`/index-web-studio`}
                             >
-                              Web studio
+                              Estúdio Web
                             </Link>
                           </div>
                           <div className="mxd-demo-grid__tags">
                             <TextScramble className="tag tag-s tag-medium mxd-scramble">
-                              Horizontal Showcase
+                              Vitrine Horizontal
                             </TextScramble>
                             <TextScramble className="tag tag-s tag-medium mxd-scramble">
-                              Stack Cards
+                              Pilha de Cartões
                             </TextScramble>
                             <TextScramble className="tag tag-s tag-medium mxd-scramble">
-                              Cursor Images
+                              Imagens no Cursor
                             </TextScramble>
                           </div>
                         </div>
@@ -413,7 +413,7 @@ export default function DemoGrid() {
                       >
                         <Link
                           className="mxd-demo-grid__image active-cursor-permanent"
-                          data-cursor-text="View Demo"
+                          data-cursor-text="Ver Demo"
                           href={`/index-digital-designer`}
                           target="_blank"
                         >
@@ -432,18 +432,18 @@ export default function DemoGrid() {
                               href={`/index-digital-designer`}
                               target="_blank"
                             >
-                              Digital designer
+                              Designer Digital
                             </Link>
                           </div>
                           <div className="mxd-demo-grid__tags">
                             <TextScramble className="tag tag-s tag-medium mxd-scramble">
-                              Inertia images
+                              Imagens com Inércia
                             </TextScramble>
                             <TextScramble className="tag tag-s tag-medium mxd-scramble">
-                              Fullscreen showcase
+                              Vitrine em Tela Cheia
                             </TextScramble>
                             <TextScramble className="tag tag-s tag-medium mxd-scramble">
-                              Images reveal
+                              Revelação de Imagens
                             </TextScramble>
                           </div>
                         </div>
@@ -465,7 +465,7 @@ export default function DemoGrid() {
                     {/* single item */}
                     <div className="marquee__item item-regular text">
                       <p className="marquee__text text-with-gliph">
-                        Freelancer/
+                        Profissional/
                       </p>
                     </div>
                     {/* single item */}
@@ -475,19 +475,19 @@ export default function DemoGrid() {
                     {/* single item */}
                     <div className="marquee__item item-regular text">
                       <p className="marquee__text text-with-gliph">
-                        Developer/
+                        Desenvolvedor/
                       </p>
                     </div>
                     {/* single item */}
                     <div className="marquee__item item-regular text">
                       <p className="marquee__text text-with-gliph">
-                        DigitalAgency/
+                        AgênciaDigital/
                       </p>
                     </div>
                     {/* single item */}
                     <div className="marquee__item item-regular text">
                       <p className="marquee__text text-with-gliph">
-                        CreativeStudio/
+                        EstúdioCriativo/
                       </p>
                     </div>
                   </div>

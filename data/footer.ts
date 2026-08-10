@@ -25,18 +25,23 @@ export type Footer1NavColumn = {
 
 export const footer1NavColumns: Footer1NavColumn[] = [
   {
-    className: "col-12 col-md-4 mxd-grid-item",
+    className: "col-12 col-md-6 col-lg-3 mxd-grid-item",
     blocks: [{ title: "/ Páginas Iniciais", links: homeLinks }],
   },
   {
-    className: "col-12 col-md-4 mxd-grid-item",
+    className: "col-12 col-md-6 col-lg-3 mxd-grid-item",
     blocks: [
       { title: "/ Portfólio", links: worksLinks },
+    ],
+  },
+  {
+    className: "col-12 col-md-6 col-lg-3 mxd-grid-item",
+    blocks: [
       { title: "/ Artigos & Insights", links: insightLinks },
     ],
   },
   {
-    className: "col-12 col-md-4 mxd-grid-item",
+    className: "col-12 col-md-6 col-lg-3 mxd-grid-item",
     blocks: [{ title: "/ Páginas Internas", links: footer1InnerPageLinks }],
   },
 ];

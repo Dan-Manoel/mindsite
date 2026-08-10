@@ -17,8 +17,8 @@ export default function DemoCTA() {
               >
                 <a
                   className="active-cursor-accent"
-                  data-cursor-text="Buy Now"
-                  href="https://themeforest.net/item/MINDSITE-digital-agency-personal-portfolio-nextjs-template/63087539?s_rank=1"
+                  data-cursor-text="Adiquira já"
+                  href="/pricing"
                   target="_blank"
                   rel="noopener noreferrer"
                 >
@@ -27,7 +27,7 @@ export default function DemoCTA() {
                     className="mxd-split-lines"
                     animation="splitLines"
                   >
-                    Show your creativity and get noticed today!
+                    Arquitetura de ponta para escalar seu ecossistema digital
                   </CommonAnimatedText>
                 </a>
               </CommonScrollAnimated>
@@ -38,12 +38,12 @@ export default function DemoCTA() {
               >
                 <a
                   className="btn btn-default-icon btn-default-icon-large btn-default-outline slide-right"
-                  href="https://themeforest.net/item/MINDSITE-digital-agency-personal-portfolio-nextjs-template/63087539?s_rank=1"
+                  href="/pricing"
                   target="_blank"
                   rel="noopener noreferrer"
                 >
                   <TextScramble className="btn-caption mxd-scramble">
-                    Buy Now
+                    Adiquira já
                   </TextScramble>
                   {/* <i class="ph ph-shopping-cart"></i> */}
                   <i className="btn-icon">
