@@ -106,7 +106,7 @@ export default function Hero() {
                           targetId="demo"
                         >
                           <TextScramble className="btn-caption mxd-scramble">
-                            Template de nova geração
+                            Sites de nova geração
                           </TextScramble>
                         </SmoothAnchorLink>
                       </div>
