@@ -398,14 +398,14 @@ export default function BlogArticle() {
                     </a>
                     <div className="mxd-article-author__info">
                       <h4 className="mxd-article-author__name">
-                        <a href="#0">Johanna Cherry</a>
+                        <a href="#0">Danilo Oliveira</a>
                         <small className="mxd-article-author__position">
-                          Especialista em Identidade de Marca
+                          CEO e Estrategista Digital da Mindsite
                         </small>
                       </h4>
                       <div className="mxd-article-author__socials">
                         <a
-                          href="https://www.linkedin.com/"
+                          href="https://www.linkedin.com/in/danilo-ms-oliveira/"
                           className="tag tag-m tag-bg default"
                         >
                           <TextScramble className="mxd-scramble">
@@ -413,11 +413,11 @@ export default function BlogArticle() {
                           </TextScramble>
                         </a>
                         <a
-                          href="https://www.behance.net/"
+                          href="https://www.mindsite.com.br"
                           className="tag tag-m tag-bg default"
                         >
                           <TextScramble className="mxd-scramble">
-                            Behance
+                            Mindsite
                           </TextScramble>
                         </a>
                       </div>

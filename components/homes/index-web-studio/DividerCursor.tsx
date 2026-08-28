@@ -127,7 +127,7 @@ export default function DividerCursor() {
                   <div className="mxd-divider-gif__back left accent">
                     <Image
                       alt="MINDSITE Template Example Image"
-                      src="/img/gifs/nice-thumbs-up.gif"
+                      src="/img/gifs/nice-thumbs-up.webm"
                       width={640}
                       height={440}
                     />
@@ -135,7 +135,7 @@ export default function DividerCursor() {
                   <div className="mxd-divider-gif__front">
                     <Image
                       alt="MINDSITE Template Example Image"
-                      src="/img/gifs/nice-thumbs-up.gif"
+                      src="/img/gifs/nice-thumbs-up.webm"
                       width={640}
                       height={440}
                     />
@@ -143,7 +143,7 @@ export default function DividerCursor() {
                   <div className="mxd-divider-gif__back right accent">
                     <Image
                       alt="MINDSITE Template Example Image"
-                      src="/img/gifs/nice-thumbs-up.gif"
+                      src="/img/gifs/nice-thumbs-up.webm"
                       width={640}
                       height={440}
                     />

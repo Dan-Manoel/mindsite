@@ -17,25 +17,25 @@ export const homeLinks: MenuLinkItem[] = [
 ];
 
 export const worksLinks: MenuLinkItem[] = [
-  { href: "/works-default", label: "Trabalhos Padrão" },
-  { href: "/works-grid", label: "Grade de Trabalhos" },
-  { href: "/works-grid-sticky", label: "Grade Fixa" },
-  { href: "/project-details", label: "Detalhes do Projeto" },
+  //{ href: "/works-default", label: "Trabalhos Padrão" },
+  //{ href: "/works-grid", label: "Grade de Trabalhos" },
+  //{ href: "/works-grid-sticky", label: "Grade Fixa" },
+  //{ href: "/project-details", label: "Detalhes do Projeto" },
 ];
 
 export const pageLinks: MenuLinkItem[] = [
-  { href: "/about-me", label: "Sobre Mim" },
-  { href: "/about-us", label: "Sobre Nós" },
+  //{ href: "/about-me", label: "Sobre Mim" },
+  // { href: "/sobre-nos", label: "Sobre Nós" }, // Rota em desenvolvimento
   { href: "/services", label: "Serviços" },
-  { href: "/team", label: "Nossa Equipe" },
-  { href: "/pricing", label: "Preços" },
+  //{ href: "/team", label: "Nossa Equipe" },
+  //{ href: "/pricing", label: "Preços" },
   { href: "/faq", label: "Perguntas Frequentes" },
   { href: "/404", label: "Página 404" },
   { href: "/", label: "Página Inicial" },
 ];
 
 export const insightLinks: MenuLinkItem[] = [
-  { href: "/blog-standard", label: "Blog Padrão" },
+  //{ href: "/blog-standard", label: "Blog Padrão" },
   { href: "/blog-creative", label: "Blog Criativo" },
   { href: "/blog-article", label: "Artigo Único" },
 ];
