@@ -18,40 +18,33 @@ const jetbrainsMono = JetBrains_Mono({
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://www.mindsite.com.br"),
-  title: "Mindsite | Agencia digital",
+  title: "Mindsite | Agência Digital",
   description:
     "A infraestrutura que o seu negócio precisa para escalar. Descubra como o Mindsite otimiza seu ecossistema digital do início ao fim.",
   icons: {
     icon: "/img/favicon/logo_filled.webp",
   },
   openGraph: {
-    title: "Mindsite | Agencia digital",
+    title: "Mindsite | Agência Digital",
     description:
       "A infraestrutura que o seu negócio precisa para escalar. Descubra como o Mindsite otimiza seu ecossistema digital do início ao fim.",
     images: [
       {
-        url: "/img/logo_og.webp",
-        width: 1599,
-        height: 715,
-        alt: "Mindsite | Agencia digital",
-        type: "image/webp",
+        url: "/img/logo_og1.jpg", // Motor de OG prefere JPG/PNG universal
+        width: 1200,
+        height: 630,
+        alt: "Mindsite | Agência Digital",
+        type: "image/jpeg",
       },
     ],
     type: "website",
   },
   twitter: {
-    card: "summary_large_image",
-    title: "Mindsite | Agencia digital",
+    card: "summary_large_image", // Instrui as plataformas a usar o layout hero/banner
+    title: "Mindsite | Agência Digital",
     description:
-      "A infraestrutura que o seu negócio precisa para escalar. Descubra como o Mindsite otimiza seu ecossistema digital do início ao fim.",
-    images: [
-      {
-        url: "/img/logo_og.webp",
-        width: 1599,
-        height: 715,
-        alt: "Mindsite | Agencia digital",
-      },
-    ],
+      "Faça o seu trabalho se destacar no mundo digital.",
+    images: ["/img/logo_og1.jpg"],
   },
 };
 
@@ -72,12 +65,12 @@ export default async function RootLayout({
       suppressHydrationWarning
     >
       <body
-      suppressHydrationWarning
+        suppressHydrationWarning
         className={`${manrope.variable} ${jetbrainsMono.variable}`}
         style={{
-  '--font-default': 'var(--font-manrope)',
-  '--font-accent': 'var(--font-jetbrains-mono)',
-} as React.CSSProperties}
+          '--font-default': 'var(--font-manrope)',
+          '--font-accent': 'var(--font-jetbrains-mono)',
+        } as React.CSSProperties}
       >
         <TemplateRuntimeProvider>
           <Header1 initialTheme={initialTheme} />
