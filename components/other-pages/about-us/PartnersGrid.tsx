@@ -7,7 +7,7 @@ import {
   CommonCardBatchAnimated,
 } from "@/components/animations/CommonScrollAnimated";
 import TextScramble from "@/components/animations/TextScramble";
-export default function TeamGrid() {
+export default function PartnersGrid() {
   return (
     <>
       <BlurSection className="mxd-section padding-top-title padding-bottom-tag-m">
@@ -24,9 +24,9 @@ export default function TeamGrid() {
                         className="reveal-type"
                         animation="revealType"
                       >
-                        Líderes
+                        Profissionais
                         <br />
-                        criativos
+                        Parceiros
                       </CommonAnimatedText>
                     </div>
                   </div>
@@ -109,11 +109,11 @@ export default function TeamGrid() {
                       </div>
                       <div className="mxd-team-grid__caption">
                         <div className="mxd-team-grid__name">
-                          <p className="project-name-m">Helen Pineapple</p>
+                          <p className="project-name-m">Consultor Digital</p>
                         </div>
                         <div className="mxd-team-grid__position">
                           <span className="tag tag-m tag-medium">
-                            Co-fundadora e diretora de design
+                            Vendas, escopo e acompanhamento
                           </span>
                         </div>
                       </div>
@@ -158,11 +158,11 @@ export default function TeamGrid() {
                       </div>
                       <div className="mxd-team-grid__caption">
                         <div className="mxd-team-grid__name">
-                          <p className="project-name-m">Alex Tomato</p>
+                          <p className="project-name-m">Arquiteto de Software</p>
                         </div>
                         <div className="mxd-team-grid__position">
                           <span className="tag tag-m tag-medium">
-                            SEO, Gerente de Marca
+                            Dev Full-stack e infraestrutura
                           </span>
                         </div>
                       </div>
@@ -207,11 +207,11 @@ export default function TeamGrid() {
                       </div>
                       <div className="mxd-team-grid__caption">
                         <div className="mxd-team-grid__name">
-                          <p className="project-name-m">Jenny Berry</p>
+                          <p className="project-name-m">Designer UX/UI</p>
                         </div>
                         <div className="mxd-team-grid__position">
                           <span className="tag tag-m tag-medium">
-                            Desenvolvedora Frontend
+                            Templates premium e interfaces sob demanda
                           </span>
                         </div>
                       </div>

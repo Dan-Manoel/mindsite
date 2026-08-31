@@ -65,12 +65,10 @@ export default function Resume() {
                           className="t-extra t-bold mxd-split-lines"
                           animation="splitLines"
                         >
-                          O web design está evoluindo rapidamente, e eu busco me manter
-                          à frente.
+                          A engenharia web moderna exige infraestruturas resilientes.
+                          {" "}
                           <span>
-                            Ferramentas e tecnologias emergentes me permitem criar
-                            sites visualmente impressionantes e com funcionalidade
-                            impecável.
+                            Projeto sistemas escaláveis garantindo que a comunicação entre banco de dados e interface ocorra com segurança e latência mínima.
                           </span>
                         </CommonAnimatedText>
                       </div>
@@ -113,7 +111,7 @@ export default function Resume() {
                     <div className="row g-0">
                       <div className="col-12 col-xl-4 mxd-grid-item">
                         <div className="mxd-resume__title">
-                          <p>Designer UI/UX</p>
+                          <p>CEO & Arquiteto de Software</p>
                         </div>
                       </div>
                       <div className="col-12 col-xl-3 mxd-grid-item">
@@ -130,9 +128,8 @@ export default function Resume() {
                         <div className="mxd-resume__link">
                           <p>
                             <a href="#0" target="_blank">
-                              Moon Light
-                            </a>{" "}
-                            Agency
+                              MindSite
+                            </a>
                           </p>
                         </div>
                       </div>
@@ -155,7 +152,7 @@ export default function Resume() {
                             as="p"
                             animation="inUp"
                           >
-                            Designer de Branding
+                            Consultor de Cibersegurança
                           </CommonScrollAnimated>
                         </div>
                       </div>
@@ -177,9 +174,8 @@ export default function Resume() {
                             animation="inUp"
                           >
                             <a href="#0" target="_blank">
-                              Moon Light
-                            </a>{" "}
-                            Agency
+                              Projetos Corporativos
+                            </a>
                           </CommonScrollAnimated>
                         </div>
                       </div>
@@ -190,7 +186,7 @@ export default function Resume() {
                             as="p"
                             animation="inUp"
                           >
-                            2024 - atual
+                            2020 - 2024
                           </CommonScrollAnimated>
                         </div>
                       </div>
@@ -208,7 +204,7 @@ export default function Resume() {
                             as="p"
                             animation="inUp"
                           >
-                            Diretor Criativo
+                            Engenheiro Full-Stack
                           </CommonScrollAnimated>
                         </div>
                       </div>
@@ -230,7 +226,7 @@ export default function Resume() {
                             animation="inUp"
                           >
                             <a href="#0" target="_blank">
-                              Koob Studio
+                              Startups & Grandes Players
                             </a>
                           </CommonScrollAnimated>
                         </div>
@@ -242,7 +238,7 @@ export default function Resume() {
                             as="p"
                             animation="inUp"
                           >
-                            2022 - 2024
+                            2015 - 2020
                           </CommonScrollAnimated>
                         </div>
                       </div>
@@ -260,7 +256,7 @@ export default function Resume() {
                             as="p"
                             animation="inUp"
                           >
-                            Designer Gráfico
+                            Desenvolvedor de Sistemas
                           </CommonScrollAnimated>
                         </div>
                       </div>
@@ -282,62 +278,8 @@ export default function Resume() {
                             animation="inUp"
                           >
                             <a href="#0" target="_blank">
-                              a1 creatives
-                            </a>{" "}
-                            Agency
-                          </CommonScrollAnimated>
-                        </div>
-                      </div>
-                      <div className="col-12 col-xl-2 mxd-grid-item">
-                        <div className="mxd-resume__date">
-                          <CommonScrollAnimated
-                            className="anim-uni-in-up"
-                            as="p"
-                            animation="inUp"
-                          >
-                            2019 - 2022
-                          </CommonScrollAnimated>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-                {/* resume item */}
-                <div className="mxd-resume__item">
-                  <div className="container-fluid px-0 mxd-resume__inner">
-                    <div className="row g-0">
-                      <div className="col-12 col-xl-4 mxd-grid-item">
-                        <div className="mxd-resume__title">
-                          <CommonScrollAnimated
-                            className="anim-uni-in-up"
-                            as="p"
-                            animation="inUp"
-                          >
-                            Ilustrador
-                          </CommonScrollAnimated>
-                        </div>
-                      </div>
-                      <div className="col-12 col-xl-3 mxd-grid-item">
-                        <div className="mxd-resume__image">
-                          <Image
-                            alt="MINDSITE Image"
-                            src="/img/illustrations/resume05.webp"
-                            width={1000}
-                            height={455}
-                          />
-                        </div>
-                      </div>
-                      <div className="col-12 col-xl-3 mxd-grid-item">
-                        <div className="mxd-resume__link">
-                          <CommonScrollAnimated
-                            className="anim-uni-in-up"
-                            as="p"
-                            animation="inUp"
-                          >
-                            <a href="#0" target="_blank">
-                              Creative mind
+                              Setor de Tecnologia
                             </a>
-                            Agency
                           </CommonScrollAnimated>
                         </div>
                       </div>
@@ -348,7 +290,7 @@ export default function Resume() {
                             as="p"
                             animation="inUp"
                           >
-                            2017 - 2019
+                            2010 - 2015
                           </CommonScrollAnimated>
                         </div>
                       </div>
@@ -396,7 +338,7 @@ export default function Resume() {
                             as="p"
                             animation="inUp"
                           >
-                            Designer UI/UX
+                            Ciência da Computação e Engenharia
                           </CommonScrollAnimated>
                         </div>
                       </div>
@@ -417,9 +359,7 @@ export default function Resume() {
                             as="p"
                             animation="inUp"
                           >
-                            <a href="#0" target="_blank">
-                              Coursera
-                            </a>
+                            Formação Base
                           </CommonScrollAnimated>
                         </div>
                       </div>
@@ -430,7 +370,7 @@ export default function Resume() {
                             as="p"
                             animation="inUp"
                           >
-                            2022 - 2024
+                            -
                           </CommonScrollAnimated>
                         </div>
                       </div>
@@ -448,7 +388,7 @@ export default function Resume() {
                             as="p"
                             animation="inUp"
                           >
-                            Design Gráfico
+                            Especialização em Cibersegurança
                           </CommonScrollAnimated>
                         </div>
                       </div>
@@ -469,9 +409,7 @@ export default function Resume() {
                             as="p"
                             animation="inUp"
                           >
-                            <a href="#0" target="_blank">
-                              California Institute of Arts
-                            </a>
+                            Foco em Privacidade
                           </CommonScrollAnimated>
                         </div>
                       </div>
@@ -482,7 +420,7 @@ export default function Resume() {
                             as="p"
                             animation="inUp"
                           >
-                            2019 - 2021
+                            -
                           </CommonScrollAnimated>
                         </div>
                       </div>
@@ -500,7 +438,7 @@ export default function Resume() {
                             as="p"
                             animation="inUp"
                           >
-                            Desenho Artístico
+                            Arquitetura de Redes
                           </CommonScrollAnimated>
                         </div>
                       </div>
@@ -521,9 +459,7 @@ export default function Resume() {
                             as="p"
                             animation="inUp"
                           >
-                            <a href="#0" target="_blank">
-                              New York Academy of Art
-                            </a>
+                            Infraestrutura
                           </CommonScrollAnimated>
                         </div>
                       </div>
@@ -534,7 +470,7 @@ export default function Resume() {
                             as="p"
                             animation="inUp"
                           >
-                            2015 - 2016
+                            -
                           </CommonScrollAnimated>
                         </div>
                       </div>
@@ -577,131 +513,47 @@ export default function Resume() {
                     <div className="mxd-toolbox">
                       {/* toolbox item */}
                       <div className="mxd-toolbox__item">
-                        <CommonScrollAnimated
-                          className="mxd-toolbox__divider divider-top anim-uni-clip-in"
-                          as="div"
-                          animation="clipIn"
-                        />
-                        <CommonScrollAnimated
-                          className="mxd-toolbox__icon anim-uni-slide-down"
-                          as="div"
-                          animation="slideDownLine"
-                        >
-                          <Image
-                            alt="MINDSITE Icon"
-                            src="/img/tech/icon-figma.svg"
-                            width={50}
-                            height={40}
-                          />
+                        <CommonScrollAnimated className="mxd-toolbox__divider divider-top anim-uni-clip-in" as="div" animation="clipIn" />
+                        <CommonScrollAnimated className="mxd-toolbox__icon anim-uni-slide-down" as="div" animation="slideDownLine">
+                          <img alt="Next.js" src="/img/tech/icon-next.svg" width={50} height={40} style={{ objectFit: 'contain' }} />
                         </CommonScrollAnimated>
-                        <CommonScrollAnimated
-                          className="mxd-toolbox__name anim-uni-slide-down"
-                          as="div"
-                          animation="slideDownLine"
-                        >
-                          <p>Figma</p>
+                        <CommonScrollAnimated className="mxd-toolbox__name anim-uni-slide-down" as="div" animation="slideDownLine">
+                          <p>Next.js</p>
                         </CommonScrollAnimated>
-                        <CommonScrollAnimated
-                          className="mxd-toolbox__divider divider-bottom anim-uni-clip-in"
-                          as="div"
-                          animation="clipIn"
-                        />
+                        <CommonScrollAnimated className="mxd-toolbox__divider divider-bottom anim-uni-clip-in" as="div" animation="clipIn" />
                       </div>
                       {/* toolbox item */}
                       <div className="mxd-toolbox__item">
-                        <CommonScrollAnimated
-                          className="mxd-toolbox__divider divider-top anim-uni-clip-in"
-                          as="div"
-                          animation="clipIn"
-                        />
-                        <CommonScrollAnimated
-                          className="mxd-toolbox__icon anim-uni-slide-down"
-                          as="div"
-                          animation="slideDownLine"
-                        >
-                          <Image
-                            alt="MINDSITE Icon"
-                            src="/img/tech/icon-photoshop.svg"
-                            width={50}
-                            height={40}
-                          />
+                        <CommonScrollAnimated className="mxd-toolbox__divider divider-top anim-uni-clip-in" as="div" animation="clipIn" />
+                        <CommonScrollAnimated className="mxd-toolbox__icon anim-uni-slide-down" as="div" animation="slideDownLine">
+                          <img alt="Supabase" src="/img/tech/icon-supabase.svg" width={50} height={40} style={{ objectFit: 'contain' }} />
                         </CommonScrollAnimated>
-                        <CommonScrollAnimated
-                          className="mxd-toolbox__name anim-uni-slide-down"
-                          as="div"
-                          animation="slideDownLine"
-                        >
-                          <p>Adobe Photoshop</p>
+                        <CommonScrollAnimated className="mxd-toolbox__name anim-uni-slide-down" as="div" animation="slideDownLine">
+                          <p>Supabase</p>
                         </CommonScrollAnimated>
-                        <CommonScrollAnimated
-                          className="mxd-toolbox__divider divider-bottom anim-uni-clip-in"
-                          as="div"
-                          animation="clipIn"
-                        />
+                        <CommonScrollAnimated className="mxd-toolbox__divider divider-bottom anim-uni-clip-in" as="div" animation="clipIn" />
                       </div>
                       {/* toolbox item */}
                       <div className="mxd-toolbox__item">
-                        <CommonScrollAnimated
-                          className="mxd-toolbox__divider divider-top anim-uni-clip-in"
-                          as="div"
-                          animation="clipIn"
-                        />
-                        <CommonScrollAnimated
-                          className="mxd-toolbox__icon anim-uni-slide-down"
-                          as="div"
-                          animation="slideDownLine"
-                        >
-                          <Image
-                            alt="MINDSITE Icon"
-                            src="/img/tech/icon-illustrator.svg"
-                            width={50}
-                            height={40}
-                          />
+                        <CommonScrollAnimated className="mxd-toolbox__divider divider-top anim-uni-clip-in" as="div" animation="clipIn" />
+                        <CommonScrollAnimated className="mxd-toolbox__icon anim-uni-slide-down" as="div" animation="slideDownLine">
+                          <img alt="GitHub" src="/img/tech/icon-github.svg" width={50} height={40} style={{ objectFit: 'contain' }} />
                         </CommonScrollAnimated>
-                        <CommonScrollAnimated
-                          className="mxd-toolbox__name anim-uni-slide-down"
-                          as="div"
-                          animation="slideDownLine"
-                        >
-                          <p>Adobe Illustrator</p>
+                        <CommonScrollAnimated className="mxd-toolbox__name anim-uni-slide-down" as="div" animation="slideDownLine">
+                          <p>GitHub</p>
                         </CommonScrollAnimated>
-                        <CommonScrollAnimated
-                          className="mxd-toolbox__divider divider-bottom anim-uni-clip-in"
-                          as="div"
-                          animation="clipIn"
-                        />
+                        <CommonScrollAnimated className="mxd-toolbox__divider divider-bottom anim-uni-clip-in" as="div" animation="clipIn" />
                       </div>
                       {/* toolbox item */}
                       <div className="mxd-toolbox__item">
-                        <CommonScrollAnimated
-                          className="mxd-toolbox__divider divider-top anim-uni-clip-in"
-                          as="div"
-                          animation="clipIn"
-                        />
-                        <CommonScrollAnimated
-                          className="mxd-toolbox__icon anim-uni-slide-down"
-                          as="div"
-                          animation="slideDownLine"
-                        >
-                          <Image
-                            alt="MINDSITE Icon"
-                            src="/img/tech/icon-sketch.svg"
-                            width={50}
-                            height={40}
-                          />
+                        <CommonScrollAnimated className="mxd-toolbox__divider divider-top anim-uni-clip-in" as="div" animation="clipIn" />
+                        <CommonScrollAnimated className="mxd-toolbox__icon anim-uni-slide-down" as="div" animation="slideDownLine">
+                          <img alt="Vercel" src="/img/tech/icon-vercel.svg" width={50} height={40} style={{ objectFit: 'contain' }} />
                         </CommonScrollAnimated>
-                        <CommonScrollAnimated
-                          className="mxd-toolbox__name anim-uni-slide-down"
-                          as="div"
-                          animation="slideDownLine"
-                        >
-                          <p>Sketch</p>
+                        <CommonScrollAnimated className="mxd-toolbox__name anim-uni-slide-down" as="div" animation="slideDownLine">
+                          <p>Vercel</p>
                         </CommonScrollAnimated>
-                        <CommonScrollAnimated
-                          className="mxd-toolbox__divider divider-bottom anim-uni-clip-in"
-                          as="div"
-                          animation="clipIn"
-                        />
+                        <CommonScrollAnimated className="mxd-toolbox__divider divider-bottom anim-uni-clip-in" as="div" animation="clipIn" />
                       </div>
                     </div>
                   </div>
@@ -709,131 +561,47 @@ export default function Resume() {
                     <div className="mxd-toolbox">
                       {/* toolbox item */}
                       <div className="mxd-toolbox__item">
-                        <CommonScrollAnimated
-                          className="mxd-toolbox__divider divider-top anim-uni-clip-in"
-                          as="div"
-                          animation="clipIn"
-                        />
-                        <CommonScrollAnimated
-                          className="mxd-toolbox__icon anim-uni-slide-down"
-                          as="div"
-                          animation="slideDownLine"
-                        >
-                          <Image
-                            alt="MINDSITE Icon"
-                            src="/img/tech/icon-blender.svg"
-                            width={50}
-                            height={40}
-                          />
+                        <CommonScrollAnimated className="mxd-toolbox__divider divider-top anim-uni-clip-in" as="div" animation="clipIn" />
+                        <CommonScrollAnimated className="mxd-toolbox__icon anim-uni-slide-down" as="div" animation="slideDownLine">
+                          <img alt="Miro" src="/img/tech/icon-miro.svg" width={50} height={40} style={{ objectFit: 'contain' }} />
                         </CommonScrollAnimated>
-                        <CommonScrollAnimated
-                          className="mxd-toolbox__name anim-uni-slide-down"
-                          as="div"
-                          animation="slideDownLine"
-                        >
-                          <p>Blender</p>
+                        <CommonScrollAnimated className="mxd-toolbox__name anim-uni-slide-down" as="div" animation="slideDownLine">
+                          <p>Miro</p>
                         </CommonScrollAnimated>
-                        <CommonScrollAnimated
-                          className="mxd-toolbox__divider divider-bottom anim-uni-clip-in"
-                          as="div"
-                          animation="clipIn"
-                        />
+                        <CommonScrollAnimated className="mxd-toolbox__divider divider-bottom anim-uni-clip-in" as="div" animation="clipIn" />
                       </div>
                       {/* toolbox item */}
                       <div className="mxd-toolbox__item">
-                        <CommonScrollAnimated
-                          className="mxd-toolbox__divider divider-top anim-uni-clip-in"
-                          as="div"
-                          animation="clipIn"
-                        />
-                        <CommonScrollAnimated
-                          className="mxd-toolbox__icon anim-uni-slide-down"
-                          as="div"
-                          animation="slideDownLine"
-                        >
-                          <Image
-                            alt="MINDSITE Icon"
-                            src="/img/tech/icon-midjourney.svg"
-                            width={50}
-                            height={40}
-                          />
+                        <CommonScrollAnimated className="mxd-toolbox__divider divider-top anim-uni-clip-in" as="div" animation="clipIn" />
+                        <CommonScrollAnimated className="mxd-toolbox__icon anim-uni-slide-down" as="div" animation="slideDownLine">
+                          <Image alt="Figma" src="/img/tech/icon-figma.svg" width={50} height={40} />
                         </CommonScrollAnimated>
-                        <CommonScrollAnimated
-                          className="mxd-toolbox__name anim-uni-slide-down"
-                          as="div"
-                          animation="slideDownLine"
-                        >
-                          <p>Midjourney</p>
+                        <CommonScrollAnimated className="mxd-toolbox__name anim-uni-slide-down" as="div" animation="slideDownLine">
+                          <p>Figma</p>
                         </CommonScrollAnimated>
-                        <CommonScrollAnimated
-                          className="mxd-toolbox__divider divider-bottom anim-uni-clip-in"
-                          as="div"
-                          animation="clipIn"
-                        />
+                        <CommonScrollAnimated className="mxd-toolbox__divider divider-bottom anim-uni-clip-in" as="div" animation="clipIn" />
                       </div>
                       {/* toolbox item */}
                       <div className="mxd-toolbox__item">
-                        <CommonScrollAnimated
-                          className="mxd-toolbox__divider divider-top anim-uni-clip-in"
-                          as="div"
-                          animation="clipIn"
-                        />
-                        <CommonScrollAnimated
-                          className="mxd-toolbox__icon anim-uni-slide-down"
-                          as="div"
-                          animation="slideDownLine"
-                        >
-                          <Image
-                            alt="MINDSITE Icon"
-                            src="/img/tech/icon-unicorn.svg"
-                            width={50}
-                            height={40}
-                          />
+                        <CommonScrollAnimated className="mxd-toolbox__divider divider-top anim-uni-clip-in" as="div" animation="clipIn" />
+                        <CommonScrollAnimated className="mxd-toolbox__icon anim-uni-slide-down" as="div" animation="slideDownLine">
+                          <Image alt="Adobe Photoshop" src="/img/tech/icon-photoshop.svg" width={50} height={40} />
                         </CommonScrollAnimated>
-                        <CommonScrollAnimated
-                          className="mxd-toolbox__name anim-uni-slide-down"
-                          as="div"
-                          animation="slideDownLine"
-                        >
-                          <p>Unicorn.studio</p>
+                        <CommonScrollAnimated className="mxd-toolbox__name anim-uni-slide-down" as="div" animation="slideDownLine">
+                          <p>Adobe Photoshop</p>
                         </CommonScrollAnimated>
-                        <CommonScrollAnimated
-                          className="mxd-toolbox__divider divider-bottom anim-uni-clip-in"
-                          as="div"
-                          animation="clipIn"
-                        />
+                        <CommonScrollAnimated className="mxd-toolbox__divider divider-bottom anim-uni-clip-in" as="div" animation="clipIn" />
                       </div>
                       {/* toolbox item */}
                       <div className="mxd-toolbox__item">
-                        <CommonScrollAnimated
-                          className="mxd-toolbox__divider divider-top anim-uni-clip-in"
-                          as="div"
-                          animation="clipIn"
-                        />
-                        <CommonScrollAnimated
-                          className="mxd-toolbox__icon anim-uni-slide-down"
-                          as="div"
-                          animation="slideDownLine"
-                        >
-                          <Image
-                            alt="MINDSITE Icon"
-                            src="/img/tech/icon-notion.svg"
-                            width={50}
-                            height={40}
-                          />
+                        <CommonScrollAnimated className="mxd-toolbox__divider divider-top anim-uni-clip-in" as="div" animation="clipIn" />
+                        <CommonScrollAnimated className="mxd-toolbox__icon anim-uni-slide-down" as="div" animation="slideDownLine">
+                          <img alt="Adobe Premiere" src="/img/tech/Premiere_Pro_icon.webp" width={50} height={40} style={{ objectFit: 'contain' }} />
                         </CommonScrollAnimated>
-                        <CommonScrollAnimated
-                          className="mxd-toolbox__name anim-uni-slide-down"
-                          as="div"
-                          animation="slideDownLine"
-                        >
-                          <p>Notion</p>
+                        <CommonScrollAnimated className="mxd-toolbox__name anim-uni-slide-down" as="div" animation="slideDownLine">
+                          <p>Adobe Premiere</p>
                         </CommonScrollAnimated>
-                        <CommonScrollAnimated
-                          className="mxd-toolbox__divider divider-bottom anim-uni-clip-in"
-                          as="div"
-                          animation="clipIn"
-                        />
+                        <CommonScrollAnimated className="mxd-toolbox__divider divider-bottom anim-uni-clip-in" as="div" animation="clipIn" />
                       </div>
                     </div>
                   </div>

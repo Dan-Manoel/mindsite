@@ -33,12 +33,8 @@ const CARDS: Card[] = [
     descr: (
       <>
         Criamos designs visualmente atraentes que aprimoram a experiência do
-        usuário.
-        <span>
-          Desde o design de UI/UX até sites incríveis, aplicativos móveis e
-          materiais impressos, garantimos que a identidade visual da sua marca
-          se conecte com o seu público.
-        </span>
+        usuário desde aplicativos móveis e garantimos que a identidade visual da marca
+        se conecte com o seu público.
       </>
     ),
   },
@@ -54,11 +50,7 @@ const CARDS: Card[] = [
     descr: (
       <>
         Desenvolvemos sites e aplicativos de alto desempenho utilizando
-        tecnologias modernas.
-        <span>
-          Nossas soluções são projetadas para serem escaláveis e funcionais,
-          oferecendo a melhor performance.
-        </span>
+        tecnologias modernas, garantindo escalabilidade e performance.
       </>
     ),
   },
@@ -73,32 +65,29 @@ const CARDS: Card[] = [
     descrClass: "t-bold t-large services-card__descr",
     descr: (
       <>
-        Do design do logo a estratégias de marca completas, garantimos que o seu
-        negócio se destaque com uma{" "}
+        Estratégias de marca completas e design premium.{" "}
         <span>
-          identidade visual única e comunicação consistente em todos os
-          pontos de contato.
+          Entregamos uma identidade visual única e integrada, executada
+          em parceria com especialistas renomados do mercado.
         </span>
       </>
     ),
   },
   {
     subtitle: "04 / Serviços",
-    title: "Soluções de marketing",
+    title: "Arquitetura de Software e Infraestrutura",
     tagCols: [
-      ["Estratégia", "Redes sociais", "Otimização de SEO"],
-      ["E-mail marketing", "Campanhas"],
+      ["Next.js", "Supabase", "React"],
+      ["Vercel", "Tailwind CSS", "APIs"],
     ],
     image: "/img/services/services-stack/s04.webp",
     descrClass: "t-bold t-large services-card__descr",
     descr: (
       <>
-        Desenvolvemos e executamos estratégias digitais de marketing
-        personalizadas.
+        Construímos ecossistemas digitais altamente escaláveis e seguros.
         <span>
-          SEO e marketing de conteúdo, gestão de redes sociais e campanhas
-          pagas — ajudamos você a alcançar e engajar seu público-alvo com
-          eficácia.
+          Utilizamos frameworks modernos como Next.js, Supabase, Tailwind e
+          Vercel para entregar infraestrutura robusta.
         </span>
       </>
     ),

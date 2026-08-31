@@ -18,6 +18,9 @@ export default function NotFound() {
     return initVelocityMarqueeRows(topRefs.current, bottomRefs.current);
   }, []);
 
+  // Textos extraídos para facilitar manutenção futura
+  const marqueeText = "Endpoint não resolvido / ";
+
   return (
     <CommonLoadAnimation>
       <>
@@ -34,36 +37,11 @@ export default function NotFound() {
                       if (el) topRefs.current[0] = el;
                     }}
                   >
-                    {/* single item */}
-                    <div className="marquee__item item-regular text">
-                      <p className="marquee__text text-with-gliph">
-                        Nada aqui/
-                      </p>
-                    </div>
-                    {/* single item */}
-                    <div className="marquee__item item-regular text">
-                      <p className="marquee__text text-with-gliph">
-                        Nada aqui/
-                      </p>
-                    </div>
-                    {/* single item */}
-                    <div className="marquee__item item-regular text">
-                      <p className="marquee__text text-with-gliph">
-                        Nada aqui/
-                      </p>
-                    </div>
-                    {/* single item */}
-                    <div className="marquee__item item-regular text">
-                      <p className="marquee__text text-with-gliph">
-                        Nada aqui/
-                      </p>
-                    </div>
-                    {/* single item */}
-                    <div className="marquee__item item-regular text">
-                      <p className="marquee__text text-with-gliph">
-                        Nada aqui/
-                      </p>
-                    </div>
+                    {[...Array(5)].map((_, i) => (
+                      <div key={`t1-${i}`} className="marquee__item item-regular text">
+                        <p className="marquee__text text-with-gliph">{marqueeText}</p>
+                      </div>
+                    ))}
                   </div>
                   <div
                     className="marquee__bottom"
@@ -71,36 +49,11 @@ export default function NotFound() {
                       if (el) bottomRefs.current[0] = el;
                     }}
                   >
-                    {/* single item */}
-                    <div className="marquee__item item-regular text">
-                      <p className="marquee__text text-with-gliph">
-                        Nada aqui/
-                      </p>
-                    </div>
-                    {/* single item */}
-                    <div className="marquee__item item-regular text">
-                      <p className="marquee__text text-with-gliph">
-                        Nada aqui/
-                      </p>
-                    </div>
-                    {/* single item */}
-                    <div className="marquee__item item-regular text">
-                      <p className="marquee__text text-with-gliph">
-                        Nada aqui/
-                      </p>
-                    </div>
-                    {/* single item */}
-                    <div className="marquee__item item-regular text">
-                      <p className="marquee__text text-with-gliph">
-                        Nada aqui/
-                      </p>
-                    </div>
-                    {/* single item */}
-                    <div className="marquee__item item-regular text">
-                      <p className="marquee__text text-with-gliph">
-                        Nada aqui/
-                      </p>
-                    </div>
+                    {[...Array(5)].map((_, i) => (
+                      <div key={`b1-${i}`} className="marquee__item item-regular text">
+                        <p className="marquee__text text-with-gliph">{marqueeText}</p>
+                      </div>
+                    ))}
                   </div>
                   <div
                     className="marquee__top"
@@ -108,36 +61,11 @@ export default function NotFound() {
                       if (el) topRefs.current[1] = el;
                     }}
                   >
-                    {/* single item */}
-                    <div className="marquee__item item-regular text">
-                      <p className="marquee__text text-with-gliph">
-                        Nada aqui/
-                      </p>
-                    </div>
-                    {/* single item */}
-                    <div className="marquee__item item-regular text">
-                      <p className="marquee__text text-with-gliph">
-                        Nada aqui/
-                      </p>
-                    </div>
-                    {/* single item */}
-                    <div className="marquee__item item-regular text">
-                      <p className="marquee__text text-with-gliph">
-                        Nada aqui/
-                      </p>
-                    </div>
-                    {/* single item */}
-                    <div className="marquee__item item-regular text">
-                      <p className="marquee__text text-with-gliph">
-                        Nada aqui/
-                      </p>
-                    </div>
-                    {/* single item */}
-                    <div className="marquee__item item-regular text">
-                      <p className="marquee__text text-with-gliph">
-                        Nada aqui/
-                      </p>
-                    </div>
+                    {[...Array(5)].map((_, i) => (
+                      <div key={`t2-${i}`} className="marquee__item item-regular text">
+                        <p className="marquee__text text-with-gliph">{marqueeText}</p>
+                      </div>
+                    ))}
                   </div>
                   <div
                     className="marquee__bottom"
@@ -145,36 +73,11 @@ export default function NotFound() {
                       if (el) bottomRefs.current[1] = el;
                     }}
                   >
-                    {/* single item */}
-                    <div className="marquee__item item-regular text">
-                      <p className="marquee__text text-with-gliph">
-                        Nada aqui/
-                      </p>
-                    </div>
-                    {/* single item */}
-                    <div className="marquee__item item-regular text">
-                      <p className="marquee__text text-with-gliph">
-                        Nada aqui/
-                      </p>
-                    </div>
-                    {/* single item */}
-                    <div className="marquee__item item-regular text">
-                      <p className="marquee__text text-with-gliph">
-                        Nada aqui/
-                      </p>
-                    </div>
-                    {/* single item */}
-                    <div className="marquee__item item-regular text">
-                      <p className="marquee__text text-with-gliph">
-                        Nada aqui/
-                      </p>
-                    </div>
-                    {/* single item */}
-                    <div className="marquee__item item-regular text">
-                      <p className="marquee__text text-with-gliph">
-                        Nada aqui/
-                      </p>
-                    </div>
+                    {[...Array(5)].map((_, i) => (
+                      <div key={`b2-${i}`} className="marquee__item item-regular text">
+                        <p className="marquee__text text-with-gliph">{marqueeText}</p>
+                      </div>
+                    ))}
                   </div>
                 </div>
                 {/* Marquee Divider End */}
@@ -192,7 +95,7 @@ export default function NotFound() {
                     <CommonLoadFade index={0}>
                       <div className="mxd-error__image image-1 mxd-move-slow loading-fade">
                         <Image
-                          alt="MINDSITE Template Sample Image"
+                          alt="MindSite 404 Illustration"
                           src="/img/illustrations/404_03.webp"
                           width={600}
                           height={251}
@@ -201,7 +104,7 @@ export default function NotFound() {
                     </CommonLoadFade>
                     <div className="mxd-error__image image-2">
                       <Image
-                        alt="MINDSITE Template Sample Image"
+                        alt="MindSite 404 Illustration"
                         src="/img/illustrations/404_01.webp"
                         width={400}
                         height={480}
@@ -209,7 +112,7 @@ export default function NotFound() {
                     </div>
                     <div className="mxd-error__image image-3">
                       <Image
-                        alt="MINDSITE Template Sample Image"
+                        alt="MindSite 404 Illustration"
                         src="/img/illustrations/404_02.webp"
                         width={485}
                         height={400}
@@ -218,7 +121,7 @@ export default function NotFound() {
                     <CommonLoadFade index={1}>
                       <div className="mxd-error__image image-4 mxd-move-slow loading-fade">
                         <Image
-                          alt="MINDSITE Template Sample Image"
+                          alt="MindSite 404 Illustration"
                           src="/img/illustrations/404_04.webp"
                           width={485}
                           height={203}
@@ -226,17 +129,17 @@ export default function NotFound() {
                       </div>
                     </CommonLoadFade>
                   </div>
-                  <div className="mxd-error__caption">
+                  <div className="mxd-error__caption" style={{ maxWidth: "800px", margin: "0 auto" }}>
                     <CommonAnimatedText
                       as="p"
                       className="loading-split"
                       animation="splitLinesLoad"
                     >
-                      Esta página não existe. <span>Desculpe.</span>
+                      Você tentou acessar uma rota inexistente. Em ecossistemas digitais de alta performance, até os erros são desenhados para manter a fluidez da sua experiência. <span>Retorne à infraestrutura principal.</span>
                     </CommonAnimatedText>
                     <CommonLoadFade index={2}>
                       <Link
-                        className="btn btn-default-icon btn-default-icon-left btn-default-outline slide-left loading-fade"
+                        className="btn btn-default-icon btn-default-icon-left btn-default-outline slide-left loading-fade mt-4"
                         href={`/`}
                       >
                         <i className="btn-icon">
@@ -249,7 +152,7 @@ export default function NotFound() {
                           </svg>
                         </i>
                         <TextScramble className="btn-caption mxd-scramble">
-                          Ir para o Início
+                          Retornar ao Início
                         </TextScramble>
                       </Link>
                     </CommonLoadFade>
@@ -272,7 +175,7 @@ export default function NotFound() {
                     </div>
                     <div className="mxd-error__dataitem">
                       <span className="tag tag-m">
-                        A infraestrutura que o seu negócio precisa para escalar
+                        Arquitetura escalável para ecossistemas digitais
                       </span>
                     </div>
                     <div className="mxd-error__dataitem">

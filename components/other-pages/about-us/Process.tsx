@@ -24,11 +24,10 @@ export default function Process() {
                             className="manifest manifest-m mxd-split-lines active-cursor-accent"
                             animation="splitLines"
                           >
-                            Somos uma agência web criativa especializada em design
-                            inovador e desenvolvimento de ponta.
+                            Somos um hub de especialistas independentes unindo as melhores práticas de mercado.
+                            {" "}
                             <span>
-                              Ajudamos empresas a se destacarem e prosperarem no
-                              cenário moderno.
+                              Ajudamos empresas a estruturarem sua Casa Digital com precisão.
                             </span>
                           </CommonAnimatedText>
                         </Link>
@@ -68,9 +67,7 @@ export default function Process() {
                         className="t-medium mxd-split-lines"
                         animation="splitLines"
                       >
-                        Descubra como a inteligência artificial está transformando
-                        os processos artísticos, superando limites e inspirando
-                        novas possibilidades no design digital.
+                        Definição conjunta do escopo arquitetural, alinhamento rigoroso de expectativas e planejamento da fundação da sua Casa Digital.
                       </CommonAnimatedText>
                     </div>
                     <CommonScrollAnimated
@@ -106,9 +103,7 @@ export default function Process() {
                         className="t-medium mxd-split-lines"
                         animation="splitLines"
                       >
-                        Descubra como a inteligência artificial está transformando
-                        os processos artísticos, superando limites e inspirando
-                        novas possibilidades no design digital.
+                        Desenho estrutural das interfaces, curadoria de assets e aprovação de layouts de alta fidelidade focados em conversão.
                       </CommonAnimatedText>
                     </div>
                     <CommonScrollAnimated
@@ -144,9 +139,7 @@ export default function Process() {
                         className="t-medium mxd-split-lines"
                         animation="splitLines"
                       >
-                        Descubra como a inteligência artificial está transformando
-                        os processos artísticos, superando limites e inspirando
-                        novas possibilidades no design digital.
+                        Engenharia de software aplicada com entregas em etapas, feedback contínuo e deploy escalável utilizando nossa stack padrão.
                       </CommonAnimatedText>
                     </div>
                     <CommonScrollAnimated

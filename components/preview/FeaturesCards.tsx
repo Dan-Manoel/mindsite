@@ -26,7 +26,7 @@ export default function FeaturesCards() {
                           className="mxd-split-lines"
                           animation="splitLines"
                         >
-                          Recursos de primeira, criados para você
+                          Padrão de Qualidade Técnica MindSite
                         </CommonAnimatedText>
                       </Link>
                     </div>
@@ -39,11 +39,11 @@ export default function FeaturesCards() {
                           className="t-bold t-large mxd-split-lines"
                           animation="splitLines"
                         >
-                          Desenvolvimento repleto de animações fluidas, ferramentas de design
-                          moderno e código limpo.{" "}
+                          Nossos projetos incluem nativamente transições fluidas com GSAP,
+                          alternância de tema e código limpo.{" "}
                           <span>
-                            É tecnologia flexível, preparada para o futuro,
-                            fácil de personalizar e agradável de usar.
+                            Arquitetura de software desenhada para escalabilidade,
+                            performance e estabilidade a longo prazo.
                           </span>
                         </CommonAnimatedText>
                       </div>
@@ -85,8 +85,8 @@ export default function FeaturesCards() {
                         </div>
                         <div className="mxd-niche-cards__descr wide">
                           <p className="t-bold t-medium">
-                            Alterne facilmente entre os modos claro e escuro
-                            <span> para uma experiência ainda mais agradável.</span>
+                            Alternância de tema dinâmica nativa e otimizada
+                            <span> garantindo zero flickering e total estabilidade de UI.</span>
                           </p>
                         </div>
                         <div className="mxd-niche-cards__image absolute-desktop-bottom">
@@ -113,7 +113,7 @@ export default function FeaturesCards() {
                             <div className="mxd-niche-cards__inner fixed-height-desktop space-between-desktop">
                               <div className="mxd-niche-cards__title">
                                 <div className="mxd-niche-cards__name">
-                                  <p>Design dinâmico &amp; elegante</p>
+                                  <p>Interfaces Dinâmicas e Fluidas</p>
                                 </div>
                                 <div className="mxd-niche-cards__tags">
                                   <TextScramble className="tag tag-m tag-medium mxd-scramble">
@@ -135,9 +135,9 @@ export default function FeaturesCards() {
                               </div>
                               <div className="mxd-niche-cards__descr wide">
                                 <p className="t-bold t-medium">
-                                  Layouts modernos e cativantes criados{" "}
+                                  Engenharia de front-end com foco em usabilidade e performance,{" "}
                                   <span>
-                                    para destacar sua marca e manter os visitantes engajados.
+                                    maximizando métricas de retenção e conversão de usuários.
                                   </span>
                                 </p>
                               </div>
@@ -178,9 +178,9 @@ export default function FeaturesCards() {
                               </div>
                               <div className="mxd-niche-cards__descr wide">
                                 <p className="t-bold t-medium t-permanent">
-                                  Feito com código limpo e bem estruturado{" "}
+                                  Baseado em código altamente modular e rigoroso,{" "}
                                   <span>
-                                    que é rápido, seguro e fácil de manter.
+                                    projetado para máxima performance, segurança e escalabilidade.
                                   </span>
                                 </p>
                               </div>
@@ -221,9 +221,9 @@ export default function FeaturesCards() {
                               </div>
                               <div className="mxd-niche-cards__descr short">
                                 <p className="t-bold t-medium">
-                                  Adicionando movimento único,{" "}
+                                  Integração nativa e otimizada de animações com GSAP,{" "}
                                   <span>
-                                    efeitos mágicos de rolagem e profundidade criativa às suas páginas.
+                                    entregando renderização de alta performance e fluidez a 60fps.
                                   </span>
                                 </p>
                               </div>

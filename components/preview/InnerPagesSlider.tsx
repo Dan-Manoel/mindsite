@@ -186,9 +186,9 @@ export default function InnerPagesSlider() {
 
                   {/* navigation buttons */}
                   <div className="swiper-button-prev mxd-slider-btn mxd-slider-btn-prev">
-                    <a
+                    <button
+                      type="button"
                       className="btn btn-line-icon btn-line-default slide-left"
-                      href="#0"
                       aria-label="Previous Slide"
                     >
                       <i>
@@ -197,12 +197,12 @@ export default function InnerPagesSlider() {
                       <TextScramble className="btn-caption mxd-scramble">
                         Anterior
                       </TextScramble>
-                    </a>
+                    </button>
                   </div>
                   <div className="swiper-button-next mxd-slider-btn mxd-slider-btn-next mxd-slider-btn-next-fullwidth">
-                    <a
+                    <button
+                      type="button"
                       className="btn btn-line-icon btn-line-default slide-right"
-                      href="#0"
                       aria-label="Next Slide"
                     >
                       <TextScramble className="btn-caption mxd-scramble">
@@ -211,7 +211,7 @@ export default function InnerPagesSlider() {
                       <i>
                         <ArrowOutIcon />
                       </i>
-                    </a>
+                    </button>
                   </div>
                 </Swiper>
               </CommonLoadFade>

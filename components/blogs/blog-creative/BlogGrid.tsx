@@ -39,7 +39,7 @@ export default function BlogGrid() {
                         <div className="post-simple-alt__caption">
                           <div className="post-simple-alt__title">
                             <h3>
-                              <Link href={`/blog-article`}>
+                              <Link href={`/inovacoes-frontend`}>
                                 Inovações de frontend e jornadas de usuário
                               </Link>
                             </h3>

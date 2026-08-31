@@ -95,21 +95,21 @@ export default function InnerHeadline() {
                           className="inner-headline__title banners-hover centered loading-item"
                         >
                           <h1 className="small">
-                            Criando{" "}
+                            Construindo o seu{" "}
                             <Link
                               ref={trigger1Ref}
                               className="inner-headline__trigger banners-trigger-1"
                               href={`/works-default`}
                             >
-                              experiências de usuário
+                              ecossistema no mundo digital
                             </Link>{" "}
-                            envolventes e{" "}
+                            com uma rede de{" "}
                             <Link
                               ref={trigger2Ref}
                               className="inner-headline__trigger banners-trigger-2"
                               href={`/works-default`}
                             >
-                              soluções de design
+                              especialistas independentes
                             </Link>
                           </h1>
                         </div>
@@ -216,11 +216,13 @@ export default function InnerHeadline() {
                             <li className="loading-item">
                               <a
                                 className="mxd-socials-line__link"
-                                href="https://dribbble.com/"
+                                href="https://vercel.com"
                                 target="_blank"
+                                style={{ display: "flex", alignItems: "center", gap: "8px" }}
                               >
+                                <img src="/img/tech/icon-vercel.svg" width={16} height={16} alt="Vercel" style={{ objectFit: 'contain' }} />
                                 <TextScramble className="mxd-scramble">
-                                  Dribbble
+                                  Vercel
                                 </TextScramble>
                               </a>
                             </li>
@@ -229,11 +231,13 @@ export default function InnerHeadline() {
                             <li className="loading-item">
                               <a
                                 className="mxd-socials-line__link"
-                                href="https://www.behance.net/"
+                                href="https://supabase.com"
                                 target="_blank"
+                                style={{ display: "flex", alignItems: "center", gap: "8px" }}
                               >
+                                <img src="/img/tech/icon-supabase.svg" width={16} height={16} alt="Supabase" style={{ objectFit: 'contain' }} />
                                 <TextScramble className="mxd-scramble">
-                                  Behance
+                                  Supabase
                                 </TextScramble>
                               </a>
                             </li>
@@ -242,11 +246,13 @@ export default function InnerHeadline() {
                             <li className="loading-item">
                               <a
                                 className="mxd-socials-line__link"
-                                href="https://github.com/"
+                                href="https://github.com"
                                 target="_blank"
+                                style={{ display: "flex", alignItems: "center", gap: "8px" }}
                               >
+                                <img src="/img/tech/icon-github.svg" width={16} height={16} alt="GitHub" style={{ objectFit: 'contain' }} />
                                 <TextScramble className="mxd-scramble">
-                                  Github
+                                  GitHub
                                 </TextScramble>
                               </a>
                             </li>
@@ -255,11 +261,13 @@ export default function InnerHeadline() {
                             <li className="loading-item">
                               <a
                                 className="mxd-socials-line__link"
-                                href="https://codepen.io/"
+                                href="https://www.figma.com/community"
                                 target="_blank"
+                                style={{ display: "flex", alignItems: "center", gap: "8px" }}
                               >
+                                <img src="/img/tech/icon-figma.svg" width={16} height={16} alt="Figma Community" style={{ objectFit: 'contain' }} />
                                 <TextScramble className="mxd-scramble">
-                                  Codepen
+                                  Figma Community
                                 </TextScramble>
                               </a>
                             </li>
@@ -268,11 +276,13 @@ export default function InnerHeadline() {
                             <li className="loading-item">
                               <a
                                 className="mxd-socials-line__link"
-                                href="https://www.figma.com/community"
+                                href="https://react.dev"
                                 target="_blank"
+                                style={{ display: "flex", alignItems: "center", gap: "8px" }}
                               >
+                                <img src="/img/tech/02_react.svg" width={16} height={16} alt="React" style={{ objectFit: 'contain' }} />
                                 <TextScramble className="mxd-scramble">
-                                  Figma Community
+                                  React
                                 </TextScramble>
                               </a>
                             </li>

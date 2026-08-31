@@ -161,9 +161,9 @@ export default function Components() {
                     className="mxd-split-lines"
                     animation="splitLines"
                   >
-                    Componentes
+                    Engenharia
                     <br />
-                    funcionais
+                    Modular
                   </CommonAnimatedText>
                 </CommonScrollAnimated>
               </div>
@@ -174,42 +174,42 @@ export default function Components() {
                     as="span"
                     animation="inUp"
                   >
-                    Pilha de Cards
+                    Arquitetura Escalável
                   </CommonScrollAnimated>
                   <CommonScrollAnimated
                     className="tag tag-s tag-medium mxd-scramble anim-uni-in-up"
                     as="span"
                     animation="inUp"
                   >
-                    Hover Slideshow
+                    Performance Extrema
                   </CommonScrollAnimated>
                   <CommonScrollAnimated
                     className="tag tag-s tag-medium mxd-scramble anim-uni-in-up"
                     as="span"
                     animation="inUp"
                   >
-                    Marquee
+                    Código Modular
                   </CommonScrollAnimated>
                   <CommonScrollAnimated
                     className="tag tag-s tag-medium mxd-scramble anim-uni-in-up"
                     as="span"
                     animation="inUp"
                   >
-                    Física
+                    Componentes Isolados
                   </CommonScrollAnimated>
                   <CommonScrollAnimated
                     className="tag tag-s tag-medium mxd-scramble anim-uni-in-up"
                     as="span"
                     animation="inUp"
                   >
-                    Split Text
+                    Animações Nativas
                   </CommonScrollAnimated>
                   <CommonScrollAnimated
                     className="tag tag-s tag-medium mxd-scramble anim-uni-in-up"
                     as="span"
                     animation="inUp"
                   >
-                    Cursor de Imagem
+                    Integração Contínua
                   </CommonScrollAnimated>
                 </div>
                 <div className="tags-column">
@@ -218,42 +218,42 @@ export default function Components() {
                     as="span"
                     animation="inUp"
                   >
-                    Cursor Trail
+                    Otimização de Render
                   </CommonScrollAnimated>
                   <CommonScrollAnimated
                     className="tag tag-s tag-medium mxd-scramble anim-uni-in-up"
                     as="span"
                     animation="inUp"
                   >
-                    Preview de Vídeo
+                    Acessibilidade
                   </CommonScrollAnimated>
                   <CommonScrollAnimated
                     className="tag tag-s tag-medium mxd-scramble anim-uni-in-up"
                     as="span"
                     animation="inUp"
                   >
-                    Pilha de Serviços
+                    Padrões W3C
                   </CommonScrollAnimated>
                   <CommonScrollAnimated
                     className="tag tag-s tag-medium mxd-scramble anim-uni-in-up"
                     as="span"
                     animation="inUp"
                   >
-                    Zoom de Vídeo
+                    Clean Code
                   </CommonScrollAnimated>
                   <CommonScrollAnimated
                     className="tag tag-s tag-medium mxd-scramble anim-uni-in-up"
                     as="span"
                     animation="inUp"
                   >
-                    Bento Grid
+                    Lógica de UI
                   </CommonScrollAnimated>
                   <CommonScrollAnimated
                     className="tag tag-s tag-medium mxd-scramble anim-uni-in-up"
                     as="span"
                     animation="inUp"
                   >
-                    Perspectiva
+                    APIs Resilientes
                   </CommonScrollAnimated>
                 </div>
               </div>

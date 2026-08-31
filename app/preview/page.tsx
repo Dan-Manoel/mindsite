@@ -18,8 +18,9 @@ export default function PreviewPage() {
       <>
         <Hero />
         <DemoGrid />
-        <ContentPagesStack />
+
         <ResponsivePromo />
+        <ContentPagesStack />
         <InnerPagesSlider />
         <Components />
         <FeaturesCards />

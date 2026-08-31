@@ -38,11 +38,10 @@ export default function ResponsivePromo() {
                               className="mxd-split-lines"
                               animation="splitLines"
                             >
-                              Totalmente responsivo e perfeito nos mínimos
-                              detalhes, fica ótimo em qualquer dispositivo.
+                              Arquiteturas pixel-perfect com engenharia de ponta.
                               <span>
-                                Seu site se mantém deslumbrante e funcional em
-                                todas as telas.
+                                Garantimos zero degradação de performance ou layout em
+                                qualquer breakpoint ou dispositivo.
                               </span>
                             </CommonAnimatedText>
                           </CommonScrollAnimated>
@@ -122,27 +121,27 @@ export default function ResponsivePromo() {
                 <div className="marquee__toright" ref={marqueeTrackRef}>
                   {/* single item */}
                   <div className="marquee__item item-regular text">
-                    <p className="marquee__text text-with-gliph">Páginas/</p>
+                    <p className="marquee__text text-with-gliph">Performance/</p>
                   </div>
                   {/* single item */}
                   <div className="marquee__item item-regular text">
-                    <p className="marquee__text text-with-gliph">Internas/</p>
+                    <p className="marquee__text text-with-gliph">Escalabilidade/</p>
                   </div>
                   {/* single item */}
                   <div className="marquee__item item-regular text">
-                    <p className="marquee__text text-with-gliph">Páginas/</p>
+                    <p className="marquee__text text-with-gliph">Performance/</p>
                   </div>
                   {/* single item */}
                   <div className="marquee__item item-regular text">
-                    <p className="marquee__text text-with-gliph">Internas/</p>
+                    <p className="marquee__text text-with-gliph">Escalabilidade/</p>
                   </div>
                   {/* single item */}
                   <div className="marquee__item item-regular text">
-                    <p className="marquee__text text-with-gliph">Páginas/</p>
+                    <p className="marquee__text text-with-gliph">Performance/</p>
                   </div>
                   {/* single item */}
                   <div className="marquee__item item-regular text">
-                    <p className="marquee__text text-with-gliph">Internas/</p>
+                    <p className="marquee__text text-with-gliph">Escalabilidade/</p>
                   </div>
                 </div>
               </div>

@@ -43,20 +43,34 @@ export default function TemplateRuntimeProvider({
   useEffect(() => {
     const transitionEl = pageTransitionRef.current;
     let transitionTween: gsap.core.Tween | null = null;
+    let transitionRafId: number;
+    let safetyTimerId: number;
+
     if (transitionEl) {
-      if (pageTransitionRevealCompleted) {
-        gsap.set(transitionEl, { y: "-100%", pointerEvents: "none" });
-      } else {
-        pageTransitionRevealCompleted = true;
-        transitionTween = gsap.to(transitionEl, {
-          y: "-100%",
-          duration: 0.7,
-          ease: "hop",
-          onComplete: () => {
-            gsap.set(transitionEl, { pointerEvents: "none" });
-          },
-        });
-      }
+      // Garantir que a animação (e cálculos GSAP) rodem apenas após a hidratação
+      transitionRafId = requestAnimationFrame(() => {
+        if (pageTransitionRevealCompleted) {
+          gsap.set(transitionEl, { yPercent: -100, display: "none" });
+        } else {
+          pageTransitionRevealCompleted = true;
+          transitionTween = gsap.to(transitionEl, {
+            yPercent: -100,
+            duration: 0.7,
+            ease: "hop",
+            onComplete: () => {
+              gsap.set(transitionEl, { display: "none" });
+            },
+          });
+        }
+      });
+
+      // Safety net: garante que o overlay seja removido mesmo se o GSAP
+      // falhar silenciosamente no mobile (problemas de hidratação/dvh).
+      safetyTimerId = window.setTimeout(() => {
+        if (transitionEl && getComputedStyle(transitionEl).display !== "none") {
+          gsap.set(transitionEl, { yPercent: -100, display: "none" });
+        }
+      }, 2000);
     }
 
     const instance = new Lenis();
@@ -122,7 +136,7 @@ export default function TemplateRuntimeProvider({
       const isBackForward = navEntry?.type === "back_forward";
       if (event.persisted || isBackForward) {
         const el = pageTransitionRef.current;
-        if (el) gsap.set(el, { y: "-100%", pointerEvents: "none" });
+        if (el) gsap.set(el, { yPercent: -100, display: "none" });
       }
     };
     window.addEventListener("pageshow", onPageShow);
@@ -131,6 +145,8 @@ export default function TemplateRuntimeProvider({
 
     return () => {
       transitionTween?.kill();
+      cancelAnimationFrame(transitionRafId);
+      clearTimeout(safetyTimerId);
       cancelAnimationFrame(lenisStateRafId);
       cancelAnimationFrame(rafId);
       window.removeEventListener("resize", onResize);

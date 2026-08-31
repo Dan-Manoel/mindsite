@@ -7,6 +7,7 @@ import CommonLoadAnimation, {
 import CommonAnimatedText from "@/components/animations/CommonAnimatedText";
 import TextScramble from "@/components/animations/TextScramble";
 import SmoothAnchorLink from "@/components/common/SmoothAnchorLink";
+
 export default function InnerHeadlineArticle() {
   return (
     <CommonLoadAnimation>
@@ -81,15 +82,12 @@ export default function InnerHeadlineArticle() {
                               className="post-featured-fullscreen__title permanent loading-split"
                               animation="splitLinesLoad"
                             >
-                              Minha jornada rumo ao futuro da arte
+                              Minha jornada na arquitetura de software na era da IA
                             </CommonAnimatedText>
                             <CommonLoadItem index={0}>
                               <div className="post-featured-fullscreen__excerpt loading-item">
                                 <p className="t-large t-permanent">
-                                  Descubra como a inteligência artificial está
-                                  transformando os processos artísticos, ampliando
-                                  limites e inspirando novas possibilidades no
-                                  design digital.
+                                  Descubra como a integração de IA otimiza o desenvolvimento de ecossistemas web escaláveis, acelerando a escrita de código e a estruturação de infraestruturas de alta performance.
                                 </p>
                               </div>
                             </CommonLoadItem>
@@ -103,7 +101,7 @@ export default function InnerHeadlineArticle() {
                               <div className="post-featured-fullscreen__data">
                                 <CommonLoadItem index={1}>
                                   <span className="tag tag-s-mobile tag-permanent loading-item">
-                                    27 de janeiro de 2026
+                                    06 de janeiro de 2026
                                   </span>
                                 </CommonLoadItem>
                                 <CommonLoadItem index={2}>
@@ -116,21 +114,21 @@ export default function InnerHeadlineArticle() {
                                 <CommonLoadItem index={3}>
                                   <a className="loading-item" href="#0">
                                     <TextScramble className="tag tag-s-mobile tag-permanent mxd-scramble">
-                                      Midjourney
+                                      Gemini
                                     </TextScramble>
                                   </a>
                                 </CommonLoadItem>
                                 <CommonLoadItem index={4}>
                                   <a className="loading-item" href="#0">
                                     <TextScramble className="tag tag-s-mobile tag-permanent mxd-scramble">
-                                      Motion
+                                      IA
                                     </TextScramble>
                                   </a>
                                 </CommonLoadItem>
                                 <CommonLoadItem index={5}>
                                   <a className="loading-item" href="#0">
                                     <TextScramble className="tag tag-s-mobile tag-permanent mxd-scramble">
-                                      Editorial
+                                      Engenharia
                                     </TextScramble>
                                   </a>
                                 </CommonLoadItem>

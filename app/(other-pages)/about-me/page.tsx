@@ -21,7 +21,7 @@ export default function AboutMePage() {
         <ParallaxDividerImage />
         <Resume />
         <ParallaxDividerImage2 />
-        <TestimonialsSlider />
+        {/* <TestimonialsSlider /> */}
         <CTAWithMarquee />
       </div>
     </>

@@ -34,7 +34,7 @@ export default function ContentPagesStack() {
                                     animation="inUp"
                                   >
                                     <TextScramble className="mxd-scramble">
-                                      01 / Páginas de Conteúdo
+                                      01 / Motores de Blog
                                     </TextScramble>
                                   </CommonScrollAnimated>
                                   <div className="demo-card__title">
@@ -44,44 +44,44 @@ export default function ContentPagesStack() {
                                       href={`/blog-creative`}
                                       target="_blank"
                                     >
-                                      <p>Páginas de Blog</p>
+                                      <p>Arquitetura de Blog</p>
                                     </Link>
                                   </div>
                                   <div className="demo-card__tags">
-<div className="tags-column">
+                                    <div className="tags-column">
                                       <TextScramble className="tag tag-s-mobile mxd-scramble">
-                                        Criativo
+                                        SEO Técnico
                                       </TextScramble>
                                       <TextScramble className="tag tag-s-mobile mxd-scramble">
-                                        Tela Cheia
+                                        SSR Dinâmico
                                       </TextScramble>
                                       <TextScramble className="tag tag-s-mobile mxd-scramble">
-                                        Prévia de Posts
+                                        Headless CMS
                                       </TextScramble>
                                       <TextScramble className="tag tag-s-mobile mxd-scramble">
-                                        Imagens no Cursor
+                                        Alta Performance
                                       </TextScramble>
                                     </div>
                                     <div className="tags-column">
                                       <TextScramble className="tag tag-s-mobile mxd-scramble">
-                                        Anúncios
+                                        Gestão Simples
                                       </TextScramble>
                                       <TextScramble className="tag tag-s-mobile mxd-scramble">
-                                        Acervo
+                                        Core Web Vitals
                                       </TextScramble>
                                       <TextScramble className="tag tag-s-mobile mxd-scramble">
-                                        Grid
+                                        Escalabilidade
                                       </TextScramble>
                                       <TextScramble className="tag tag-s-mobile mxd-scramble">
-                                        Listagem de Posts
+                                        Open Graph
                                       </TextScramble>
                                     </div>
                                   </div>
                                 </div>
                                 <p className="t-extra t-bold t-120 demo-card__descr">
-                                  Um blog que é bonito, tem ótima leitura,{" "}
+                                  Integramos um motor de blog robusto ao seu ecossistema.{" "}
                                   <span>
-                                    e dá vida às suas histórias perfeitamente.
+                                    Arquitetura orientada a SEO Técnico, SSR e máxima performance.
                                   </span>
                                 </p>
                               </div>
@@ -139,7 +139,7 @@ export default function ContentPagesStack() {
                                     animation="inUp"
                                   >
                                     <TextScramble className="mxd-scramble">
-                                      02 / Páginas de Conteúdo
+                                      02 / Vitrines Digitais
                                     </TextScramble>
                                   </CommonScrollAnimated>
                                   <div className="demo-card__title">
@@ -149,41 +149,41 @@ export default function ContentPagesStack() {
                                       href={`/works-default`}
                                       target="_blank"
                                     >
-                                      <p>Portfólio</p>
+                                      <p>Grids de Alta Precisão</p>
                                     </Link>
                                   </div>
                                   <div className="demo-card__tags">
                                     <div className="tags-column">
                                       <TextScramble className="tag tag-s-mobile mxd-scramble">
-                                        Cards Empilhados
+                                        Renderização Rápida
                                       </TextScramble>
                                       <TextScramble className="tag tag-s-mobile mxd-scramble">
-                                        Vídeo em Zoom
+                                        Image Optimization
                                       </TextScramble>
                                       <TextScramble className="tag tag-s-mobile mxd-scramble">
-                                        Grid Fixo
+                                        Lazy Loading
                                       </TextScramble>
                                       <TextScramble className="tag tag-s-mobile mxd-scramble">
-                                        Slideshow no Hover
+                                        Acessibilidade
                                       </TextScramble>
                                     </div>
                                     <div className="tags-column">
                                       <TextScramble className="tag tag-s-mobile mxd-scramble">
-                                        Vitrine Horizontal
+                                        Arquitetura Fluida
                                       </TextScramble>
                                       <TextScramble className="tag tag-s-mobile mxd-scramble">
-                                        Galeria Clip-Path
+                                        Integração de Mídia
                                       </TextScramble>
                                       <TextScramble className="tag tag-s-mobile mxd-scramble">
-                                        Imagem no Cursor
+                                        CDN Global
                                       </TextScramble>
                                     </div>
                                   </div>
                                 </div>
                                 <p className="t-extra t-bold t-120 demo-card__descr">
-                                  Dê vida ao seu trabalho com layouts incríveis{" "}
+                                  Desenvolvemos portfólios com grids matemáticos de alta precisão{" "}
                                   <span>
-                                    e apresente seus produtos e serviços de forma brilhante.
+                                    para destacar os produtos da sua empresa de forma brilhante e otimizada.
                                   </span>
                                 </p>
                               </div>

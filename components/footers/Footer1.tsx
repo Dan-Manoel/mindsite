@@ -76,9 +76,9 @@ export default function Footer1() {
                     className="t-bold t-large t-120 mxd-split-lines-reverse"
                     animation="splitLinesReverse"
                   >
-                    O seu novo site está aqui!
+                    O futuro do seu produto digital começa aqui.
                     <span>
-                      Apresente seus produtos, serviços e expertise com impacto.
+                      Construa aplicações web robustas, rápidas e escaláveis com a MindSite.
                     </span>
                   </CommonAnimatedText>
                 </div>
@@ -94,7 +94,7 @@ export default function Footer1() {
                     rel="noopener noreferrer"
                   >
                     <TextScramble className="btn-caption mxd-scramble">
-                      Adiquira já
+                      Agende uma consultoria
                     </TextScramble>
                     {/* <i class="btn-icon ph-bold ph-arrow-right"></i> */}
                     <i className="btn-icon">
@@ -112,7 +112,7 @@ export default function Footer1() {
                     targetId="demo"
                   >
                     <TextScramble className="btn-caption mxd-scramble">
-                      Demo
+                      Escale seu produto
                     </TextScramble>
                     {/* <i class="btn-icon ph-bold ph-arrow-right"></i> */}
                     <i className="btn-icon">

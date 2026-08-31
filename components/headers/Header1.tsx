@@ -51,7 +51,7 @@ export default function Header1({ initialTheme }: Header1Props) {
                 xmlns="http://www.w3.org/2000/svg"
                 viewBox="0 0 1737 1638"
                 // Trava inline adaptada para herança de cor do template (preenchimento sólido)
-                style={{ fill: 'currentColor', width: 'auto', height: '40px' }}
+                style={{ fill: 'currentColor', width: '42.4px', height: '40px' }}
               >
                 <path
                   fillRule="evenodd"

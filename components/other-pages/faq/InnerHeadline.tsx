@@ -18,39 +18,39 @@ type FAQItem = {
 
 const FAQ_ITEMS: FAQItem[] = [
   {
-    question: "Quais serviços vocês oferecem?",
+    question: "Quais soluções e tecnologias são utilizadas no desenvolvimento?",
     answer:
-      "Oferecemos uma gama completa de soluções digitais, incluindo design e desenvolvimento de sites, branding, marketing digital, soluções de e-commerce, SEO, criação de conteúdo e suporte contínuo. Se você precisa de um novo site, uma reformulação de marca ou uma estratégia de marketing digital, nossa equipe está preparada para ajudar sua empresa a crescer online.",
+      "O foco está na engenharia de software frontend e backend para a construção de ecossistemas digitais sólidos. Isso inclui o desenvolvimento de plataformas SaaS, vitrines digitais de alta performance e arquiteturas escaláveis utilizando Next.js, TypeScript e Tailwind CSS, além de integrações modernas com Vercel e Supabase.",
   },
   {
-    question: "Quanto tempo leva um projeto?",
+    question: "Qual é o tempo estimado para o desenvolvimento de um projeto?",
     answer:
-      "Os prazos variam de acordo com a complexidade do projeto. Um site simples pode levar algumas semanas, enquanto uma identidade visual completa ou um projeto de desenvolvimento personalizado pode levar alguns meses. Definimos prazos claros e mantemos você atualizado em cada etapa.",
+      "O cronograma está diretamente atrelado à complexidade da arquitetura exigida. Estruturas otimizadas e objetivas podem ser implementadas em algumas semanas, enquanto ecossistemas completos com lógicas complexas de backend exigem ciclos mais extensos. O escopo é definido através de etapas claras e versionadas.",
   },
   {
-    question: "Vocês trabalham com empresas de todos os tamanhos?",
+    question: "O escopo de desenvolvimento atende empresas de quais portes?",
     answer:
-      "Sim! Colaboramos com startups, pequenas empresas e grandes corporações em vários setores. Independentemente do tamanho ou estágio da sua empresa, adaptamos nossos serviços para atender às suas necessidades e objetivos específicos.",
+      "A infraestrutura web moderna é, por natureza, escalável. A aplicação das melhores práticas de engenharia permite o desenvolvimento de soluções tanto para startups validando novas ideias quanto para operações consolidadas que necessitam de refatoração de código e ganhos de performance.",
   },
   {
-    question: "Vocês podem reformular meu site atual?",
+    question: "É possível modernizar ou refatorar um site que já existe?",
     answer:
-      "Com certeza. Somos especializados em reformulações de sites para melhorar a experiência do usuário, modernizar sua marca e otimizar o desempenho. Trabalharemos com você para entender sua visão e objetivos de negócios, transformando seu site atual em um ativo digital poderoso.",
+      "Sim. A modernização envolve a auditoria da estrutura atual e a migração para frameworks modernos. O objetivo é substituir códigos legados por uma arquitetura de alto desempenho, melhorando drasticamente as métricas de usabilidade (Core Web Vitals) e a experiência do usuário.",
   },
   {
-    question: "Vocês podem ajudar a melhorar o ranqueamento do meu site nos motores de busca?",
+    question: "Como funciona a melhoria de ranqueamento em sites de busca (Google, etc.)?",
     answer:
-      "Nossos especialistas em SEO utilizam estratégias comprovadas, incluindo pesquisa de palavras-chave, otimização on-page, link building e criação de conteúdo para aumentar a visibilidade e o ranqueamento do seu site no Google e outros motores de busca.",
+      "Através da aplicação rigorosa de estratégias de SEO técnico (Search Engine Optimization), como o Server-Side Rendering (SSR) e a otimização de assets no código, aliados a uma arquitetura de informação limpa, é possível aumentar o ranqueamento orgânico, a performance de indexação e a visibilidade digital da plataforma.",
   },
   {
-    question: "Vocês oferecem suporte e manutenção contínuos?",
+    question: "Existe suporte para manutenção e evolução após o lançamento?",
     answer:
-      "Sim! Oferecemos manutenção contínua de sites, monitoramento de desempenho e suporte de marketing digital para garantir que sua presença online permaneça eficiente e atualizada. Nossos pacotes de suporte podem ser personalizados de acordo com suas necessidades.",
+      "A manutenibilidade é um princípio nativo do desenvolvimento. A utilização de código limpo, tipagem estática e deploys contínuos facilita o suporte a longo prazo. É possível estruturar ciclos de acompanhamento para garantir estabilidade, atualizações de segurança e a implementação escalonada de novas funcionalidades.",
   },
   {
-    question: "Como começamos?",
+    question: "Qual é o fluxo para iniciar a construção do projeto?",
     answer:
-      "Começar é fácil! Basta entrar em contato conosco pelo nosso site ou nos ligar. Agendaremos uma chamada inicial para discutir seus objetivos, desafios e requisitos do projeto. A partir daí, enviaremos uma proposta com nossa abordagem recomendada, prazos e próximos passos.",
+      "O primeiro passo é uma chamada técnica de alinhamento. Nesse momento, avaliam-se os requisitos do sistema, os objetivos de negócio e as integrações necessárias. Com essas informações, é estruturada uma proposta de arquitetura clara, definindo o roadmap de desenvolvimento e os próximos passos práticos.",
   },
 ];
 

@@ -40,12 +40,10 @@ export default function StatisticsLines() {
                             className="manifest manifest-s mxd-split-lines active-cursor-accent"
                             animation="splitLines"
                           >
-                            O web design está evoluindo rapidamente, e eu busco me manter
-                            à frente.
+                            A engenharia web moderna exige infraestruturas resilientes.
+                            {" "}
                             <span>
-                              Ferramentas e tecnologias emergentes me permitem
-                              criar sites visualmente impressionantes e com funcionalidade
-                              impecável.
+                              Projeto sistemas escaláveis garantindo que a comunicação entre banco de dados e interface ocorra com segurança e latência mínima.
                             </span>
                           </CommonAnimatedText>
                         </a>
@@ -56,37 +54,37 @@ export default function StatisticsLines() {
                         {/* statistics single item */}
                         <MxdStatsLineItem>
                           <div className="mxd-stats-lines__number">
-                            <p id="stats-counter-1">40+</p>
+                            <p id="stats-counter-1">15+</p>
                           </div>
                           <div className="mxd-stats-lines__caption">
-                            <p>Clientes satisfeitos que confiam no meu trabalho</p>
+                            <p>Anos de experiência em tecnologia, infraestrutura e segurança da informação.</p>
                           </div>
                         </MxdStatsLineItem>
                         {/* statistics single item */}
                         <MxdStatsLineItem>
                           <div className="mxd-stats-lines__number">
-                            <p id="stats-counter-2">86%</p>
+                            <p id="stats-counter-2">100%</p>
                           </div>
                           <div className="mxd-stats-lines__caption">
-                            <p>Clientes que retornam para novos projetos</p>
+                            <p>Foco na privacidade de dados e escalabilidade desde a primeira linha de código.</p>
                           </div>
                         </MxdStatsLineItem>
                         {/* statistics single item */}
                         <MxdStatsLineItem>
                           <div className="mxd-stats-lines__number">
-                            <p id="stats-counter-3">3+</p>
+                            <p id="stats-counter-3">50+</p>
                           </div>
                           <div className="mxd-stats-lines__caption">
-                            <p>Anos de experiência profissional</p>
+                            <p>Startups e ecossistemas digitais lançados com sucesso.</p>
                           </div>
                         </MxdStatsLineItem>
                         {/* statistics single item */}
                         <MxdStatsLineItem>
                           <div className="mxd-stats-lines__number">
-                            <p id="stats-counter-4">50+</p>
+                            <p id="stats-counter-4">99.9%</p>
                           </div>
                           <div className="mxd-stats-lines__caption">
-                            <p>Projetos concluídos com sucesso</p>
+                            <p>Uptime arquitetado para grandes players do mercado.</p>
                           </div>
                         </MxdStatsLineItem>
                       </div>

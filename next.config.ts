@@ -1,6 +1,6 @@
 import type { NextConfig } from "next";
 const nextConfig: NextConfig = {
-  allowedDevOrigins: ['192.168.2.9'],
+  allowedDevOrigins: ['192.168.2.5'],
 };
 // next.config.js
 module.exports = {

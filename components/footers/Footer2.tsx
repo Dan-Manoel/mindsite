@@ -191,7 +191,7 @@ export default function Footer2({ name = "MINDSITE" }: { name?: string }) {
                           <div className="mxd-footer-nav02__list">
                             <a
                               className="socials-list__item slide-right-up"
-                              href="https://dribbble.com/"
+                              href="https://vercel.com/"
                               target="_blank"
                             >
                               <CommonScrollAnimated
@@ -212,7 +212,7 @@ export default function Footer2({ name = "MINDSITE" }: { name?: string }) {
                                   as="div"
                                   animation="slideDownLine"
                                 >
-                                  <span>Dribbble</span>
+                                  <span>Vercel</span>
                                 </CommonScrollAnimated>
                               </div>
                               <CommonScrollAnimated
@@ -246,7 +246,7 @@ export default function Footer2({ name = "MINDSITE" }: { name?: string }) {
                             </a>
                             <a
                               className="socials-list__item slide-right-up"
-                              href="https://www.behance.net/"
+                              href="https://supabase.com/"
                               target="_blank"
                             >
                               <CommonScrollAnimated
@@ -267,7 +267,7 @@ export default function Footer2({ name = "MINDSITE" }: { name?: string }) {
                                   as="div"
                                   animation="slideDownLine"
                                 >
-                                  <span>Behance</span>
+                                  <span>Supabase</span>
                                 </CommonScrollAnimated>
                               </div>
                               <CommonScrollAnimated
@@ -322,62 +322,7 @@ export default function Footer2({ name = "MINDSITE" }: { name?: string }) {
                                   as="div"
                                   animation="slideDownLine"
                                 >
-                                  <span>Github</span>
-                                </CommonScrollAnimated>
-                              </div>
-                              <CommonScrollAnimated
-                                className="socials-list__arrow anim-uni-slide-down"
-                                as="div"
-                                animation="slideDownLine"
-                              >
-                                <i>
-                                  <svg
-                                    version="1.1"
-                                    xmlns="http://www.w3.org/2000/svg"
-                                    xmlnsXlink="http://www.w3.org/1999/xlink"
-                                    x="0px"
-                                    y="0px"
-                                    viewBox="0 0 18 18"
-                                    enableBackground="new 0 0 18 18"
-                                    xmlSpace="preserve"
-                                  >
-                                    <path
-                                      d="M18,0v14.4h-3.6V7.2h-3.6V3.6H3.6V0H18z M7.2,10.8h3.6V7.2H7.2C7.2,7.2,7.2,10.8,7.2,10.8z M3.6,14.4h3.6v-3.6H3.6V14.4z
-                                M0,18h3.6v-3.6H0V18z"
-                                    />
-                                  </svg>
-                                </i>
-                              </CommonScrollAnimated>
-                              <CommonScrollAnimated
-                                className="socials-list__divider divider-bottom anim-uni-clip-in"
-                                as="div"
-                                animation="clipIn"
-                              />
-                            </a>
-                            <a
-                              className="socials-list__item slide-right-up"
-                              href="https://codepen.io/"
-                              target="_blank"
-                            >
-                              <CommonScrollAnimated
-                                className="socials-list__divider divider-top anim-uni-clip-in"
-                                as="div"
-                                animation="clipIn"
-                              />
-                              <div className="socials-list__info">
-                                <CommonScrollAnimated
-                                  className="socials-list__number anim-uni-slide-down"
-                                  as="div"
-                                  animation="slideDownLine"
-                                >
-                                  <span>[04]</span>
-                                </CommonScrollAnimated>
-                                <CommonScrollAnimated
-                                  className="socials-list__name anim-uni-slide-down"
-                                  as="div"
-                                  animation="slideDownLine"
-                                >
-                                  <span>Codepen</span>
+                                  <span>GitHub</span>
                                 </CommonScrollAnimated>
                               </div>
                               <CommonScrollAnimated
@@ -425,7 +370,7 @@ export default function Footer2({ name = "MINDSITE" }: { name?: string }) {
                                   as="div"
                                   animation="slideDownLine"
                                 >
-                                  <span>[05]</span>
+                                  <span>[04]</span>
                                 </CommonScrollAnimated>
                                 <CommonScrollAnimated
                                   className="socials-list__name anim-uni-slide-down"
@@ -433,6 +378,61 @@ export default function Footer2({ name = "MINDSITE" }: { name?: string }) {
                                   animation="slideDownLine"
                                 >
                                   <span>Figma Community</span>
+                                </CommonScrollAnimated>
+                              </div>
+                              <CommonScrollAnimated
+                                className="socials-list__arrow anim-uni-slide-down"
+                                as="div"
+                                animation="slideDownLine"
+                              >
+                                <i>
+                                  <svg
+                                    version="1.1"
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    xmlnsXlink="http://www.w3.org/1999/xlink"
+                                    x="0px"
+                                    y="0px"
+                                    viewBox="0 0 18 18"
+                                    enableBackground="new 0 0 18 18"
+                                    xmlSpace="preserve"
+                                  >
+                                    <path
+                                      d="M18,0v14.4h-3.6V7.2h-3.6V3.6H3.6V0H18z M7.2,10.8h3.6V7.2H7.2C7.2,7.2,7.2,10.8,7.2,10.8z M3.6,14.4h3.6v-3.6H3.6V14.4z
+                                M0,18h3.6v-3.6H0V18z"
+                                    />
+                                  </svg>
+                                </i>
+                              </CommonScrollAnimated>
+                              <CommonScrollAnimated
+                                className="socials-list__divider divider-bottom anim-uni-clip-in"
+                                as="div"
+                                animation="clipIn"
+                              />
+                            </a>
+                            <a
+                              className="socials-list__item slide-right-up"
+                              href="https://react.dev/"
+                              target="_blank"
+                            >
+                              <CommonScrollAnimated
+                                className="socials-list__divider divider-top anim-uni-clip-in"
+                                as="div"
+                                animation="clipIn"
+                              />
+                              <div className="socials-list__info">
+                                <CommonScrollAnimated
+                                  className="socials-list__number anim-uni-slide-down"
+                                  as="div"
+                                  animation="slideDownLine"
+                                >
+                                  <span>[05]</span>
+                                </CommonScrollAnimated>
+                                <CommonScrollAnimated
+                                  className="socials-list__name anim-uni-slide-down"
+                                  as="div"
+                                  animation="slideDownLine"
+                                >
+                                  <span>React</span>
                                 </CommonScrollAnimated>
                               </div>
                               <CommonScrollAnimated

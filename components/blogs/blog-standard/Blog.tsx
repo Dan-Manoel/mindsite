@@ -45,19 +45,19 @@ export default function Blog() {
                           </div>
                           <div className="post-featured__categories">
                             <TextScramble className="tag tag-s-mobile tag-permanent mxd-scramble">
-                              Midjourney
+                              Gemini
                             </TextScramble>
                             <TextScramble className="tag tag-s-mobile tag-permanent mxd-scramble">
-                              Motion
+                              IA
                             </TextScramble>
                             <TextScramble className="tag tag-s-mobile tag-permanent mxd-scramble">
-                              Editorial
+                              Engenharia
                             </TextScramble>
                           </div>
                         </div>
                         <div className="post-featured__info">
                           <h2 className="post-featured__title permanent">
-                            Minha jornada rumo ao futuro da arte
+                            Minha jornada na arquitetura de software na era da IA
                           </h2>
                           <div className="post-featured__excerpt">
                             <p className="t-medium t-permanent">
@@ -81,7 +81,7 @@ export default function Blog() {
                         className="post-simple__container active-cursor-image active-cursor-permanent"
                         data-cursor-image="/img/blog/preview/500x500_pr01.webp"
                         data-cursor-text="Ler Post"
-                        href={`/blog-article`}
+                        href={`/inovacoes-frontend`}
                       >
                         <div className="container-fluid px-0 post-simple__inner">
                           <div className="row gx-0">
@@ -101,7 +101,7 @@ export default function Blog() {
                                 <h3>Inovações de frontend e jornadas de usuário</h3>
                                 <div className="post-simple__data">
                                   <span className="meta-author comma-tag">
-                                    John Lemon
+                                    Danilo Oliveira
                                   </span>
                                   <span className="meta-date">
                                     02 de fevereiro de 2026
@@ -131,7 +131,7 @@ export default function Blog() {
                         className="post-simple__container active-cursor-image active-cursor-permanent"
                         data-cursor-image="/img/blog/preview/500x500_pr02.webp"
                         data-cursor-text="Ler Post"
-                        href={`/blog-article`}
+                        href={`/elevando-workshops`}
                       >
                         <div className="container-fluid px-0 post-simple__inner">
                           <div className="row gx-0">
@@ -181,7 +181,7 @@ export default function Blog() {
                         className="post-simple__container active-cursor-image active-cursor-permanent"
                         data-cursor-image="/img/blog/preview/500x500_pr03.webp"
                         data-cursor-text="Ler Post"
-                        href={`/blog-article`}
+                        href={`/mundos-3d`}
                       >
                         <div className="container-fluid px-0 post-simple__inner">
                           <div className="row gx-0">
@@ -234,7 +234,7 @@ export default function Blog() {
                         className="post-simple__container active-cursor-image active-cursor-permanent"
                         data-cursor-image="/img/blog/preview/500x500_pr04.webp"
                         data-cursor-text="Ler Post"
-                        href={`/blog-article`}
+                        href={`/design-em-motion`}
                       >
                         <div className="container-fluid px-0 post-simple__inner">
                           <div className="row gx-0">
@@ -252,7 +252,7 @@ export default function Blog() {
                             <div className="col-12 col-xxl-7">
                               <div className="post-simple__title">
                                 <h3>
-                                  Dando vida a ideias com design em motion e criatividade
+                                  Dando vida a ideias com design em motion
                                 </h3>
                                 <div className="post-simple__data">
                                   <span className="meta-author comma-tag">
@@ -286,7 +286,7 @@ export default function Blog() {
                         className="post-simple__container active-cursor-image active-cursor-permanent"
                         data-cursor-image="/img/blog/preview/500x500_pr05.webp"
                         data-cursor-text="Ler Post"
-                        href={`/blog-article`}
+                        href={`/web-design-minimalista`}
                       >
                         <div className="container-fluid px-0 post-simple__inner">
                           <div className="row gx-0">
@@ -305,7 +305,7 @@ export default function Blog() {
                             <div className="col-12 col-xxl-7">
                               <div className="post-simple__title">
                                 <h3>
-                                  Dominando a arte do web design minimalista com impacto
+                                  Dominando a arte do web design minimalista
                                 </h3>
                                 <div className="post-simple__data">
                                   <span className="meta-author comma-tag">
@@ -477,7 +477,7 @@ export default function Blog() {
                     <ul className="widget__recent-posts">
                       <li className="recent-post__item">
                         <div className="recent-post__thumb">
-                          <Link href={`/blog-article`}>
+                          <Link href={`/inovacoes-frontend`}>
                             <Image
                               alt="Prévia da Publicação Recente"
                               src="/img/blog/300x300_rp-01.webp"
@@ -500,9 +500,9 @@ export default function Blog() {
                             </a>
                           </div>
                           <div className="recent-post__title">
-                            <Link href={`/blog-article`}>
-                              Dominando a arte do
-                              <span>web design minimalista com impacto</span>
+                            <Link href={`/inovacoes-frontend`}>
+                              Inovações de frontend e
+                              <span>jornadas de usuário</span>
                             </Link>
                           </div>
                         </div>
@@ -533,15 +533,15 @@ export default function Blog() {
                           </div>
                           <div className="recent-post__title">
                             <Link href={`/blog-article`}>
-                              Projetando para o
-                              <span>futuro dos espaços digitais interativos</span>
+                              Minha jornada na arquitetura de
+                              <span>software na era da IA</span>
                             </Link>
                           </div>
                         </div>
                       </li>
                       <li className="recent-post__item">
                         <div className="recent-post__thumb">
-                          <Link href={`/blog-article`}>
+                          <Link href={`/elevando-workshops`}>
                             <Image
                               alt="Prévia da Publicação Recente"
                               src="/img/blog/300x300_rp-03.webp"
@@ -564,9 +564,9 @@ export default function Blog() {
                             </a>
                           </div>
                           <div className="recent-post__title">
-                            <Link href={`/blog-article`}>
-                              Criando mundos 3D imersivos
-                              <span>com ferramentas modernas</span>
+                            <Link href={`/elevando-workshops`}>
+                              Elevando workshops digitais
+                              <span>com design envolvente</span>
                             </Link>
                           </div>
                         </div>
@@ -615,10 +615,10 @@ export default function Blog() {
                         <div className="social-links-small__divider" />
                         <a
                           className="social-links-small__link"
-                          href="https://dribbble.com/"
+                          href="https://vercel.com/"
                           target="_blank"
                         >
-                          <p className="social-links-small__title">Dribbble</p>
+                          <p className="social-links-small__title">Vercel</p>
                           <div className="social-links-small__icon">
                             <i>
                               <svg
@@ -646,41 +646,10 @@ export default function Blog() {
                         <div className="social-links-small__divider" />
                         <a
                           className="social-links-small__link"
-                          href="https://www.behance.net/"
+                          href="https://supabase.com/"
                           target="_blank"
                         >
-                          <p className="social-links-small__title">Behance</p>
-                          <div className="social-links-small__icon">
-                            <i>
-                              <svg
-                                version="1.1"
-                                xmlns="http://www.w3.org/2000/svg"
-                                xmlnsXlink="http://www.w3.org/1999/xlink"
-                                x="0px"
-                                y="0px"
-                                viewBox="0 0 18 18"
-                                enableBackground="new 0 0 18 18"
-                                xmlSpace="preserve"
-                              >
-                                <path
-                                  d="M18,0v14.4h-3.6V7.2h-3.6V3.6H3.6V0H18z M7.2,10.8h3.6V7.2H7.2C7.2,7.2,7.2,10.8,7.2,10.8z M3.6,14.4h3.6v-3.6H3.6V14.4z
-                            M0,18h3.6v-3.6H0V18z"
-                                />
-                              </svg>
-                            </i>
-                          </div>
-                        </a>
-                        <div className="social-links-small__divider" />
-                      </div>
-                      {/* item */}
-                      <div className="social-links-small__item">
-                        <div className="social-links-small__divider" />
-                        <a
-                          className="social-links-small__link"
-                          href="https://www.instagram.com/"
-                          target="_blank"
-                        >
-                          <p className="social-links-small__title">Instagram</p>
+                          <p className="social-links-small__title">Supabase</p>
                           <div className="social-links-small__icon">
                             <i>
                               <svg
@@ -711,38 +680,7 @@ export default function Blog() {
                           href="https://github.com/"
                           target="_blank"
                         >
-                          <p className="social-links-small__title">Github</p>
-                          <div className="social-links-small__icon">
-                            <i>
-                              <svg
-                                version="1.1"
-                                xmlns="http://www.w3.org/2000/svg"
-                                xmlnsXlink="http://www.w3.org/1999/xlink"
-                                x="0px"
-                                y="0px"
-                                viewBox="0 0 18 18"
-                                enableBackground="new 0 0 18 18"
-                                xmlSpace="preserve"
-                              >
-                                <path
-                                  d="M18,0v14.4h-3.6V7.2h-3.6V3.6H3.6V0H18z M7.2,10.8h3.6V7.2H7.2C7.2,7.2,7.2,10.8,7.2,10.8z M3.6,14.4h3.6v-3.6H3.6V14.4z
-                            M0,18h3.6v-3.6H0V18z"
-                                />
-                              </svg>
-                            </i>
-                          </div>
-                        </a>
-                        <div className="social-links-small__divider" />
-                      </div>
-                      {/* item */}
-                      <div className="social-links-small__item">
-                        <div className="social-links-small__divider" />
-                        <a
-                          className="social-links-small__link"
-                          href="https://codepen.io/"
-                          target="_blank"
-                        >
-                          <p className="social-links-small__title">Codepen</p>
+                          <p className="social-links-small__title">GitHub</p>
                           <div className="social-links-small__icon">
                             <i>
                               <svg
@@ -773,8 +711,39 @@ export default function Blog() {
                           href="https://www.figma.com/community"
                           target="_blank"
                         >
+                          <p className="social-links-small__title">Figma Community</p>
+                          <div className="social-links-small__icon">
+                            <i>
+                              <svg
+                                version="1.1"
+                                xmlns="http://www.w3.org/2000/svg"
+                                xmlnsXlink="http://www.w3.org/1999/xlink"
+                                x="0px"
+                                y="0px"
+                                viewBox="0 0 18 18"
+                                enableBackground="new 0 0 18 18"
+                                xmlSpace="preserve"
+                              >
+                                <path
+                                  d="M18,0v14.4h-3.6V7.2h-3.6V3.6H3.6V0H18z M7.2,10.8h3.6V7.2H7.2C7.2,7.2,7.2,10.8,7.2,10.8z M3.6,14.4h3.6v-3.6H3.6V14.4z
+                            M0,18h3.6v-3.6H0V18z"
+                                />
+                              </svg>
+                            </i>
+                          </div>
+                        </a>
+                        <div className="social-links-small__divider" />
+                      </div>
+                      {/* item */}
+                      <div className="social-links-small__item">
+                        <div className="social-links-small__divider" />
+                        <a
+                          className="social-links-small__link"
+                          href="https://react.dev/"
+                          target="_blank"
+                        >
                           <p className="social-links-small__title">
-                            Figma Community
+                            React
                           </p>
                           <div className="social-links-small__icon">
                             <i>

@@ -45,9 +45,9 @@ export default function InnerHeadline() {
                               <CommonLoadItem index={0}>
                                 <div className="inner-headline__title no-sup pre-subtitle-large loading-item">
                                   <CommonHeroTyped className="large animated-type">
-                                    <b>Designer UI</b>
-                                    <b>Desenvolvedor</b>
-                                    <b>Ilustrador</b>
+                                    <b>Arquiteto de Software</b>
+                                    <b>Cyber Scientist</b>
+                                    <b>Engenheiro SaaS</b>
                                   </CommonHeroTyped>
                                 </div>
                               </CommonLoadItem>
@@ -59,11 +59,10 @@ export default function InnerHeadline() {
                                   data-cursor-text="Baixar CV"
                                   href="#0"
                                 >
-                                  👋 Olá! Sou Danilo Oliveira. Sou apaixonado por
+                                  👋 Olá! Sou Danilo Oliveira. Construo ecossistemas SaaS de alta performance,
                                   {" "}
                                   <span>
-                                    criar designs que contam histórias, despertam
-                                    emoções e geram impacto.
+                                    unindo a precisão matemática da arquitetura de software com a robustez da cibersegurança.
                                   </span>
                                 </CommonAnimatedText>
                               </div>
@@ -72,32 +71,32 @@ export default function InnerHeadline() {
                               <div className="inner-headline__tags align-end-desktop tags-large-subtitle">
                                 <CommonLoadItem index={1}>
                                   <TextScramble className="tag tag-m meta-tag mxd-scramble loading-item">
-                                    Sites
+                                    Next.js
                                   </TextScramble>
                                 </CommonLoadItem>
                                 <CommonLoadItem index={2}>
                                   <TextScramble className="tag tag-m meta-tag mxd-scramble loading-item">
-                                    Design UI/UX
+                                    Supabase
                                   </TextScramble>
                                 </CommonLoadItem>
                                 <CommonLoadItem index={3}>
                                   <TextScramble className="tag tag-m meta-tag mxd-scramble loading-item">
-                                    Desenvolvimento
+                                    TypeScript
                                   </TextScramble>
                                 </CommonLoadItem>
                                 <CommonLoadItem index={4}>
                                   <TextScramble className="tag tag-m meta-tag mxd-scramble loading-item">
-                                    Promoções
+                                    Cibersegurança
                                   </TextScramble>
                                 </CommonLoadItem>
                                 <CommonLoadItem index={5}>
                                   <TextScramble className="tag tag-m meta-tag mxd-scramble loading-item">
-                                    Direção de arte
+                                    Privacidade de Dados
                                   </TextScramble>
                                 </CommonLoadItem>
                                 <CommonLoadItem index={6}>
                                   <TextScramble className="tag tag-m meta-tag mxd-scramble loading-item">
-                                    Marketing
+                                    CI/CD
                                   </TextScramble>
                                 </CommonLoadItem>
                               </div>

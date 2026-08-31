@@ -30,9 +30,9 @@ export default function BlogPreview() {
                           className="reveal-type"
                           animation="revealType"
                         >
-                          Nossos artigos
+                          Engenharia de Software
                           <br />
-                          em destaque
+                          e Inovações
                         </CommonAnimatedText>
                       </div>
                     </div>
@@ -58,10 +58,10 @@ export default function BlogPreview() {
                             className="t-bold t-large mxd-split-lines"
                             animation="splitLines"
                           >
-                            Ideias inspiradoras, insights criativos e o que há de mais recente
-                            em design e tecnologia.
+                            Acesse nosso blog central para ler sobre engenharia de software,
+                            design de interfaces e as últimas inovações no frontend.
                             <span>
-                              Impulsionando a inovação para a sua jornada digital.
+                              Impulsionando a excelência técnica na sua jornada digital.
                             </span>
                           </CommonAnimatedText>
                         </div>

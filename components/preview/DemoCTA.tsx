@@ -17,7 +17,7 @@ export default function DemoCTA() {
               >
                 <a
                   className="active-cursor-accent"
-                  data-cursor-text="Adiquira já"
+                  data-cursor-text="Inicie o Projeto"
                   href="/pricing"
                   target="_blank"
                   rel="noopener noreferrer"
@@ -43,7 +43,7 @@ export default function DemoCTA() {
                   rel="noopener noreferrer"
                 >
                   <TextScramble className="btn-caption mxd-scramble">
-                    Adiquira já
+                    Inicie seu projeto
                   </TextScramble>
                   {/* <i class="ph ph-shopping-cart"></i> */}
                   <i className="btn-icon">

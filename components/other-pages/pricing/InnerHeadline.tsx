@@ -46,7 +46,7 @@ export default function InnerHeadline() {
                                   className="large loading-split"
                                   animation="splitLinesLoad"
                                 >
-                                  Planos e preços<sup>(3)</sup>
+                                  Planos e preços
                                 </CommonAnimatedText>
                               </div>
                               <CommonLoadItem index={0}>

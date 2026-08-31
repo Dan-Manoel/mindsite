@@ -29,13 +29,12 @@ export default function Approach() {
                           className="manifest manifest-s mxd-split-lines"
                           animation="splitLines"
                         >
-                          De designs impecáveis a um código perfeito, cada
-                          detalhe dos nossos projetos é elaborado com cuidado
-                          para garantir os mais altos padrões de qualidade.
+                          A união de desenvolvedores, designers e consultores
+                          trabalhando em paralelo para entregar resultados.
+                          {" "}
                           <span>
-                            Acompanhamos as tendências do design, oferecendo
-                            soluções modernas e de grande impacto visual para
-                            destacar a sua marca.
+                            Combinamos expertise estratégica, criatividade visual e 
+                            engenharia de ponta para arquitetar a sua Casa Digital.
                           </span>
                         </CommonAnimatedText>
                       </div>
@@ -57,37 +56,37 @@ export default function Approach() {
                         {/* statistics single item */}
                         <MxdStatsLineItem>
                           <div className="mxd-stats-lines__number">
-                            <p id="stats-counter-1">50+</p>
+                            <p id="stats-counter-1">100%</p>
                           </div>
                           <div className="mxd-stats-lines__caption">
-                            <p>Clientes satisfeitos que confiam em nosso trabalho</p>
+                            <p>Foco absoluto em performance, segurança e escalabilidade.</p>
                           </div>
                         </MxdStatsLineItem>
                         {/* statistics single item */}
                         <MxdStatsLineItem>
                           <div className="mxd-stats-lines__number">
-                            <p id="stats-counter-2">94%</p>
+                            <p id="stats-counter-2">3</p>
                           </div>
                           <div className="mxd-stats-lines__caption">
-                            <p>Clientes que retornam para novos projetos</p>
+                            <p>Pilares de atuação: Consultoria Estratégica, Design e Engenharia.</p>
                           </div>
                         </MxdStatsLineItem>
                         {/* statistics single item */}
                         <MxdStatsLineItem>
                           <div className="mxd-stats-lines__number">
-                            <p id="stats-counter-3">7+</p>
+                            <p id="stats-counter-3">24/7</p>
                           </div>
                           <div className="mxd-stats-lines__caption">
-                            <p>Anos de experiência profissional</p>
+                            <p>Acompanhamento e relacionamento contínuo através dos nossos Consultores Digitais.</p>
                           </div>
                         </MxdStatsLineItem>
                         {/* statistics single item */}
                         <MxdStatsLineItem>
                           <div className="mxd-stats-lines__number">
-                            <p id="stats-counter-4">80+</p>
+                            <p id="stats-counter-4">∞</p>
                           </div>
                           <div className="mxd-stats-lines__caption">
-                            <p>Projetos concluídos com sucesso</p>
+                            <p>Possibilidades de expansão com a arquitetura modular SaaS.</p>
                           </div>
                         </MxdStatsLineItem>
                       </div>

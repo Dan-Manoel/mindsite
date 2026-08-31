@@ -18,6 +18,19 @@
  * ------------------------------------------------
  * Table of Contents End
  * ------------------------------------------------ */
+/* Fallback CSS: se o GSAP não completar a animação no mobile,
+   esta keyframe garante que o overlay saia da tela após 1.5s. */
+@keyframes mxd-transition-fallback {
+  0%, 70% {
+    transform: translateY(0%);
+    display: flex;
+  }
+  100% {
+    transform: translateY(-110%);
+    display: none;
+  }
+}
+
 .mxd-page-transition {
   position: fixed;
   top: 0;
@@ -26,26 +39,20 @@
   left: 0;
   width: 100%;
   height: 100%;
-  display: -webkit-box;
-  display: -moz-box;
-  display: -ms-flexbox;
   display: flex;
-  -webkit-box-pack: center;
-  -moz-box-pack: center;
-  -ms-flex-pack: center;
   justify-content: center;
-  -webkit-box-align: center;
-  -moz-box-align: center;
-  -ms-flex-align: center;
   align-items: center;
   background-color: #000000;
-  -webkit-transform: translateY(0%);
-  -moz-transform: translateY(0%);
-  -ms-transform: translateY(0%);
   transform: translateY(0%);
   will-change: transform;
   z-index: 999;
+  pointer-events: none;
+  /* Fallback: anima para fora da tela em 1.5s caso o GSAP não rode.
+     O GSAP sobrescreve a transform inline, tornando esta animação inerte
+     quando ele funciona normalmente. forwards mantém o estado final. */
+  animation: mxd-transition-fallback 0.8s ease-in-out 0.1s forwards;
 }
+
 
 .mxd-loader {
   position: fixed;

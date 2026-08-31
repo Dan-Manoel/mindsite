@@ -2,7 +2,7 @@
 
 import { gsap } from "gsap";
 
-import { useLayoutEffect, useRef, type ReactNode, type RefObject } from "react";
+import { useLayoutEffect, useRef, type ReactNode, type RefObject, type CSSProperties } from "react";
 import { useBlurContainerRef } from "@/components/animations/BlurScrollRoot";
 
 type BlurSectionProps = {
@@ -10,6 +10,7 @@ type BlurSectionProps = {
   id?: string;
   children: ReactNode;
   className?: string;
+  style?: CSSProperties;
 };
 
 /** Wraps content that should reveal the global blur overlay while in view. */
@@ -18,6 +19,7 @@ export default function BlurSection({
   id,
   children,
   className,
+  style,
 }: BlurSectionProps) {
   const sectionRef = useRef<HTMLElement | null>(null);
   const containerRef = useBlurContainerRef();
@@ -57,7 +59,7 @@ export default function BlurSection({
 
   if (Tag === "footer") {
     return (
-      <footer ref={sectionRef as RefObject<HTMLElement>} id={id} className={cn}>
+      <footer ref={sectionRef as RefObject<HTMLElement>} id={id} className={cn} style={style}>
         {children}
       </footer>
     );
@@ -68,13 +70,14 @@ export default function BlurSection({
         ref={sectionRef as RefObject<HTMLElement>}
         id={id}
         className={cn}
+        style={style}
       >
         {children}
       </section>
     );
   }
   return (
-    <div ref={sectionRef as RefObject<HTMLDivElement>} id={id} className={cn}>
+    <div ref={sectionRef as RefObject<HTMLDivElement>} id={id} className={cn} style={style}>
       {children}
     </div>
   );

@@ -4,7 +4,7 @@ import ParallaxDividerImage from "@/components/other-pages/about-us/ParallaxDivi
 import Process from "@/components/other-pages/about-us/Process";
 import DoubleMarqueeDivider from "@/components/other-pages/about-us/DoubleMarqueeDivider";
 import Awards from "@/components/other-pages/about-us/Awards";
-import TeamGrid from "@/components/other-pages/about-us/TeamGrid";
+import PartnersGrid from "@/components/other-pages/about-us/PartnersGrid";
 import ParallaxDividerImage2 from "@/components/other-pages/about-us/ParallaxDividerImage2";
 import Approach from "@/components/other-pages/about-us/Approach";
 import BlogPreview from "@/components/other-pages/about-us/BlogPreview";
@@ -21,8 +21,7 @@ export default function AboutUsPage() {
         <ParallaxDividerImage />
         <Process />
         <DoubleMarqueeDivider />
-        <Awards />
-        <TeamGrid />
+        <PartnersGrid />
         <ParallaxDividerImage2 />
         <Approach />
         <BlogPreview />
