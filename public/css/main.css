@@ -23818,3 +23818,66 @@ form textarea:required:valid {
         max-width: 800px !important;
     }
 }
+/* ------------------------------------------------*/
+/* OVERRIDES DE EMERGÊNCIA - CORREÇÃO MOBILE       */
+/* ------------------------------------------------*/
+@media only screen and (max-width: 767px) {
+  
+  /* 1. Correção ContentPagesStack: Força o fluxo normal do DOM */
+  .mxd-demo-stack {
+    gap: 4rem !important; /* Remove o gap colossal de 25svh */
+    height: auto !important;
+  }
+  
+  .mxd-demo-stack__card {
+    height: auto !important; /* Permite que o card cresça com o conteúdo */
+    min-height: 100svh;
+  }
+
+  .demo-card__wrapper {
+    padding-top: 4rem !important; /* Reduz o espaço em branco inicial */
+  }
+
+  .demo-card__image .img-01,
+  .demo-card__image .img-02 {
+    position: relative !important; /* Remove o absolute fatal para o GSAP */
+    max-width: 100% !important;
+    margin-top: 2rem !important;
+    display: block !important;
+  }
+
+  /* 2. Correção InnerPagesSlider: Reordenação e Botões */
+  .mxd-demo-swiper {
+    padding-bottom: 6rem !important; /* Cria área de respiro para as setas */
+  }
+
+  .mxd-demo-swiper__slide {
+    display: flex !important;
+    flex-direction: column !important;
+  }
+
+  /* Empurra o título para cima da imagem */
+  .demo-swiper-slide__descr {
+    order: -1 !important;
+    margin-top: 0 !important;
+    margin-bottom: 2rem !important;
+  }
+
+  /* Joga os botões do Swiper para a base, lado a lado, sem invadir a imagem */
+  .mxd-slider-btn-prev, 
+  .mxd-slider-btn-next {
+    position: absolute !important;
+    top: auto !important;
+    bottom: 0 !important;
+    transform: none !important;
+  }
+
+  .mxd-slider-btn-prev {
+    left: 10% !important;
+  }
+  
+  .mxd-slider-btn-next {
+    right: 10% !important;
+    left: auto !important;
+  }
+}
