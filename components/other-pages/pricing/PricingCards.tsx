@@ -76,7 +76,7 @@ export default function PricingCards() {
                         <div className="mxd-pricing-table__data">
                           <div className="pricing-data__header">
                             <CommonScrollAnimated className="pricing-header__title anim-uni-in-up" as="p" animation="inUp">
-                              Essential
+                              Essencial
                             </CommonScrollAnimated>
                           </div>
                           <div className="pricing-data__info">
@@ -112,7 +112,7 @@ export default function PricingCards() {
                         <div className="mxd-pricing-table__data">
                           <div className="pricing-data__header">
                             <CommonScrollAnimated className="pricing-header__title anim-uni-in-up" as="p" animation="inUp">
-                              Development
+                              Desenvolvimento
                             </CommonScrollAnimated>
                           </div>
                           <div className="pricing-data__info">
@@ -148,7 +148,7 @@ export default function PricingCards() {
                         <div className="mxd-pricing-table__data">
                           <div className="pricing-data__header">
                             <CommonScrollAnimated className="pricing-header__title small no-margin anim-uni-in-up" as="p" animation="inUp">
-                              Advanced
+                              Avançado
                             </CommonScrollAnimated>
                           </div>
                           <div className="pricing-data__info">

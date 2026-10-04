@@ -15,15 +15,11 @@ type Header1Props = {
   initialTheme: "light" | "dark";
 };
 
-const isPreviewHome = (pathname: string) =>
-  pathname === "/" || pathname === "/preview";
-
 export default function Header1({ initialTheme }: Header1Props) {
   const headerRef = useRef<HTMLElement>(null);
   const lenis = useLenis();
   useHeaderScrollHidden(headerRef, lenis);
   const pathname = usePathname();
-  const onPurchaseHome = isPreviewHome(pathname);
   const isPermanent =
     pathname === "/index-branding-studio" ||
     pathname === "/index-digital-agency" ||
@@ -69,49 +65,26 @@ export default function Header1({ initialTheme }: Header1Props) {
         </CommonLoadFade>
         <CommonLoadFade index={1}>
           <div className="mxd-header__controls loading-fade">
-            {onPurchaseHome ? (
-              <a
-                className="btn mxd-header__link slide-right"
-                href="/pricing"
-                aria-label="Adiquira MINDSITE"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                <span className="btn-caption">
-                  <TextScramble className="mxd-scramble">Adiquira já</TextScramble>
-                </span>
-                <i>
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    version="1.1"
-                    viewBox="0 0 18 18"
-                  >
-                    <path d="M3.1,15.6h2.4v2.4h-2.4v-2.4ZM10.2,18h2.4v-2.4h-2.4v2.4ZM14.9,4.7H5.5V0H.8v2.4h2.4v11.8h9.4v-2.4h-7.1v-4.7h9.4v2.4h2.4v-4.7h-2.4ZM12.5,11.8h2.4v-2.4h-2.4v2.4Z" />
-                  </svg>
-                </i>
-              </a>
-            ) : (
-              <Link
-                className="btn mxd-header__link slide-right"
-                href="/contact"
-                aria-label="Fale Conosco"
-              >
-                <span className="btn-caption">
-                  <TextScramble className="mxd-scramble">
-                    Fale Conosco
-                  </TextScramble>
-                </span>
-                <i>
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    version="1.1"
-                    viewBox="0 0 18 18"
-                  >
-                    <path d="M3.1,15.6h2.4v2.4h-2.4v-2.4ZM10.2,18h2.4v-2.4h-2.4v2.4ZM14.9,4.7H5.5V0H.8v2.4h2.4v11.8h9.4v-2.4h-7.1v-4.7h9.4v2.4h2.4v-4.7h-2.4ZM12.5,11.8h2.4v-2.4h-2.4v2.4Z" />
-                  </svg>
-                </i>
-              </Link>
-            )}
+            <Link
+              className="btn mxd-header__link slide-right"
+              href="/contact"
+              aria-label="Fale Conosco"
+            >
+              <span className="btn-caption">
+                <TextScramble className="mxd-scramble">
+                  Fale Conosco
+                </TextScramble>
+              </span>
+              <i>
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  version="1.1"
+                  viewBox="0 0 18 18"
+                >
+                  <path d="M3.1,15.6h2.4v2.4h-2.4v-2.4ZM10.2,18h2.4v-2.4h-2.4v2.4ZM14.9,4.7H5.5V0H.8v2.4h2.4v11.8h9.4v-2.4h-7.1v-4.7h9.4v2.4h2.4v-4.7h-2.4ZM12.5,11.8h2.4v-2.4h-2.4v2.4Z" />
+                </svg>
+              </i>
+            </Link>
             <ThemeSwitcher
               isPermanent={isPermanent}
               initialTheme={initialTheme}

@@ -2,6 +2,7 @@ import type { MenuLinkItem } from "@/types/menu";
 
 export const homeLinks: MenuLinkItem[] = [
   { href: "/", label: "Início" },
+  { href: "/contact", label: "Contato" },
   //{ href: "/index-branding-studio", label: "Estúdio de Branding" },
   //{ href: "/index-software-development-company", label: "Desenvolvimento de Software" },
   //{ href: "/index-creative-agency", label: "Agência Criativa" },
@@ -29,6 +30,7 @@ export const pageLinks: MenuLinkItem[] = [
   { href: "/services", label: "Serviços" },
   //{ href: "/team", label: "Nossa Equipe" },
   { href: "/pricing", label: "Preços" },
+  { href: "/contact", label: "Contato" },
   { href: "/faq", label: "Perguntas Frequentes" },
   { href: "/404", label: "Página 404" },
   { href: "/", label: "Página Inicial" },

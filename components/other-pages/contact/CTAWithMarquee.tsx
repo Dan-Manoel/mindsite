@@ -13,6 +13,17 @@ export default function CTAWithMarquee() {
   useLayoutEffect(() => {
     return initCtaMarqueeToLeft(marqueeTrackRef.current);
   }, []);
+  const handleScrollToForm = (e: React.MouseEvent<HTMLAnchorElement>) => {
+    const formElement = document.getElementById("contact-form");
+    if (formElement) {
+      e.preventDefault();
+      formElement.scrollIntoView({ behavior: "smooth", block: "center" });
+      const firstInput =
+        formElement.querySelector<HTMLInputElement>("input[name='name']");
+      firstInput?.focus();
+    }
+  };
+
   return (
     <>
       <BlurSection className="mxd-section bg-color-opposite">
@@ -30,7 +41,8 @@ export default function CTAWithMarquee() {
                   >
                     <Link
                       className="btn btn-line btn-line-opposite"
-                      href={`/contact`}
+                      href="#contact-form"
+                      onClick={handleScrollToForm}
                     >
                       <TextScramble className="btn-caption mxd-scramble">
                         Fale conosco
@@ -41,7 +53,8 @@ export default function CTAWithMarquee() {
                     <Link
                       className="active-cursor-accent"
                       data-cursor-text="Contato"
-                      href={`/contact`}
+                      href="#contact-form"
+                      onClick={handleScrollToForm}
                     >
                       <CommonAnimatedText
                         as="h2"

@@ -91,6 +91,7 @@ export default function Partners() {
                           alt={`Logo ${client.name}`}
                           src={client.src}
                           fill
+                          sizes="130px"
                           style={{ objectFit: 'contain', objectPosition: 'center' }}
                         />
                       </div>

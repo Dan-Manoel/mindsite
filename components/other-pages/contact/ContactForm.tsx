@@ -6,14 +6,12 @@ import TextScramble from "@/components/animations/TextScramble";
 
 type FormStatus = "idle" | "sending" | "success" | "error";
 
-const WEB3_SUBMIT = "https://api.web3forms.com/submit";
+interface ApiResponse {
+  success: boolean;
+  message?: string;
+  id?: string;
+}
 
-type Web3Response = { success: boolean; message?: string };
-
-/**
- * Web3Forms React example: FormData from the form, `access_key` appended, then POST to their API.
- * The key is public (inlined at build) — set `NEXT_PUBLIC_WEB3FORMS_ACCESS_KEY` in `.env.local` (not hardcoded).
- */
 export default function ContactForm() {
   const [status, setStatus] = useState<FormStatus>("idle");
   const [feedback, setFeedback] = useState("");
@@ -22,43 +20,55 @@ export default function ContactForm() {
     e.preventDefault();
     if (status === "sending") return;
 
-    const key = process.env.NEXT_PUBLIC_WEB3FORMS_ACCESS_KEY;
-    if (!key) {
-      setStatus("error");
-      setFeedback(
-        "Defina NEXT_PUBLIC_WEB3FORMS_ACCESS_KEY em .env.local (obtenha uma chave em web3forms.com) e reinicie o servidor.",
-      );
-      return;
-    }
-
     setStatus("sending");
     setFeedback("");
 
     const form = e.currentTarget;
     const formData = new FormData(form);
-    formData.append("access_key", key);
+
+    const payload = {
+      name: formData.get("name"),
+      company: formData.get("company"),
+      email: formData.get("email"),
+      phone: formData.get("phone"),
+      message: formData.get("message"),
+      _gotcha: formData.get("_gotcha"),
+    };
 
     try {
-      const res = await fetch(WEB3_SUBMIT, { method: "POST", body: formData });
-      const data: Web3Response = await res.json();
-      if (data.success) {
+      const res = await fetch("/api/contact", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(payload),
+      });
+
+      const data: ApiResponse = await res.json().catch(() => ({
+        success: false,
+        message: "Erro na resposta do servidor.",
+      }));
+
+      if (res.ok && data.success) {
         setStatus("success");
         setFeedback(
-          "Obrigado pela sua mensagem. Entraremos em contato o mais breve possível.",
+          data.message ||
+            "Obrigado pela sua mensagem. Entraremos em contato o mais breve possível.",
         );
         form.reset();
         return;
       }
+
       setStatus("error");
       setFeedback(
         data.message && data.message.length > 0
           ? data.message
-          : "Ocorreu um erro. Por favor, tente novamente em alguns instantes.",
+          : "Ocorreu um erro ao enviar. Por favor, tente novamente em alguns instantes.",
       );
     } catch {
       setStatus("error");
       setFeedback(
-        "A solicitação falhou. Verifique sua conexão, bloqueadores de anúncios e tente novamente.",
+        "A solicitação falhou. Verifique sua conexão e tente novamente.",
       );
     }
   }
@@ -77,6 +87,18 @@ export default function ContactForm() {
             <i className="ph-fill ph-smiley-wink reply__icon" />
             <p className="reply__title">Pronto!</p>
             <span className="reply__text">{feedback}</span>
+            <div style={{ marginTop: "1.6rem" }}>
+              <button
+                type="button"
+                className="btn btn-line"
+                onClick={() => {
+                  setStatus("idle");
+                  setFeedback("");
+                }}
+              >
+                <span className="btn-caption">Enviar outra mensagem</span>
+              </button>
+            </div>
           </div>
         )}
 
@@ -85,12 +107,16 @@ export default function ContactForm() {
           id="contact-form"
           onSubmit={onSubmit}
         >
+          {/* Honeypot field for spam prevention */}
           <input
-            type="hidden"
-            name="subject"
-            defaultValue="Nova mensagem da página de contato"
-            aria-hidden
+            type="text"
+            name="_gotcha"
+            style={{ display: "none" }}
+            tabIndex={-1}
+            autoComplete="off"
+            aria-hidden="true"
           />
+
           <div className="container-fluid p-0">
             <div className="row gx-0">
               <CommonLoadItem index={0}>
@@ -181,7 +207,11 @@ export default function ContactForm() {
           </div>
         </form>
         {status === "error" && feedback ? (
-          <p className="reply__text" role="alert" style={{ marginTop: "2.4rem" }}>
+          <p
+            className="reply__text"
+            role="alert"
+            style={{ marginTop: "2.4rem", color: "#f87171" }}
+          >
             {feedback}
           </p>
         ) : null}

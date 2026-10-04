@@ -2,19 +2,46 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useRef, useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import CommonLoadAnimation, { CommonLoadFade } from "@/components/animations/CommonLoadAnimation";
 import TextScramble from "@/components/animations/TextScramble";
 import BlurSection from "@/components/animations/BlurSection";
 
-const PORTFOLIO_CATEGORIES = [
+export interface TemplateItem {
+  name: string;
+  image: string;
+  href: string;
+  tags: string[];
+}
+
+export interface PortfolioCategory {
+  name: string;
+  templates: TemplateItem[];
+}
+
+const PORTFOLIO_CATEGORIES: PortfolioCategory[] = [
   {
     name: "Essencial",
-    templates: [],
+    templates: [
+      {
+        name: "Dottoressa",
+        image: "/img/demo/screens/dottoressa.webp",
+        href: "/preview/dottoressa",
+        tags: ["Clínica & Saúde", "Agendamento", "Design Editorial", "Clean UI"],
+      },
+
+    ],
   },
   {
     name: "Biotech & Organic",
-    templates: [],
+    templates: [
+      {
+        name: "AuraVita",
+        image: "/img/demo/screens/auravita.webp",
+        href: "/preview/auravita",
+        tags: ["Saúde Integrativa", "Cursos & Retiros", "Design Orgânico", "Clean UI"],
+      },
+    ],
   },
   {
     name: "Deep-Tech",
@@ -54,7 +81,7 @@ const PORTFOLIO_CATEGORIES = [
         tags: ["Slideshow com Hover", "Marquee", "Física"],
       },
       {
-        name: "Portfólio de Completo",
+        name: "Portfólio Completo",
         image: "/img/demo/screens/06.webp",
         href: "/index-web-developer",
         tags: ["Bloco Fixo", "Slideshow", "Cursor de Imagem"],
@@ -91,11 +118,18 @@ const PORTFOLIO_CATEGORIES = [
   },
   {
     name: "Criadores & Portfólio",
-    templates: [],
+    templates: [
+      {
+        name: "Nightfolio",
+        image: "/img/demo/screens/nightfolio.webp",
+        href: "/preview/nightfolio",
+        tags: ["GSAP Scroll", "Lenis Smooth", "Next.js 16", "Dark Cinematic"],
+      },
+    ],
   },
 ];
 
-function TemplateCard({ template, isDragging = false }: { template: any; isDragging?: boolean }) {
+function TemplateCard({ template, isDragging = false }: { template: TemplateItem; isDragging?: boolean }) {
   return (
     <div className="demo-carousel-card" style={{ pointerEvents: isDragging ? 'none' : 'auto' }}>
       <Link
@@ -103,7 +137,16 @@ function TemplateCard({ template, isDragging = false }: { template: any; isDragg
         target="_blank"
         className="active-cursor-permanent"
         data-cursor-text="Analisar Projeto"
-        style={{ position: 'relative', width: '100%', aspectRatio: '16/10', overflow: 'hidden', display: 'block', backgroundColor: 'rgba(0,0,0,0.05)', borderRadius: '4px', border: '2px solid rgba(128, 128, 128, 0.3)' }}
+        style={{
+          position: 'relative',
+          width: '100%',
+          aspectRatio: '16/10',
+          overflow: 'hidden',
+          display: 'block',
+          backgroundColor: 'rgba(0,0,0,0.05)',
+          borderRadius: '4px',
+          border: '2px solid rgba(128, 128, 128, 0.3)'
+        }}
         draggable={false}
       >
         <Image
@@ -113,6 +156,7 @@ function TemplateCard({ template, isDragging = false }: { template: any; isDragg
           sizes="(max-width: 768px) 85vw, (max-width: 1024px) 50vw, 650px"
           style={{ objectFit: 'cover', pointerEvents: 'none' }}
           draggable={false}
+          priority={template.name === "Nightfolio"}
         />
       </Link>
 
@@ -145,8 +189,6 @@ function TemplateCard({ template, isDragging = false }: { template: any; isDragg
   );
 }
 
-
-
 const DesktopSeparator = () => (
   <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, opacity: 0.3, padding: '0 1rem' }}>
     <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
@@ -155,16 +197,15 @@ const DesktopSeparator = () => (
   </div>
 );
 
-function DesktopCategoryCarousel({ category }: { category: any }) {
+function DesktopCategoryCarousel({ category }: { category: PortfolioCategory }) {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isMobile, setIsMobile] = useState(true);
   const templates = category.templates;
   const [fadeKey, setFadeKey] = useState(0);
 
-// Hook blindado para SSR (só calcula no client)
   useEffect(() => {
     const checkMobile = () => setIsMobile(window.innerWidth < 768);
-    checkMobile(); // define initial
+    checkMobile();
     window.addEventListener('resize', checkMobile);
     return () => window.removeEventListener('resize', checkMobile);
   }, []);
@@ -195,6 +236,7 @@ function DesktopCategoryCarousel({ category }: { category: any }) {
 
   if (templates.length === 0) return null;
 
+  // Renderização centralizada limpa quando a categoria possui apenas 1 item cadastrado
   if (templates.length === 1) {
     return (
       <div style={{ display: 'flex', justifyContent: 'center', width: '100%', paddingBottom: '2rem' }}>
@@ -204,15 +246,15 @@ function DesktopCategoryCarousel({ category }: { category: any }) {
   }
 
   const card1 = templates[currentIndex];
-  // Calculate next index, but only access if we need a second card
   const nextIdx = (currentIndex + 1) % templates.length;
   const card2 = templates[nextIdx];
 
   return (
-    <div className="demo-carousel-wrapper">
+    <div className={`demo-carousel-wrapper ${templates.length <= 2 ? 'hide-desktop-controls' : ''}`}>
       <div
         onClick={handlePrev}
         className="carousel-control prev opacity-50 hover:opacity-100 transition-opacity flex items-center justify-center cursor-pointer"
+        aria-label="Item anterior"
       >
         <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
           <path d="M19 12H5M5 12L12 19M5 12L12 5" />
@@ -232,6 +274,7 @@ function DesktopCategoryCarousel({ category }: { category: any }) {
       <div
         onClick={handleNext}
         className="carousel-control next opacity-50 hover:opacity-100 transition-opacity flex items-center justify-center cursor-pointer"
+        aria-label="Próximo item"
       >
         <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
           <path d="M5 12H19M19 12L12 5M19 12L12 19" />
@@ -263,7 +306,6 @@ export default function DemoGrid() {
           100% { opacity: 1; transform: scale(1); }
         }
         
-        /* New Responsive CSS Rules injected for Mobile Layout */
         .demo-carousel-wrapper {
           display: flex;
           flex-direction: row;
@@ -291,6 +333,7 @@ export default function DemoGrid() {
           .carousel-cards-container { flex-direction: row; width: auto; order: unset; }
           .carousel-control.prev { order: unset; }
           .carousel-control.next { order: unset; }
+          .hide-desktop-controls .carousel-control { display: none !important; }
         }
       `}} />
       <BlurSection id="demo" className="mxd-section" style={{ width: '100%' }}>

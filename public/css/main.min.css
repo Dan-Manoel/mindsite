@@ -10393,7 +10393,7 @@ form textarea:required:valid {
 .mxd-hero-07__objects {
     display: -ms-grid;
     display: grid;
-    -ms-grid-columns: (1fr)[2];
+    -ms-grid-columns: 1fr 1fr;
     grid-template-columns: repeat(2, 1fr);
     gap: 3rem;
     margin-bottom: 6rem
@@ -10417,7 +10417,7 @@ form textarea:required:valid {
 
 @media only screen and (min-width:1200px) {
     .mxd-hero-07__objects {
-        -ms-grid-columns: (1fr)[5];
+        -ms-grid-columns: 1fr 1fr 1fr 1fr 1fr;
         grid-template-columns: repeat(5, 1fr);
         margin-bottom: 0
     }
@@ -13483,7 +13483,6 @@ form textarea:required:valid {
     -o-object-fit: contain;
     object-fit: contain;
     pointer-events: none;
-    user-drag: none;
     -webkit-user-drag: none;
     -moz-user-select: none;
     -webkit-user-select: none;
