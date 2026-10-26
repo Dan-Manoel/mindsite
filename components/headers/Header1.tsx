@@ -65,6 +65,29 @@ export default function Header1({ initialTheme }: Header1Props) {
         </CommonLoadFade>
         <CommonLoadFade index={1}>
           <div className="mxd-header__controls loading-fade">
+            {/* Botão de Login Minimalista (Apenas Ícone 16-bit Pixel Art Alinhado) */}
+            <Link
+              aria-label="Acessar Área do Cliente"
+              className="btn mxd-header__link slide-right"
+              href="/login"
+              title="Área do Cliente"
+            >
+              <i>
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  version="1.1"
+                  viewBox="0 0 18 18"
+                  width="18"
+                  height="18"
+                  fill="currentColor"
+                >
+                  {/* Cabeça pixel-art */}
+                  <path d="M6,2h6v2H6V2z M5,4h8v4H5V4z M6,8h6v2H6V8z" />
+                  {/* Ombros e tronco pixel-art */}
+                  <path d="M3,12h12v2H3V12z M2,14h14v4H2V14z" />
+                </svg>
+              </i>
+            </Link>
             <Link
               className="btn mxd-header__link slide-right"
               href="/contact"
