@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { Resend } from "resend";
-import { contactLeadSchema } from "@/app/actions/contact";
+import { contactLeadSchema } from "@/app/actions/contact.schema";
 import { renderLeadEmailHtml } from "@/lib/mail/leadTemplate";
 
 export async function POST(req: Request) {

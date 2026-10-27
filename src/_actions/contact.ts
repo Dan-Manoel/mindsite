@@ -1,3 +1,3 @@
 "use server";
 
-export * from "@/app/actions/contact";
+export { sendContactLead } from "@/app/actions/contact";

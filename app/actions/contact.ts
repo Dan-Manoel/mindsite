@@ -1,60 +1,16 @@
 "use server";
 
 import { Resend } from "resend";
-import { z } from "zod";
 import { renderLeadEmailHtml } from "@/lib/mail/leadTemplate";
-
-/**
- * Schema Zod para validação estrita dos dados de entrada do formulário de contato.
- * Compatível com Zod 3 e Zod 4.
- */
-export const contactLeadSchema = z.object({
-  name: z
-    .string()
-    .trim()
-    .min(2, "Por favor, informe seu nome completo (mínimo de 2 caracteres).")
-    .max(120, "O nome informado é muito longo."),
-  company: z
-    .string()
-    .trim()
-    .max(120, "O nome da empresa é muito longo.")
-    .optional()
-    .nullable()
-    .transform((val) => val || ""),
-  email: z
-    .string()
-    .trim()
-    .email("Por favor, informe um endereço de e-mail válido.")
-    .max(255, "O e-mail informado é muito longo.")
-    .toLowerCase(),
-  phone: z
-    .string()
-    .trim()
-    .max(30, "O número de telefone é muito longo.")
-    .optional()
-    .nullable()
-    .transform((val) => val || ""),
-  message: z
-    .string()
-    .trim()
-    .min(5, "Por favor, escreva algumas palavras sobre o seu projeto (mínimo de 5 caracteres).")
-    .max(3000, "A mensagem ultrapassou o limite permitido de 3000 caracteres."),
-  _gotcha: z
-    .string()
-    .optional()
-    .nullable(),
-});
-
-export type ContactLeadInput = z.infer<typeof contactLeadSchema>;
-
-export interface ContactActionResult {
-  error: boolean;
-  message: string;
-}
+import {
+  contactLeadSchema,
+  type ContactLeadInput,
+  type ContactActionResult,
+} from "./contact.schema";
 
 /**
  * Server Action para validação e disparo de e-mails para novos leads capturados via Resend.
- * Suporta chamada direta com objeto tipado ou com FormData nativo de formulários Next.js.
+ * Em conformidade estrita com o Next.js App Router ("use server" exporta apenas funções assíncronas).
  */
 export async function sendContactLead(
   input: ContactLeadInput | FormData

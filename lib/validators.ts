@@ -71,3 +71,10 @@ export function maskDocument(value: string): string {
     .replace(/(\d{4})(\d)/, "$1-$2")
     .substring(0, 18);
 }
+
+// Reexportação dos validadores de contato
+export {
+  contactLeadSchema,
+  type ContactLeadInput,
+  type ContactActionResult,
+} from "@/app/actions/contact.schema";
