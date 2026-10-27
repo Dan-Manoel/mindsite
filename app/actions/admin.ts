@@ -17,6 +17,7 @@ import {
   InstallmentStatus,
   UserRole,
 } from "@prisma/client";
+import { settleInstallmentManuallyAction as settleAction } from "@/app/actions/adminClients";
 
 // Validador de autorização de administrador
 export async function assertAdmin() {
@@ -340,7 +341,7 @@ export async function updateTicketStatusAction(
 }
 
 // Lançamento de despesa operacional da empresa
-export type CreateExpenseInput = {
+type CreateExpenseInput = {
   name: string;
   category: ExpenseCategory;
   frequency: ExpenseFrequency;
@@ -416,7 +417,7 @@ export async function settleExpenseAction(
 }
 
 // Criação atômica de fatura com múltiplos itens discriminados (prisma.$transaction)
-export type CreateInvoiceInput = {
+type CreateInvoiceInput = {
   userId: string;
   dueDate: string;
   items: Array<{
@@ -505,7 +506,7 @@ export async function createInvoiceWithItemsAction(input: CreateInvoiceInput) {
   }
 }
 
-export interface IssueInvoiceItemInput {
+interface IssueInvoiceItemInput {
   description: string;
   amount: number;
   installmentId?: string;
@@ -720,4 +721,10 @@ export async function addTicketCommentAction(ticketId: string, message: string) 
   }
 }
 
-export { settleInstallmentManuallyAction, markInstallmentPaidAction } from "@/app/actions/adminClients";
+export async function settleInstallmentManuallyAction(installmentId: string) {
+  return settleAction(installmentId);
+}
+
+export async function markInstallmentPaidAction(installmentId: string) {
+  return settleAction(installmentId);
+}

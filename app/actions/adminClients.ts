@@ -561,7 +561,9 @@ export async function settleInstallmentManuallyAction(installmentId: string) {
 }
 
 // Alias para padronização de nomenclatura
-export const markInstallmentPaidAction = settleInstallmentManuallyAction;
+export async function markInstallmentPaidAction(installmentId: string) {
+  return settleInstallmentManuallyAction(installmentId);
+}
 
 // 7. Adicionar Parcela Avulsa a Contrato Existente
 export async function addInstallmentToContractAction(
