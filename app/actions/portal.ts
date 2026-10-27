@@ -2,7 +2,7 @@
 
 import { createClient } from "@/lib/supabase/server";
 import { prisma } from "@/lib/prisma";
-import { TicketCategory } from "@prisma/client";
+import { TicketCategory, InvoiceStatus } from "@prisma/client";
 import { revalidatePath } from "next/cache";
 import { createInfinitePayCheckoutLink } from "@/lib/payment/infinitepay";
 import { createAdminClient } from "@/lib/supabase/admin";
@@ -161,10 +161,58 @@ export async function getClientDashboardData() {
 
   const now = new Date();
 
-  const activeInvoice =
-    client.invoices.find((inv) => inv.status === "PENDING" || inv.status === "OVERDUE") ||
-    client.invoices[0] ||
-    null;
+  // Consolidação de todas as parcelas dos contratos ativos
+  const allInstallments = client.projects.flatMap((p) =>
+    p.contracts.flatMap((c) =>
+      c.installments.map((inst) => ({
+        id: inst.id,
+        installmentNumber: inst.installmentNumber,
+        amount: Number(inst.amount),
+        scheduledDate: inst.scheduledDate,
+        status: inst.status,
+        description: inst.description || "Parcela",
+        projectName: p.name,
+        invoiceItemId: inst.invoiceItemId,
+      }))
+    )
+  );
+
+  // 1. Faturas em atraso (status === 'OVERDUE' ou PENDING com dueDate < now)
+  const overdueInvoices = client.invoices.filter(
+    (inv) => inv.status === "OVERDUE" || (inv.status === "PENDING" && new Date(inv.dueDate) < now)
+  );
+
+  // 2. Parcelas agendadas com vencimento expirado (mesmo que sem fatura gerada)
+  const overdueScheduledInstallments = allInstallments.filter(
+    (inst) => inst.status === "SCHEDULED" && new Date(inst.scheduledDate) < now
+  );
+
+  const isOverdue = overdueInvoices.length > 0 || overdueScheduledInstallments.length > 0;
+
+  const overdueInvoicesAmount = overdueInvoices.reduce((sum, inv) => sum + Number(inv.totalAmount), 0);
+  const overdueInstallmentsAmount = overdueScheduledInstallments.reduce((sum, inst) => sum + inst.amount, 0);
+  const totalOverdueAmount = overdueInvoicesAmount + overdueInstallmentsAmount;
+
+  // Faturas pendentes vigentes (vencimento futuro)
+  const pendingInvoices = client.invoices.filter(
+    (inv) => inv.status === "PENDING" && new Date(inv.dueDate) >= now
+  );
+
+  // Fatura ativa em aberto: a em atraso mais antiga, ou a pendente futura mais próxima.
+  // Se não houver fatura aberta, activeInvoice será null (NUNCA fallback para faturas pagas)
+  const openInvoice = overdueInvoices[0] || pendingInvoices[0] || null;
+
+  // Verificação estrita de liquidação de faturas e parcelas até a data corrente
+  const hasUnsettledPastOrCurrent =
+    client.invoices.some(
+      (inv) => (inv.status === "PENDING" || inv.status === "OVERDUE") && new Date(inv.dueDate) <= now
+    ) ||
+    allInstallments.some(
+      (inst) => (inst.status === "SCHEDULED" || inst.status === "BILLED") && new Date(inst.scheduledDate) <= now
+    );
+
+  const hasAnyTransactions = client.invoices.length > 0 || allInstallments.length > 0;
+  const allPaid = hasAnyTransactions && !hasUnsettledPastOrCurrent && !isOverdue;
 
   // 2. Estatísticas de Chamados
   const openTickets = client.tickets.filter((t) => t.status === "OPEN" || t.status === "IN_PROGRESS").length;
@@ -320,47 +368,61 @@ export async function getClientDashboardData() {
         createdAt: c.createdAt.toISOString(),
       })),
     })),
-    activeInvoice: activeInvoice
+    activeInvoice: openInvoice
       ? {
-        id: activeInvoice.id,
-        invoiceNumber: activeInvoice.invoiceNumber,
-        dueDate: activeInvoice.dueDate.toISOString(),
-        totalAmount: Number(activeInvoice.totalAmount),
-        pixCopyPaste: activeInvoice.pixCopyPaste,
-        pixQrCode: activeInvoice.pixQrCode,
-        gatewayInvoiceUrl: activeInvoice.gatewayInvoiceUrl,
-        items: activeInvoice.items.map((i) => ({
-          id: i.id,
-          description: i.description,
-          amount: Number(i.amount),
-        })),
-      }
+          id: openInvoice.id,
+          invoiceNumber: openInvoice.invoiceNumber,
+          dueDate: openInvoice.dueDate.toISOString(),
+          totalAmount: Number(openInvoice.totalAmount),
+          pixCopyPaste: openInvoice.pixCopyPaste,
+          pixQrCode: openInvoice.pixQrCode,
+          gatewayInvoiceUrl: openInvoice.gatewayInvoiceUrl,
+          status:
+            openInvoice.status === "OVERDUE" ||
+            (openInvoice.status === "PENDING" && new Date(openInvoice.dueDate) < now)
+              ? "OVERDUE"
+              : openInvoice.status,
+          items: openInvoice.items.map((i) => ({
+            id: i.id,
+            description: i.description,
+            amount: Number(i.amount),
+          })),
+        }
       : null,
-    upcomingInstallments: client.projects.flatMap((p) =>
-      p.contracts.flatMap((c) =>
-        c.installments
-          .filter((inst) => inst.status === "SCHEDULED")
-          .map((inst) => ({
-            id: inst.id,
-            installmentNumber: inst.installmentNumber,
-            amount: Number(inst.amount),
-            scheduledDate: inst.scheduledDate.toISOString(),
-            description: inst.description || "Parcela",
-            projectName: p.name,
-            status: inst.status,
-          }))
-      )
-    ),
-    invoicesHistory: client.invoices.map((inv) => ({
-      id: inv.id,
-      invoiceNumber: inv.invoiceNumber,
-      dueDate: inv.dueDate.toISOString(),
-      totalAmount: Number(inv.totalAmount),
-      status: inv.status,
-      paidAt: inv.paidAt ? inv.paidAt.toISOString() : null,
-      receiptUrl: inv.receiptUrl || null,
-      gatewayInvoiceUrl: inv.gatewayInvoiceUrl || null,
-    })),
+    billingSummary: {
+      isOverdue,
+      totalOverdueAmount,
+      allPaid,
+      overdueInvoicesCount: overdueInvoices.length,
+      overdueInstallmentsCount: overdueScheduledInstallments.length,
+      hasOverdueInstallmentsWithoutInvoice: overdueScheduledInstallments.length > 0,
+    },
+    upcomingInstallments: allInstallments
+      .filter((inst) => inst.status === "SCHEDULED" && new Date(inst.scheduledDate) >= now)
+      .sort((a, b) => new Date(a.scheduledDate).getTime() - new Date(b.scheduledDate).getTime())
+      .map((inst) => ({
+        id: inst.id,
+        installmentNumber: inst.installmentNumber,
+        amount: inst.amount,
+        scheduledDate: inst.scheduledDate.toISOString(),
+        description: inst.description,
+        projectName: inst.projectName,
+        status: inst.status,
+      })),
+    invoicesHistory: client.invoices.map((inv) => {
+      const isInvOverdue =
+        inv.status === "OVERDUE" || (inv.status === "PENDING" && new Date(inv.dueDate) < now);
+      return {
+        id: inv.id,
+        invoiceNumber: inv.invoiceNumber,
+        dueDate: inv.dueDate.toISOString(),
+        totalAmount: Number(inv.totalAmount),
+        status: isInvOverdue ? "OVERDUE" : inv.status,
+        paidAt: inv.paidAt ? inv.paidAt.toISOString() : null,
+        receiptUrl: inv.receiptUrl || null,
+        gatewayInvoiceUrl: inv.gatewayInvoiceUrl || null,
+      };
+    }),
   };
 }
 
@@ -518,6 +580,8 @@ export async function generateConsolidatedPaymentAction(payload: {
   let totalAmount = 0;
   const itemsToBill: Array<{ description: string; amount: number; installmentId?: string }> = [];
 
+  const selectedInstallmentsList: Array<{ id: string; amount: number; scheduledDate: Date }> = [];
+
   // 1. Inclui fatura corrente se solicitado
   if (payload.includeCurrentInvoice && client.invoices[0]) {
     totalAmount += Number(client.invoices[0].totalAmount);
@@ -538,6 +602,11 @@ export async function generateConsolidatedPaymentAction(payload: {
           amount: val,
           installmentId: inst.id,
         });
+        selectedInstallmentsList.push({
+          id: inst.id,
+          amount: val,
+          scheduledDate: inst.scheduledDate,
+        });
       });
     });
   });
@@ -547,6 +616,20 @@ export async function generateConsolidatedPaymentAction(payload: {
   }
 
   const invoiceNumber = `INV-${Date.now().toString().slice(-6)}`;
+
+  // Herança Obrigatória de Vencimento: A Invoice gerada para uma parcela de contrato
+  // NUNCA deve inventar uma data de vencimento aleatória (ex: +3 dias).
+  // Ela DEVE herdar exatamente a data acordada: dueDate: installment.scheduledDate
+  let dueDate = new Date();
+  if (selectedInstallmentsList.length > 0) {
+    selectedInstallmentsList.sort((a, b) => a.scheduledDate.getTime() - b.scheduledDate.getTime());
+    dueDate = selectedInstallmentsList[0].scheduledDate;
+  } else if (payload.includeCurrentInvoice && client.invoices[0]) {
+    dueDate = client.invoices[0].dueDate;
+  }
+
+  const isOverdue = dueDate <= new Date();
+  const initialStatus: InvoiceStatus = isOverdue ? "OVERDUE" : "PENDING";
 
   // 3. Comunica com a InfinitePay para gerar o link oficial de checkout
   const checkoutRes = await createInfinitePayCheckoutLink({
@@ -566,13 +649,13 @@ export async function generateConsolidatedPaymentAction(payload: {
 
   const checkoutUrl = checkoutRes.success && checkoutRes.url ? checkoutRes.url : `https://pay.infinitepay.io/checkout/${invoiceNumber}`;
 
-  // 4. Salva a fatura no Prisma com status PENDING
+  // 4. Salva a fatura no Prisma com status calculado (OVERDUE se vencimento <= hoje, senão PENDING)
   const createdInvoice = await prisma.invoice.create({
     data: {
       invoiceNumber,
-      dueDate: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000), // 3 dias de vencimento
+      dueDate,
       totalAmount,
-      status: "PENDING",
+      status: initialStatus,
       paymentMethod: payload.paymentMethod,
       gatewayPaymentId: checkoutRes.slug || invoiceNumber,
       gatewayInvoiceUrl: checkoutUrl,
@@ -589,7 +672,7 @@ export async function generateConsolidatedPaymentAction(payload: {
     },
   });
 
-  // Vincula as parcelas à nova fatura e ao item correspondente
+  // Vincula as parcelas à nova fatura e ao item correspondente com status BILLED
   for (let i = 0; i < itemsToBill.length; i++) {
     const item = itemsToBill[i];
     if (item.installmentId && createdInvoice.items[i]) {
@@ -604,6 +687,8 @@ export async function generateConsolidatedPaymentAction(payload: {
   }
 
   revalidatePath("/portal/dashboard");
+  revalidatePath("/admin/dashboard");
+  revalidatePath("/admin/clients");
   return {
     success: true,
     invoiceId: createdInvoice.id,

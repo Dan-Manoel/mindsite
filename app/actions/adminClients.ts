@@ -519,25 +519,49 @@ export async function settleInstallmentManuallyAction(installmentId: string) {
       return { success: false, error: "Parcela não encontrada." };
     }
 
-    await prisma.$transaction([
-      prisma.contractInstallment.update({
+    await prisma.$transaction(async (tx) => {
+      // 1. Atualizar a parcela
+      await tx.contractInstallment.update({
         where: { id: installmentId },
         data: { status: "PAID" },
-      }),
-      prisma.contract.update({
+      });
+
+      // 2. Incrementar o saldo pago no contrato
+      await tx.contract.update({
         where: { id: installment.contractId },
         data: { paidAmount: { increment: installment.amount } },
-      }),
-    ]);
+      });
+
+      // 3. Localizar a Invoice correspondente via invoiceItemId
+      if (installment.invoiceItemId) {
+        const invItem = await tx.invoiceItem.findUnique({
+          where: { id: installment.invoiceItemId },
+        });
+
+        if (invItem?.invoiceId) {
+          await tx.invoice.update({
+            where: { id: invItem.invoiceId },
+            data: {
+              status: "PAID",
+              paidAt: new Date(),
+            },
+          });
+        }
+      }
+    });
 
     revalidatePath("/admin/dashboard");
     revalidatePath("/admin/clients");
+    revalidatePath("/portal/dashboard");
     return { success: true, message: "Parcela baixada com sucesso!" };
   } catch (err: unknown) {
     const message = err instanceof Error ? err.message : "Erro desconhecido";
     return { success: false, error: message };
   }
 }
+
+// Alias para padronização de nomenclatura
+export const markInstallmentPaidAction = settleInstallmentManuallyAction;
 
 // 7. Adicionar Parcela Avulsa a Contrato Existente
 export async function addInstallmentToContractAction(

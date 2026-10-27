@@ -440,13 +440,28 @@ export async function createInvoiceWithItemsAction(input: CreateInvoiceInput) {
   const invoiceNumber = `INV-${new Date().getFullYear()}-${Math.floor(1000 + Math.random() * 9000)}`;
 
   try {
+    const linkedInstIds = input.items.map((it) => it.installmentId).filter(Boolean) as string[];
+    let invoiceDueDate = new Date(input.dueDate);
+    if (linkedInstIds.length > 0) {
+      const linkedInst = await prisma.contractInstallment.findMany({
+        where: { id: { in: linkedInstIds } },
+        orderBy: { scheduledDate: "asc" },
+      });
+      if (linkedInst.length > 0) {
+        invoiceDueDate = new Date(linkedInst[0].scheduledDate);
+      }
+    }
+
+    const isOverdue = invoiceDueDate <= new Date();
+    const initialStatus: InvoiceStatus = isOverdue ? "OVERDUE" : "PENDING";
+
     const invoice = await prisma.$transaction(async (tx) => {
       const createdInvoice = await tx.invoice.create({
         data: {
           invoiceNumber,
-          dueDate: new Date(input.dueDate),
+          dueDate: invoiceDueDate,
           totalAmount,
-          status: "PENDING",
+          status: initialStatus,
           pixCopyPaste: input.pixCopyPaste || null,
           pixQrCode: input.pixQrCode || null,
           gatewayInvoiceUrl: input.gatewayInvoiceUrl || null,
@@ -463,12 +478,16 @@ export async function createInvoiceWithItemsAction(input: CreateInvoiceInput) {
         },
       });
 
-      // Se houver vínculos com parcelas de contrato agendadas, atualiza status para BILLED
-      for (const item of input.items) {
-        if (item.installmentId) {
+      // Se houver vínculos com parcelas de contrato agendadas, atualiza status para BILLED e vincula invoiceItemId
+      for (let idx = 0; idx < input.items.length; idx++) {
+        const item = input.items[idx];
+        if (item.installmentId && createdInvoice.items[idx]) {
           await tx.contractInstallment.update({
             where: { id: item.installmentId },
-            data: { status: "BILLED" },
+            data: {
+              status: "BILLED",
+              invoiceItemId: createdInvoice.items[idx].id,
+            },
           });
         }
       }
@@ -530,19 +549,36 @@ export async function issueImmediateInvoiceAction(data: {
 
   const invoiceNumber = `INV-${Date.now().toString().slice(-6)}`;
 
+  const installmentIds = items
+    .map((it) => it.installmentId)
+    .filter(Boolean) as string[];
+
   let dueDate = new Date();
-  if (data.dueDateOption === "TODAY") {
-    dueDate = new Date();
-  } else if (data.dueDateOption === "24H" || data.dueDateOption === "1") {
-    dueDate = new Date(Date.now() + 1 * 24 * 60 * 60 * 1000);
-  } else if (data.dueDateOption === "3D" || data.dueDateOption === "3") {
-    dueDate = new Date(Date.now() + 3 * 24 * 60 * 60 * 1000);
-  } else if (data.dueDateOption === "5D" || data.dueDateOption === "5") {
-    dueDate = new Date(Date.now() + 5 * 24 * 60 * 60 * 1000);
+  if (installmentIds.length > 0) {
+    const linkedInstallments = await prisma.contractInstallment.findMany({
+      where: { id: { in: installmentIds } },
+      orderBy: { scheduledDate: "asc" },
+    });
+    if (linkedInstallments.length > 0) {
+      dueDate = new Date(linkedInstallments[0].scheduledDate);
+    }
   } else {
-    const days = typeof data.dueDateOption === "number" ? data.dueDateOption : (data.dueDateDays || 3);
-    dueDate = new Date(Date.now() + days * 24 * 60 * 60 * 1000);
+    if (data.dueDateOption === "TODAY") {
+      dueDate = new Date();
+    } else if (data.dueDateOption === "24H" || data.dueDateOption === "1") {
+      dueDate = new Date(Date.now() + 1 * 24 * 60 * 60 * 1000);
+    } else if (data.dueDateOption === "3D" || data.dueDateOption === "3") {
+      dueDate = new Date(Date.now() + 3 * 24 * 60 * 60 * 1000);
+    } else if (data.dueDateOption === "5D" || data.dueDateOption === "5") {
+      dueDate = new Date(Date.now() + 5 * 24 * 60 * 60 * 1000);
+    } else {
+      const days = typeof data.dueDateOption === "number" ? data.dueDateOption : (data.dueDateDays || 3);
+      dueDate = new Date(Date.now() + days * 24 * 60 * 60 * 1000);
+    }
   }
+
+  const isOverdue = dueDate <= new Date();
+  const initialStatus: InvoiceStatus = isOverdue ? "OVERDUE" : "PENDING";
 
   // 1. Gera link oficial na InfinitePay
   const checkoutRes = await createInfinitePayCheckoutLink({
@@ -571,7 +607,7 @@ export async function issueImmediateInvoiceAction(data: {
       invoiceNumber,
       dueDate,
       totalAmount,
-      status: "PENDING",
+      status: initialStatus,
       gatewayPaymentId: checkoutRes.slug || invoiceNumber,
       gatewayInvoiceUrl: checkoutUrl,
       userId: client.id,
@@ -683,3 +719,5 @@ export async function addTicketCommentAction(ticketId: string, message: string) 
     return { success: false, error: message };
   }
 }
+
+export { settleInstallmentManuallyAction, markInstallmentPaidAction } from "@/app/actions/adminClients";

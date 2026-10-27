@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { Resend } from "resend";
+import { revalidatePath } from "next/cache";
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
@@ -72,24 +73,33 @@ export async function POST(req: NextRequest) {
       }
     });
 
-    // 3. Dispara recibo de pagamento por e-mail para o cliente
-    await resend.emails.send({
-      from: "MindSite Financeiro <financeiro@mindsite.com.br>",
-      to: invoice.user.email,
-      subject: `Confirmação de Pagamento — Fatura ${invoice.invoiceNumber}`,
-      html: `
-        <div style="font-family: sans-serif; max-width: 600px; margin: auto; padding: 20px; border: 1px solid #e2e8f0; border-radius: 4px;">
-          <h2 style="color: #002bba;">Pagamento Confirmado!</h2>
-          <p>Olá, <strong>${invoice.user.fullName || "Cliente"}</strong>.</p>
-          <p>Confirmamos o recebimento do seu pagamento referente à fatura <strong>${invoice.invoiceNumber}</strong>.</p>
-          <p><strong>Valor Liquidado:</strong> R$ ${(paidAmountCents / 100).toFixed(2).replace(".", ",")}</p>
-          <p><strong>Forma de Pagamento:</strong> ${captureMethod === "pix" ? "Pix" : "Cartão de Crédito"}</p>
-          ${receiptUrl ? `<p><a href="${receiptUrl}" target="_blank" style="background:#002bba; color:#fff; padding:10px 18px; text-decoration:none; border-radius:4px; display:inline-block;">Acessar Comprovante</a></p>` : ""}
-          <hr style="border: none; border-top: 1px solid #e2e8f0; margin: 20px 0;" />
-          <p style="font-size: 12px; color: #64748b;">MindSite Agência Digital — CNPJ 19.725.535/0001-58</p>
-        </div>
-      `,
-    });
+    // 3. Dispara recibo de pagamento por e-mail para o cliente e alerta para o financeiro
+    try {
+      await resend.emails.send({
+        from: "MindSite Financeiro <financeiro@mindsite.com.br>",
+        to: invoice.user.email,
+        bcc: ["contato@mindsite.com.br", "financeiro@mindsite.com.br"],
+        subject: `Confirmação de Pagamento — Fatura ${invoice.invoiceNumber}`,
+        html: `
+          <div style="font-family: sans-serif; max-width: 600px; margin: auto; padding: 20px; border: 1px solid #e2e8f0; border-radius: 4px;">
+            <h2 style="color: #002bba;">Pagamento Confirmado!</h2>
+            <p>Olá, <strong>${invoice.user.fullName || "Cliente"}</strong>.</p>
+            <p>Confirmamos o recebimento do seu pagamento referente à fatura <strong>${invoice.invoiceNumber}</strong>.</p>
+            <p><strong>Valor Liquidado:</strong> R$ ${(paidAmountCents / 100).toFixed(2).replace(".", ",")}</p>
+            <p><strong>Forma de Pagamento:</strong> ${captureMethod === "pix" ? "Pix" : "Cartão de Crédito"}</p>
+            ${receiptUrl ? `<p><a href="${receiptUrl}" target="_blank" style="background:#002bba; color:#fff; padding:10px 18px; text-decoration:none; border-radius:4px; display:inline-block;">Acessar Comprovante</a></p>` : ""}
+            <hr style="border: none; border-top: 1px solid #e2e8f0; margin: 20px 0;" />
+            <p style="font-size: 12px; color: #64748b;">MindSite Agência Digital — CNPJ 19.725.535/0001-58</p>
+          </div>
+        `,
+      });
+    } catch (mailErr: unknown) {
+      console.error("Falha ao enviar e-mail de recibo no webhook:", mailErr);
+    }
+
+    revalidatePath("/portal/dashboard");
+    revalidatePath("/admin/dashboard");
+    revalidatePath("/admin/clients");
 
     return NextResponse.json({ success: true }, { status: 200 });
   } catch (error: unknown) {

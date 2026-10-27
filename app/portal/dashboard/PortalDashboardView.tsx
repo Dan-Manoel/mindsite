@@ -187,6 +187,14 @@ interface PortalProps {
         createdAt: string;
       }>;
     }>;
+    billingSummary?: {
+      isOverdue: boolean;
+      totalOverdueAmount: number;
+      allPaid: boolean;
+      overdueInvoicesCount: number;
+      overdueInstallmentsCount: number;
+      hasOverdueInstallmentsWithoutInvoice: boolean;
+    };
     activeInvoice: {
       id: string;
       invoiceNumber: string;
@@ -195,6 +203,7 @@ interface PortalProps {
       pixCopyPaste: string | null;
       pixQrCode: string | null;
       gatewayInvoiceUrl: string | null;
+      status?: string;
       items: Array<{ id: string; description: string; amount: number }>;
     } | null;
     upcomingInstallments?: Array<{
@@ -917,36 +926,73 @@ export default function PortalDashboardView({ data, isFirstLogin }: PortalProps)
             <div
               style={{
                 backgroundColor: "var(--base-tint)",
-                border: "1px solid var(--st-medium)",
+                border: data.billingSummary?.isOverdue
+                  ? "1px solid rgba(239, 68, 68, 0.4)"
+                  : "1px solid var(--st-medium)",
                 padding: "2.5rem",
                 borderRadius: "0.2rem",
               }}
             >
-              <span
+              <div
                 style={{
-                  display: "block",
-                  fontFamily: "var(--_font-accent)",
-                  fontSize: "1.1rem",
-                  textTransform: "uppercase",
-                  color: "var(--t-medium)",
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignItems: "center",
                   marginBottom: "0.8rem",
-                  fontWeight: 600,
                 }}
               >
-                Fatura do Mês
-              </span>
+                <span
+                  style={{
+                    display: "block",
+                    fontFamily: "var(--_font-accent)",
+                    fontSize: "1.1rem",
+                    textTransform: "uppercase",
+                    color: "var(--t-medium)",
+                    fontWeight: 600,
+                  }}
+                >
+                  Fatura do Mês
+                </span>
+                {data.billingSummary?.isOverdue && (
+                  <span
+                    style={{
+                      backgroundColor: "rgba(239, 68, 68, 0.15)",
+                      color: "#ef4444",
+                      border: "1px solid rgba(239, 68, 68, 0.3)",
+                      padding: "0.2rem 0.6rem",
+                      borderRadius: "0.2rem",
+                      fontSize: "1rem",
+                      fontWeight: 700,
+                      fontFamily: "var(--_font-accent)",
+                      letterSpacing: "0.05rem",
+                    }}
+                  >
+                    EM ATRASO
+                  </span>
+                )}
+              </div>
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end" }}>
                 <div
                   style={{
                     fontFamily: "var(--_font-accent)",
                     fontSize: "2.4rem",
                     fontWeight: 700,
-                    color: data.activeInvoice ? "var(--accent)" : "#10b981",
+                    color: data.billingSummary?.isOverdue
+                      ? "#ef4444"
+                      : data.activeInvoice
+                      ? "var(--accent)"
+                      : data.billingSummary?.allPaid
+                      ? "#10b981"
+                      : "var(--t-muted)",
                   }}
                 >
-                  {data.activeInvoice
+                  {data.billingSummary?.isOverdue
+                    ? `R$ ${data.billingSummary.totalOverdueAmount.toFixed(2).replace(".", ",")}`
+                    : data.activeInvoice
                     ? `R$ ${data.activeInvoice.totalAmount.toFixed(2).replace(".", ",")}`
-                    : "Quitada"}
+                    : data.billingSummary?.allPaid
+                    ? "Quitada"
+                    : "Sem Faturas"}
                 </div>
                 <button
                   type="button"
@@ -1454,7 +1500,11 @@ export default function PortalDashboardView({ data, isFirstLogin }: PortalProps)
               <div
                 style={{
                   backgroundColor: "var(--base-tint)",
-                  border: "1px solid var(--accent)",
+                  border:
+                    data.activeInvoice.status === "OVERDUE" ||
+                    new Date(data.activeInvoice.dueDate) < new Date()
+                      ? "1px solid rgba(239, 68, 68, 0.4)"
+                      : "1px solid var(--accent)",
                   padding: "3.5rem",
                   borderRadius: "0.4rem",
                 }}
@@ -1462,13 +1512,31 @@ export default function PortalDashboardView({ data, isFirstLogin }: PortalProps)
                 <span
                   className="tag tag-s tag-medium"
                   style={{
-                    color: "var(--accent)",
+                    backgroundColor:
+                      data.activeInvoice.status === "OVERDUE" ||
+                      new Date(data.activeInvoice.dueDate) < new Date()
+                        ? "rgba(239, 68, 68, 0.15)"
+                        : undefined,
+                    color:
+                      data.activeInvoice.status === "OVERDUE" ||
+                      new Date(data.activeInvoice.dueDate) < new Date()
+                        ? "#ef4444"
+                        : "var(--accent)",
+                    border:
+                      data.activeInvoice.status === "OVERDUE" ||
+                      new Date(data.activeInvoice.dueDate) < new Date()
+                        ? "1px solid rgba(239, 68, 68, 0.3)"
+                        : undefined,
                     marginBottom: "1rem",
                     display: "inline-block",
                     fontFamily: "var(--_font-accent)",
+                    fontWeight: 700,
                   }}
                 >
-                  Fatura em Aberto
+                  {data.activeInvoice.status === "OVERDUE" ||
+                  new Date(data.activeInvoice.dueDate) < new Date()
+                    ? "EM ATRASO"
+                    : "Fatura em Aberto"}
                 </span>
                 <h3
                   style={{
@@ -1604,6 +1672,43 @@ export default function PortalDashboardView({ data, isFirstLogin }: PortalProps)
                   </div>
                 )}
               </div>
+            ) : data.billingSummary?.hasOverdueInstallmentsWithoutInvoice ? (
+              <div
+                style={{
+                  backgroundColor: "rgba(239, 68, 68, 0.08)",
+                  border: "1px solid rgba(239, 68, 68, 0.3)",
+                  padding: "3rem",
+                  borderRadius: "0.4rem",
+                }}
+              >
+                <span
+                  style={{
+                    backgroundColor: "rgba(239, 68, 68, 0.15)",
+                    color: "#ef4444",
+                    padding: "0.3rem 0.8rem",
+                    borderRadius: "0.2rem",
+                    fontSize: "1.1rem",
+                    fontWeight: 700,
+                    fontFamily: "var(--_font-accent)",
+                    display: "inline-block",
+                    marginBottom: "1rem",
+                  }}
+                >
+                  ATENÇÃO: PARCELA EM ATRASO
+                </span>
+                <p
+                  style={{
+                    margin: 0,
+                    fontSize: "1.4rem",
+                    fontFamily: "var(--_font-accent)",
+                    color: "#ef4444",
+                  }}
+                >
+                  Você possui parcela de contrato com vencimento no passado no valor de R${" "}
+                  {data.billingSummary.totalOverdueAmount.toFixed(2).replace(".", ",")}. Entre em contato
+                  com a equipe financeira para regularização.
+                </p>
+              </div>
             ) : (
               <div
                 style={{
@@ -1616,7 +1721,9 @@ export default function PortalDashboardView({ data, isFirstLogin }: PortalProps)
                   borderRadius: "0.4rem",
                 }}
               >
-                ✓ Nenhuma fatura pendente. Seus pagamentos estão em dia!
+                {data.billingSummary?.allPaid
+                  ? "✓ Todas as faturas e parcelas estão quitadas! Seus pagamentos estão 100% em dia."
+                  : "✓ Nenhuma fatura pendente. Seus pagamentos estão em dia!"}
               </div>
             )}
 
@@ -1869,27 +1976,71 @@ export default function PortalDashboardView({ data, isFirstLogin }: PortalProps)
                           <span
                             style={{
                               fontSize: "1rem",
-                              color: inv.status === "PAID" ? "#10b981" : "#f59e0b",
+                              padding: "0.2rem 0.6rem",
+                              borderRadius: "0.2rem",
+                              fontWeight: 700,
+                              fontFamily: "var(--_font-accent)",
+                              backgroundColor:
+                                inv.status === "PAID"
+                                  ? "rgba(16, 185, 129, 0.1)"
+                                  : inv.status === "OVERDUE"
+                                  ? "rgba(239, 68, 68, 0.15)"
+                                  : "rgba(245, 158, 11, 0.1)",
+                              color:
+                                inv.status === "PAID"
+                                  ? "#10b981"
+                                  : inv.status === "OVERDUE"
+                                  ? "#ef4444"
+                                  : "#f59e0b",
+                              border: `1px solid ${
+                                inv.status === "PAID"
+                                  ? "rgba(16, 185, 129, 0.3)"
+                                  : inv.status === "OVERDUE"
+                                  ? "rgba(239, 68, 68, 0.3)"
+                                  : "rgba(245, 158, 11, 0.3)"
+                              }`,
                             }}
                           >
-                            {inv.status === "PAID" ? "PAGO" : "PENDENTE"}
+                            {inv.status === "PAID"
+                              ? "PAGO"
+                              : inv.status === "OVERDUE"
+                              ? "EM ATRASO"
+                              : "PENDENTE"}
                           </span>
                         </td>
                         <td style={{ padding: "1.2rem 1rem", textAlign: "right" }}>
-                          {inv.receiptUrl ? (
-                            <a
-                              href={inv.receiptUrl}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              style={{
-                                color: "var(--accent)",
-                                textDecoration: "underline",
-                                fontSize: "1.1rem",
-                              }}
-                            >
-                              Comprovante ↗
-                            </a>
-                          ) : inv.status !== "PAID" && inv.gatewayInvoiceUrl ? (
+                          {inv.status === "PAID" ? (
+                            inv.receiptUrl ? (
+                              <a
+                                href={inv.receiptUrl}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                style={{
+                                  color: "var(--accent)",
+                                  textDecoration: "underline",
+                                  fontSize: "1.1rem",
+                                  fontWeight: 600,
+                                }}
+                              >
+                                Ver Comprovante ↗
+                              </a>
+                            ) : (
+                              <span
+                                style={{
+                                  backgroundColor: "rgba(16, 185, 129, 0.1)",
+                                  color: "#10b981",
+                                  padding: "0.2rem 0.6rem",
+                                  borderRadius: "0.2rem",
+                                  fontSize: "1rem",
+                                  fontWeight: 700,
+                                  border: "1px solid rgba(16, 185, 129, 0.3)",
+                                  fontFamily: "var(--_font-accent)",
+                                }}
+                              >
+                                ✓ PAGO
+                              </span>
+                            )
+                          ) : inv.gatewayInvoiceUrl ? (
                             <a
                               href={inv.gatewayInvoiceUrl}
                               target="_blank"
@@ -1898,9 +2049,10 @@ export default function PortalDashboardView({ data, isFirstLogin }: PortalProps)
                                 color: "var(--accent)",
                                 textDecoration: "underline",
                                 fontSize: "1.1rem",
+                                fontWeight: 600,
                               }}
                             >
-                              Pagar ↗
+                              Pagar ➔
                             </a>
                           ) : (
                             <span style={{ color: "var(--t-muted)", fontSize: "1.1rem" }}>-</span>
