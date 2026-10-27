@@ -97,6 +97,7 @@ export default function InnerHeadline() {
                       as="span"
                       className="anim-uni-chars"
                       animation="animChars"
+                      style={{ fontSize: "clamp(3rem, 21cqw, 11rem)" }}
                     >
                       contato@mindsite.com.br
                     </CommonAnimatedText>

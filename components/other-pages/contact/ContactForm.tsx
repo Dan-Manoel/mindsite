@@ -1,24 +1,23 @@
 "use client";
 
-import { type FormEvent, useState } from "react";
+import { type FormEvent, useRef, useState } from "react";
 import { CommonLoadItem } from "@/components/animations/CommonLoadAnimation";
 import TextScramble from "@/components/animations/TextScramble";
+import { sendContactLead } from "@/app/actions/contact";
 
 type FormStatus = "idle" | "sending" | "success" | "error";
 
-interface ApiResponse {
-  success: boolean;
-  message?: string;
-  id?: string;
-}
-
 export default function ContactForm() {
   const [status, setStatus] = useState<FormStatus>("idle");
-  const [feedback, setFeedback] = useState("");
+  const [feedback, setFeedback] = useState<string>("");
+  const formRef = useRef<HTMLFormElement | null>(null);
 
-  async function onSubmit(e: FormEvent<HTMLFormElement>) {
+  const isSubmitting = status === "sending";
+  const isSuccess = status === "success";
+
+  async function handleSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
-    if (status === "sending") return;
+    if (isSubmitting) return;
 
     setStatus("sending");
     setFeedback("");
@@ -26,75 +25,57 @@ export default function ContactForm() {
     const form = e.currentTarget;
     const formData = new FormData(form);
 
-    const payload = {
-      name: formData.get("name"),
-      company: formData.get("company"),
-      email: formData.get("email"),
-      phone: formData.get("phone"),
-      message: formData.get("message"),
-      _gotcha: formData.get("_gotcha"),
-    };
-
     try {
-      const res = await fetch("/api/contact", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(payload),
-      });
+      const result = await sendContactLead(formData);
 
-      const data: ApiResponse = await res.json().catch(() => ({
-        success: false,
-        message: "Erro na resposta do servidor.",
-      }));
-
-      if (res.ok && data.success) {
-        setStatus("success");
+      if (result.error) {
+        setStatus("error");
         setFeedback(
-          data.message ||
-            "Obrigado pela sua mensagem. Entraremos em contato o mais breve possível.",
+          result.message || "Ocorreu um erro ao enviar. Por favor, tente novamente em alguns instantes."
         );
-        form.reset();
         return;
       }
 
-      setStatus("error");
+      setStatus("success");
       setFeedback(
-        data.message && data.message.length > 0
-          ? data.message
-          : "Ocorreu um erro ao enviar. Por favor, tente novamente em alguns instantes.",
+        result.message || "Obrigado pela sua mensagem! Entraremos em contato o mais breve possível."
       );
-    } catch {
+      form.reset();
+    } catch (err: unknown) {
+      console.error("[ContactForm Error]:", err);
       setStatus("error");
       setFeedback(
-        "A solicitação falhou. Verifique sua conexão e tente novamente.",
+        "A solicitação falhou devido a uma instabilidade temporária. Por favor, tente novamente."
       );
     }
   }
 
-  const showSuccessReply = status === "success";
+  function handleReset() {
+    setStatus("idle");
+    setFeedback("");
+    if (formRef.current) {
+      formRef.current.reset();
+    }
+  }
 
   return (
     <div className="mxd-block contact">
       <div className="mxd-form-container">
-        {showSuccessReply && (
+        {/* Bloco de Sucesso / Feedback Visual Oficial */}
+        {isSuccess && (
           <div
             className="form__reply centered text-center is-visible"
             role="status"
             aria-live="polite"
           >
-            <i className="ph-fill ph-smiley-wink reply__icon" />
+            <i className="ph-fill ph-smiley-wink reply__icon" aria-hidden="true" />
             <p className="reply__title">Pronto!</p>
             <span className="reply__text">{feedback}</span>
             <div style={{ marginTop: "1.6rem" }}>
               <button
                 type="button"
                 className="btn btn-line"
-                onClick={() => {
-                  setStatus("idle");
-                  setFeedback("");
-                }}
+                onClick={handleReset}
               >
                 <span className="btn-caption">Enviar outra mensagem</span>
               </button>
@@ -102,12 +83,15 @@ export default function ContactForm() {
           </div>
         )}
 
+        {/* Formulário com Interações e Acessibilidade */}
         <form
-          className={`form contact-form${status === "success" ? " is-hidden" : ""}`}
+          ref={formRef}
+          className={`form contact-form${isSuccess ? " is-hidden" : ""}`}
           id="contact-form"
-          onSubmit={onSubmit}
+          onSubmit={handleSubmit}
+          noValidate={false}
         >
-          {/* Honeypot field for spam prevention */}
+          {/* Honeypot field contra bots de spam */}
           <input
             type="text"
             name="_gotcha"
@@ -127,10 +111,13 @@ export default function ContactForm() {
                     autoComplete="name"
                     placeholder="Seu nome*"
                     required
-                    disabled={status === "sending" || showSuccessReply}
+                    disabled={isSubmitting}
+                    aria-required="true"
+                    aria-label="Seu nome"
                   />
                 </div>
               </CommonLoadItem>
+
               <CommonLoadItem index={1}>
                 <div className="col-12 col-md-6 mxd-grid-item loading-item">
                   <input
@@ -138,10 +125,12 @@ export default function ContactForm() {
                     name="company"
                     autoComplete="organization"
                     placeholder="Nome da empresa"
-                    disabled={status === "sending" || showSuccessReply}
+                    disabled={isSubmitting}
+                    aria-label="Nome da empresa"
                   />
                 </div>
               </CommonLoadItem>
+
               <CommonLoadItem index={2}>
                 <div className="col-12 col-md-6 mxd-grid-item loading-item">
                   <input
@@ -150,10 +139,13 @@ export default function ContactForm() {
                     autoComplete="email"
                     placeholder="Email*"
                     required
-                    disabled={status === "sending" || showSuccessReply}
+                    disabled={isSubmitting}
+                    aria-required="true"
+                    aria-label="Seu endereço de e-mail"
                   />
                 </div>
               </CommonLoadItem>
+
               <CommonLoadItem index={3}>
                 <div className="col-12 col-md-6 mxd-grid-item loading-item">
                   <input
@@ -161,36 +153,43 @@ export default function ContactForm() {
                     name="phone"
                     autoComplete="tel"
                     placeholder="Telefone"
-                    disabled={status === "sending" || showSuccessReply}
+                    disabled={isSubmitting}
+                    aria-label="Seu número de telefone de contato"
                   />
                 </div>
               </CommonLoadItem>
+
               <CommonLoadItem index={4}>
                 <div className="col-12 mxd-grid-item loading-item">
                   <textarea
                     name="message"
                     placeholder="Algumas palavras sobre o seu projeto*"
                     required
-                    defaultValue={""}
-                    disabled={status === "sending" || showSuccessReply}
+                    defaultValue=""
+                    disabled={isSubmitting}
+                    rows={4}
+                    aria-required="true"
+                    aria-label="Algumas palavras sobre o seu projeto"
                   />
                 </div>
               </CommonLoadItem>
+
               <CommonLoadItem index={5}>
                 <div className="col-12 mxd-grid-item loading-item">
                   <button
                     className="btn btn-default-icon btn-default-accent slide-right"
                     type="submit"
-                    disabled={status === "sending" || showSuccessReply}
+                    disabled={isSubmitting}
+                    aria-busy={isSubmitting}
                   >
-                    {status === "sending" ? (
+                    {isSubmitting ? (
                       <span className="btn-caption">Enviando…</span>
                     ) : (
                       <TextScramble className="btn-caption mxd-scramble">
                         Enviar
                       </TextScramble>
                     )}
-                    <i className="btn-icon">
+                    <i className="btn-icon" aria-hidden="true">
                       <svg
                         xmlns="http://www.w3.org/2000/svg"
                         version="1.1"
@@ -206,14 +205,39 @@ export default function ContactForm() {
             </div>
           </div>
         </form>
+
+        {/* Mensagem de Erro / Validação */}
         {status === "error" && feedback ? (
-          <p
-            className="reply__text"
+          <div
             role="alert"
-            style={{ marginTop: "2.4rem", color: "#f87171" }}
+            style={{
+              marginTop: "2rem",
+              padding: "1rem 1.25rem",
+              borderRadius: "6px",
+              backgroundColor: "rgba(239, 68, 68, 0.1)",
+              border: "1px solid rgba(239, 68, 68, 0.3)",
+              display: "flex",
+              alignItems: "center",
+              gap: "0.75rem",
+            }}
           >
-            {feedback}
-          </p>
+            <i
+              className="ph-bold ph-warning-circle"
+              style={{ color: "#ef4444", fontSize: "1.25rem", flexShrink: 0 }}
+              aria-hidden="true"
+            />
+            <p
+              className="reply__text"
+              style={{
+                color: "#fca5a5",
+                margin: 0,
+                fontSize: "0.95rem",
+                lineHeight: 1.4,
+              }}
+            >
+              {feedback}
+            </p>
+          </div>
         ) : null}
       </div>
     </div>

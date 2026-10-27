@@ -1,5 +1,7 @@
 import { NextResponse } from "next/server";
 import { Resend } from "resend";
+import { contactLeadSchema } from "@/app/actions/contact";
+import { renderLeadEmailHtml } from "@/lib/mail/leadTemplate";
 
 export async function POST(req: Request) {
   try {
@@ -13,32 +15,60 @@ export async function POST(req: Request) {
       );
     }
 
-    const resend = new Resend(apiKey);
-    const body = await req.json();
-    const { name, email, message } = body;
+    const body = await req.json().catch(() => ({}));
 
-    if (!name || !email || !message) {
+    // Validação estrita via Zod
+    const validation = contactLeadSchema.safeParse(body);
+    if (!validation.success) {
+      const firstIssue = validation.error.issues[0];
       return NextResponse.json(
-        { error: true, message: "Campos obrigatórios ausentes." },
+        { error: true, message: firstIssue ? firstIssue.message : "Campos inválidos." },
         { status: 400 }
       );
     }
 
-    const recipient = process.env.CONTACT_RECIPIENT_EMAIL || "contato@mindsite.com.br";
+    const { name, company, email, phone, message, _gotcha } = validation.data;
 
-    const { error } = await resend.emails.send({
-      from: "MindSite Leads <contato@mindsite.com.br>",
+    // Proteção honeypot
+    if (_gotcha && _gotcha.trim().length > 0) {
+      return NextResponse.json({
+        error: false,
+        message: "Obrigado pela sua mensagem! Entraremos em contato o mais breve possível.",
+      });
+    }
+
+    const resend = new Resend(apiKey);
+    const recipient = process.env.CONTACT_RECIPIENT_EMAIL || "contato@mindsite.com.br";
+    const fromSender = process.env.CONTACT_EMAIL_FROM || "MindSite - Vitrine <no-reply@mindsite.com.br>";
+    const companyLabel = company && company.length > 0 ? company : "Sem Empresa";
+
+    const html = renderLeadEmailHtml({
+      name,
+      company,
+      email,
+      phone,
+      message,
+      submittedAt: new Date(),
+    });
+
+    const { data, error } = await resend.emails.send({
+      from: fromSender,
       to: [recipient],
       replyTo: email,
-      subject: `[Lead MindSite] ${name}`,
-      text: `Nome: ${name}\nE-mail: ${email}\nMensagem: ${message}`,
+      subject: `Novo Lead Capturado: ${name} (${companyLabel})`,
+      html,
     });
 
     if (error) {
+      console.error("[Resend API Error]:", error);
       return NextResponse.json({ error: true, message: error.message }, { status: 400 });
     }
 
-    return NextResponse.json({ error: false, message: "Mensagem enviada com sucesso!" });
+    return NextResponse.json({
+      error: false,
+      message: "Obrigado pela sua mensagem! Entraremos em contato o mais breve possível.",
+      id: data?.id,
+    });
   } catch (err: unknown) {
     const errorMsg = err instanceof Error ? err.message : "Erro interno no servidor.";
     return NextResponse.json({ error: true, message: errorMsg }, { status: 500 });
