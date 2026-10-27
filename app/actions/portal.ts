@@ -4,7 +4,10 @@ import { createClient } from "@/lib/supabase/server";
 import { prisma } from "@/lib/prisma";
 import { TicketCategory } from "@prisma/client";
 import { revalidatePath } from "next/cache";
-import { createInfinitePayCharge, createInfinitePayCheckoutLink } from "@/lib/payment/infinitepay";
+import { createInfinitePayCheckoutLink } from "@/lib/payment/infinitepay";
+import { createAdminClient } from "@/lib/supabase/admin";
+import { logAudit } from "@/lib/audit";
+import { getAutentiqueDocument } from "@/lib/integrations/autentique";
 
 export async function getClientDashboardData() {
   const supabase = await createClient();
@@ -38,6 +41,9 @@ export async function getClientDashboardData() {
         include: {
           attachments: true,
           project: true,
+          comments: {
+            orderBy: { createdAt: "asc" },
+          },
         },
       },
       invoices: {
@@ -81,6 +87,9 @@ export async function getClientDashboardData() {
           include: {
             attachments: true,
             project: true,
+            comments: {
+              orderBy: { createdAt: "asc" },
+            },
           },
         },
         invoices: {
@@ -132,7 +141,7 @@ export async function getClientDashboardData() {
         dueDate: new Date(Date.now() + 5 * 24 * 60 * 60 * 1000),
         totalAmount: 300.0,
         status: "PENDING",
-        pixCopyPaste: "00020126580014br.gov.bcb.pix0136danilo@mindsite.com.br5204000053039865406300.005802BR5916Mindsite Agencia6009Sao Paulo62070503***6304E8A2",
+        pixCopyPaste: "00020126580014br.gov.bcb.pix0136contato@mindsite.com.br5204000053039865406300.005802BR5916Mindsite Agencia6009Sao Paulo62070503***6304E8A2",
         userId: client.id,
         items: {
           create: [
@@ -146,8 +155,8 @@ export async function getClientDashboardData() {
       include: { items: true },
     });
 
-    client.projects = [newProject as any];
-    client.invoices = [pendingInv as any];
+    client.projects = [newProject as unknown as (typeof client.projects)[number]];
+    client.invoices = [pendingInv as unknown as (typeof client.invoices)[number]];
   }
 
   const now = new Date();
@@ -184,19 +193,19 @@ export async function getClientDashboardData() {
       planName = "Essential";
       monthlyQuota = 5;
       emailBoxes = "5 caixas de e-mail";
-      features = "5 chamados básicos mensais (SLA 24h)";
+      features = "5 e-mails, 5 chamados básicos (SLA 24h)";
       slaHoursLabel = "24h";
     } else if (val === 300) {
       planName = "Development";
-      monthlyQuota = 15;
+      monthlyQuota = 12;
       emailBoxes = "15 caixas de e-mail";
-      features = "Chamados básicos (SLA 24h) e intermediários de layout/código (SLA 72h)";
+      features = "15 e-mails, 10 chamados básicos e 2 intermediários (SLA 24h a 72h)";
       slaHoursLabel = "24h a 72h";
     } else if (val === 700) {
       planName = "Advanced";
       monthlyQuota = 30;
       emailBoxes = "30+ caixas de e-mail";
-      features = "Suporte prioritário a regras de negócio e novas rotas (SLA 7 dias)";
+      features = "30+ e-mails, 25 chamados básicos, 5 intermediários e 1 landing page inclusa (SLA 7 dias)";
       slaHoursLabel = "7 dias";
     } else {
       planName = "Personalizado";
@@ -225,21 +234,51 @@ export async function getClientDashboardData() {
     });
   });
 
+  const docId =
+    client.autentiqueDocId ||
+    client.projects.flatMap((p) => p.contracts).find((c) => c.autentiqueDocId)?.autentiqueDocId ||
+    null;
+
+  let autentiqueContract: {
+    docId: string | null;
+    name: string;
+    signed: boolean;
+    signUrl: string | null;
+    downloadUrl: string | null;
+  } | null = null;
+
+  if (docId) {
+    const autoDoc = await getAutentiqueDocument(docId);
+    autentiqueContract = {
+      docId,
+      name: autoDoc?.name || "Termo de Sustentação & Prestação de Serviços Digitais",
+      signed: autoDoc?.signed ?? false,
+      signUrl: autoDoc?.signUrl || `https://autentique.com.br/documentos/${docId}`,
+      downloadUrl: autoDoc?.downloadUrl || `https://autentique.com.br/documentos/${docId}`,
+    };
+  }
+
   return {
     client: {
       id: client.id,
       fullName: client.fullName,
       email: client.email,
+      secondaryEmail: client.secondaryEmail,
+      phone: client.phone,
+      document: client.document,
+      address: client.address,
+      avatarUrl: client.avatarUrl,
       companyName: client.companyName,
       activeProject: client.projects[0]
         ? {
-            id: client.projects[0].id,
-            name: client.projects[0].name,
-            domain: client.projects[0].domain,
-            description: client.projects[0].description,
-          }
+          id: client.projects[0].id,
+          name: client.projects[0].name,
+          domain: client.projects[0].domain,
+          description: client.projects[0].description,
+        }
         : null,
     },
+    autentiqueContract,
     sustainability: {
       planName,
       monthlyPrice,
@@ -273,22 +312,29 @@ export async function getClientDashboardData() {
         fileName: a.fileName,
         fileUrl: a.fileUrl,
       })),
+      comments: (t.comments || []).map((c) => ({
+        id: c.id,
+        message: c.message,
+        authorName: c.authorName,
+        isAdmin: c.isAdmin,
+        createdAt: c.createdAt.toISOString(),
+      })),
     })),
     activeInvoice: activeInvoice
       ? {
-          id: activeInvoice.id,
-          invoiceNumber: activeInvoice.invoiceNumber,
-          dueDate: activeInvoice.dueDate.toISOString(),
-          totalAmount: Number(activeInvoice.totalAmount),
-          pixCopyPaste: activeInvoice.pixCopyPaste,
-          pixQrCode: activeInvoice.pixQrCode,
-          gatewayInvoiceUrl: activeInvoice.gatewayInvoiceUrl,
-          items: activeInvoice.items.map((i) => ({
-            id: i.id,
-            description: i.description,
-            amount: Number(i.amount),
-          })),
-        }
+        id: activeInvoice.id,
+        invoiceNumber: activeInvoice.invoiceNumber,
+        dueDate: activeInvoice.dueDate.toISOString(),
+        totalAmount: Number(activeInvoice.totalAmount),
+        pixCopyPaste: activeInvoice.pixCopyPaste,
+        pixQrCode: activeInvoice.pixQrCode,
+        gatewayInvoiceUrl: activeInvoice.gatewayInvoiceUrl,
+        items: activeInvoice.items.map((i) => ({
+          id: i.id,
+          description: i.description,
+          amount: Number(i.amount),
+        })),
+      }
       : null,
     upcomingInstallments: client.projects.flatMap((p) =>
       p.contracts.flatMap((c) =>
@@ -341,23 +387,25 @@ export async function addTicketCommentAction(ticketId: string, comment: string) 
     return { success: false, error: "Chamado não encontrado." };
   }
 
-  const authorName = user.user_metadata?.full_name || user.email?.split("@")[0] || "Cliente";
-  const timestamp = new Date().toLocaleString("pt-BR", {
-    day: "2-digit",
-    month: "2-digit",
-    year: "numeric",
-    hour: "2-digit",
-    minute: "2-digit",
-  });
+  const isAdmin = user.app_metadata?.role === "ADMIN" || user.email === "contato@mindsite.com.br";
+  const authorName = isAdmin
+    ? "Danilo (MindSite)"
+    : user.user_metadata?.full_name || user.email?.split("@")[0] || "Cliente";
 
-  const appendedDescription = `${ticket.description.trim()}\n\n---\n💬 [${timestamp}] ${authorName}:\n${comment.trim()}`;
+  await prisma.ticketComment.create({
+    data: {
+      ticketId,
+      message: comment.trim(),
+      authorName,
+      isAdmin,
+    },
+  });
 
   await prisma.ticket.update({
     where: { id: ticketId },
     data: {
-      description: appendedDescription,
       updatedAt: new Date(),
-      status: ticket.status === "WAITING_CLIENT" ? "IN_PROGRESS" : ticket.status,
+      status: ticket.status === "WAITING_CLIENT" ? "OPEN" : ticket.status,
     },
   });
 
@@ -425,8 +473,9 @@ export async function createTicketAction(formData: {
     revalidatePath("/portal/dashboard");
     revalidatePath("/admin/dashboard");
     return { success: true, ticketId: ticket.id };
-  } catch (error: any) {
-    return { success: false, error: error.message || "Erro ao registrar chamado." };
+  } catch (error: unknown) {
+    const message = error instanceof Error ? error.message : "Erro ao registrar chamado.";
+    return { success: false, error: message };
   }
 }
 
@@ -560,5 +609,131 @@ export async function generateConsolidatedPaymentAction(payload: {
     invoiceId: createdInvoice.id,
     checkoutUrl: checkoutUrl,
     orderNsu: invoiceNumber,
+  };
+}
+
+export async function updateClientProfileAction(data: {
+  fullName?: string;
+  phone?: string;
+  address?: string;
+  secondaryEmail?: string;
+  avatarUrl?: string;
+}) {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    return { success: false, error: "Não autenticado." };
+  }
+
+  try {
+    const updated = await prisma.user.update({
+      where: { id: user.id },
+      data: {
+        ...(data.fullName !== undefined ? { fullName: data.fullName } : {}),
+        ...(data.phone !== undefined ? { phone: data.phone } : {}),
+        ...(data.address !== undefined ? { address: data.address } : {}),
+        ...(data.secondaryEmail !== undefined ? { secondaryEmail: data.secondaryEmail } : {}),
+        ...(data.avatarUrl !== undefined ? { avatarUrl: data.avatarUrl } : {}),
+      },
+    });
+
+    // Auditoria LGPD
+    await logAudit(user.id, "PROFILE_EDIT", {
+      fields: Object.keys(data),
+      timestamp: new Date().toISOString(),
+    });
+
+    revalidatePath("/portal/dashboard");
+    revalidatePath("/portal/perfil");
+    return { success: true, user: updated };
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : "Erro ao salvar perfil.";
+    console.error("Erro ao atualizar perfil:", message);
+    return { success: false, error: message };
+  }
+}
+
+export async function completeFirstLoginAction(options?: { passwordChanged?: boolean }) {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    return { success: false, error: "Não autenticado." };
+  }
+
+  try {
+    const adminClient = createAdminClient();
+    await adminClient.auth.admin.updateUserById(user.id, {
+      user_metadata: {
+        ...user.user_metadata,
+        first_login: false,
+      },
+    });
+
+    if (options?.passwordChanged) {
+      await logAudit(user.id, "PASSWORD_CHANGE", {
+        reason: "FIRST_LOGIN",
+        timestamp: new Date().toISOString(),
+      });
+    }
+
+    revalidatePath("/portal/dashboard");
+    return { success: true };
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : "Erro ao concluir primeiro login.";
+    console.error("Erro ao atualizar first_login:", message);
+    return { success: false, error: message };
+  }
+}
+
+export async function logPasswordChangeAuditAction() {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) return { success: false };
+
+  await logAudit(user.id, "PASSWORD_CHANGE", {
+    reason: "PROFILE_CHANGE",
+    timestamp: new Date().toISOString(),
+  });
+
+  return { success: true };
+}
+
+export async function getClientProfileData() {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    throw new Error("Não autenticado.");
+  }
+
+  const client = await prisma.user.findUnique({
+    where: { id: user.id },
+  });
+
+  if (!client) {
+    throw new Error("Cliente não encontrado.");
+  }
+
+  return {
+    id: client.id,
+    fullName: client.fullName || "",
+    email: client.email,
+    secondaryEmail: client.secondaryEmail || "",
+    phone: client.phone || "",
+    address: client.address || "",
+    document: client.document || "",
+    avatarUrl: client.avatarUrl || "",
+    companyName: client.companyName || "",
   };
 }

@@ -23,7 +23,7 @@ export async function createInfinitePayCheckoutLink(params: CreateCheckoutLinkPa
   const redirectUrl = params.redirectUrl || `${appUrl}/portal/dashboard?payment=success`;
   const webhookUrl = params.webhookUrl || `${appUrl}/api/webhooks/infinitepay`;
 
-  const payload: any = {
+  const payload: Record<string, unknown> = {
     handle: handle,
     order_nsu: params.orderNsu,
     items: params.items,
@@ -62,11 +62,12 @@ export async function createInfinitePayCheckoutLink(params: CreateCheckoutLinkPa
       url: data.url || data.payment_url,
       slug: data.slug || data.invoice_slug,
     };
-  } catch (error: any) {
-    console.error("Erro ao gerar link InfinitePay:", error.message);
+  } catch (error: unknown) {
+    const message = error instanceof Error ? error.message : "Erro desconhecido";
+    console.error("Erro ao gerar link InfinitePay:", message);
     return {
       success: false,
-      error: error.message,
+      error: message,
     };
   }
 }
@@ -127,7 +128,8 @@ export async function createInfinitePayCharge(params: CreateChargeParams) {
       pixQrCode: data.pix_qrcode_url || null,
       paymentUrl: data.payment_url || null,
     };
-  } catch (error: any) {
-    return { success: false, error: error.message };
+  } catch (error: unknown) {
+    const message = error instanceof Error ? error.message : "Erro desconhecido";
+    return { success: false, error: message };
   }
 }

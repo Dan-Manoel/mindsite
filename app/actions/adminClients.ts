@@ -1,15 +1,20 @@
 "use server";
 
 import { createClient } from "@/lib/supabase/server";
-import { createAdminClient } from "@/lib/supabase/admin";
+import { supabaseAdmin, createAdminClient } from "@/lib/supabase/admin";
 import { prisma } from "@/lib/prisma";
 import { ContractType, UserRole } from "@prisma/client";
 import { revalidatePath } from "next/cache";
+import { Resend } from "resend";
+import { renderWelcomeEmailHtml } from "@/lib/mail/welcomeTemplate";
+
+const resend = new Resend(process.env.RESEND_API_KEY);
 
 export interface ProjectInputDTO {
   id?: string;
   name: string;
   domain?: string;
+  description?: string;
   setupAmount: number;
   installments: Array<{
     id?: string;
@@ -30,9 +35,11 @@ export interface ClientDTO {
   document?: string;
   companyName?: string;
   address?: string;
+  autentiqueDocId?: string;
   projects: ProjectInputDTO[];
 }
 
+// 1. Criar Cliente com Rollback Seguro, Telemetria Ativa e Remetente Oficial Resend
 export async function createClientWithProjectsAction(data: ClientDTO) {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
@@ -41,30 +48,33 @@ export async function createClientWithProjectsAction(data: ClientDTO) {
     return { success: false, error: "Acesso não autorizado." };
   }
 
-  // Validação matemática rigorosa do setup vs parcelas
+  // Validação matemática do setup
   for (const proj of data.projects) {
     if (proj.setupAmount > 0) {
-      const sum = proj.installments.reduce((acc, curr) => acc + (Number(curr.amount) || 0), 0);
+      const sum = proj.installments.reduce((acc: number, curr: { amount: number | string }) => acc + (Number(curr.amount) || 0), 0);
       if (Math.abs(sum - proj.setupAmount) > 0.01) {
         return {
           success: false,
-          error: `No projeto "${proj.name}", a soma das parcelas (R$ ${sum.toFixed(2)}) não bate com o valor total (R$ ${proj.setupAmount.toFixed(2)}).`,
+          error: `No projeto "${proj.name}", a soma das parcelas (R$ ${sum.toFixed(2)}) não confere com o valor total (R$ ${proj.setupAmount.toFixed(2)}).`,
         };
       }
     }
   }
 
-  const adminClient = createAdminClient();
+  let createdAuthUserId: string | null = null;
+  const rawPassword = data.password || "MindSite@2026";
 
   try {
-    const { data: authData, error: authError } = await adminClient.auth.admin.createUser({
+    // 1. Provisão no Supabase Auth via Admin Client
+    const { data: authData, error: authError } = await supabaseAdmin.auth.admin.createUser({
       email: data.primaryEmail,
-      password: data.password || "MindSite@2026",
+      password: rawPassword,
       email_confirm: true,
       app_metadata: { role: "CLIENT" },
       user_metadata: {
         full_name: data.fullName,
         company_name: data.companyName,
+        first_login: true,
       },
     });
 
@@ -72,24 +82,341 @@ export async function createClientWithProjectsAction(data: ClientDTO) {
       return { success: false, error: authError?.message || "Erro no Supabase Auth." };
     }
 
-    const userId = authData.user.id;
+    createdAuthUserId = authData.user.id;
+    const userId = createdAuthUserId;
 
-    await prisma.$transaction(async (tx) => {
-      await tx.user.create({
-        data: {
-          id: userId,
-          email: data.primaryEmail,
-          secondaryEmail: data.secondaryEmail || null,
-          fullName: data.fullName,
-          companyName: data.companyName || null,
-          phone: data.phone || null,
-          document: data.document || null,
-          address: data.address || null,
-          role: UserRole.CLIENT,
-        },
+    // 2. Persistência atômica no banco relacional via Prisma
+    await prisma.$transaction(
+      async (tx) => {
+        // ATENÇÃO: User NÃO possui autentiqueDocId no create.
+        await tx.user.create({
+          data: {
+            id: userId,
+            email: data.primaryEmail,
+            secondaryEmail: data.secondaryEmail || null,
+            fullName: data.fullName,
+            companyName: data.companyName || null,
+            phone: data.phone || null,
+            document: data.document || null,
+            address: data.address || null,
+            role: UserRole.CLIENT,
+          },
+        });
+
+        for (const proj of data.projects) {
+          const slug = `${proj.name.toLowerCase().replace(/[^a-z0-9]+/g, "-")}-${Math.random().toString(36).substring(7)}`;
+
+          const createdProject = await tx.project.create({
+            data: {
+              name: proj.name,
+              slug: slug,
+              domain: proj.domain || null,
+              description: proj.description || null,
+              userId: userId,
+            },
+          });
+
+          if (proj.setupAmount > 0) {
+            const setupContract = await tx.contract.create({
+              data: {
+                title: `Setup & Implantação — ${proj.name}`,
+                contractType: ContractType.PROJECT_DEV,
+                totalAmount: proj.setupAmount,
+                userId: userId,
+                projectId: createdProject.id,
+                autentiqueDocId: data.autentiqueDocId?.trim() || null,
+              },
+            });
+
+            for (let i = 0; i < proj.installments.length; i++) {
+              const inst = proj.installments[i];
+              await tx.contractInstallment.create({
+                data: {
+                  installmentNumber: i + 1,
+                  amount: inst.amount,
+                  scheduledDate: new Date(inst.scheduledDate),
+                  description: inst.description || `Parcela ${i + 1}`,
+                  contractId: setupContract.id,
+                },
+              });
+            }
+          }
+
+          if (proj.sustainabilityPlan !== "NONE") {
+            let planPrice = 100;
+            let planTitle = "Plano Essential";
+
+            if (proj.sustainabilityPlan === "DEVELOPMENT") {
+              planPrice = 300;
+              planTitle = "Plano Development";
+            } else if (proj.sustainabilityPlan === "ADVANCED") {
+              planPrice = 700;
+              planTitle = "Plano Advanced";
+            }
+
+            await tx.contract.create({
+              data: {
+                title: `Sustentação Mensal — ${planTitle} (${proj.name})`,
+                contractType: ContractType.SUSTAINABILITY,
+                totalAmount: planPrice,
+                startDate: proj.sustainabilityStartDate ? new Date(proj.sustainabilityStartDate) : new Date(),
+                userId: userId,
+                projectId: createdProject.id,
+                autentiqueDocId: data.autentiqueDocId?.trim() || null,
+              },
+            });
+          }
+        }
+      },
+      { timeout: 15000 }
+    );
+
+    // 3. Disparo do E-mail de Boas-Vindas via Resend com Telemetria Ativa
+    try {
+      const primaryProject = data.projects[0];
+      const planName = primaryProject?.sustainabilityPlan || "Essential";
+      const appUrl = process.env.NEXT_PUBLIC_APP_URL || "https://mindsite.com.br";
+
+      const benefits = [
+        "Acesso à Área do Cliente para abertura e triagem de chamados",
+        "Visualização de faturas e pagamentos com liquidação imediata",
+        "Acompanhamento de SLAs contratuais em tempo real",
+      ];
+
+      const htmlContent = renderWelcomeEmailHtml({
+        clientName: data.fullName,
+        loginUrl: `${appUrl}/login`,
+        userEmail: data.primaryEmail,
+        temporaryPassword: rawPassword,
+        projectName: primaryProject?.name || "Ambiente Digital",
+        planName: planName,
+        planBenefits: benefits,
       });
 
-      for (const proj of data.projects) {
+      console.log(`[Resend Dispatch] Enviando boas-vindas para: ${data.primaryEmail}...`);
+
+      const emailResult = await resend.emails.send({
+        from: "MindSite <contato@mindsite.com.br>",
+        to: data.primaryEmail,
+        subject: "Bem-vindo à MindSite — Acesso ao Portal & Projeto",
+        html: htmlContent,
+      });
+
+      if (emailResult.error) {
+        console.error("❌ [Resend Error]:", JSON.stringify(emailResult.error, null, 2));
+      } else {
+        console.log("✅ [Resend Success] E-mail despachado! ID:", emailResult.data?.id);
+      }
+    } catch (mailError: unknown) {
+      const message = mailError instanceof Error ? mailError.message : "Erro desconhecido";
+      console.error("❌ [Resend Exception]:", message);
+    }
+
+    revalidatePath("/admin/dashboard");
+    revalidatePath("/admin/clients");
+    return { success: true, userId };
+  } catch (err: unknown) {
+    if (createdAuthUserId) {
+      await supabaseAdmin.auth.admin.deleteUser(createdAuthUserId).catch(() => {});
+    }
+    const message = err instanceof Error ? err.message : "Erro ao cadastrar cliente";
+    return { success: false, error: message };
+  }
+}
+
+// 2. Buscar Lista com Serialização Limpa (Sem classes Decimal)
+export async function getClientsListAction(query?: string) {
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+
+  if (!user || user.app_metadata?.role !== "ADMIN") {
+    throw new Error("Acesso não autorizado.");
+  }
+
+  const rawClients = await prisma.user.findMany({
+    where: {
+      role: UserRole.CLIENT,
+      ...(query
+        ? {
+            OR: [
+              { fullName: { contains: query, mode: "insensitive" } },
+              { companyName: { contains: query, mode: "insensitive" } },
+              { email: { contains: query, mode: "insensitive" } },
+              { document: { contains: query, mode: "insensitive" } },
+              { projects: { some: { name: { contains: query, mode: "insensitive" } } } },
+            ],
+          }
+        : {}),
+    },
+    include: {
+      projects: {
+        include: {
+          contracts: {
+            include: {
+              installments: { orderBy: { scheduledDate: "asc" } },
+            },
+          },
+        },
+      },
+      invoices: {
+        where: { status: { in: ["PENDING", "OVERDUE"] } },
+      },
+    },
+    orderBy: { createdAt: "desc" },
+  });
+
+  // Mapeia todas as instâncias de Decimal explicitamente para Number
+  return rawClients.map((c) => ({
+    id: c.id,
+    fullName: c.fullName,
+    companyName: c.companyName,
+    email: c.email,
+    secondaryEmail: c.secondaryEmail,
+    phone: c.phone,
+    document: c.document,
+    address: c.address,
+    projects: c.projects.map((p) => ({
+      id: p.id,
+      name: p.name,
+      domain: p.domain,
+      description: p.description,
+      contracts: p.contracts.map((con) => ({
+        id: con.id,
+        title: con.title,
+        contractType: con.contractType,
+        status: con.status,
+        totalAmount: Number(con.totalAmount),
+        paidAmount: Number(con.paidAmount),
+        autentiqueDocId: con.autentiqueDocId,
+        installments: con.installments.map((ins) => ({
+          id: ins.id,
+          installmentNumber: ins.installmentNumber,
+          amount: Number(ins.amount),
+          scheduledDate: ins.scheduledDate.toISOString(),
+          status: ins.status,
+          description: ins.description,
+        })),
+      })),
+    })),
+    pendingInvoicesCount: c.invoices.length,
+  }));
+}
+
+// 3. Buscar Cliente Único Serializado (Sem classes Decimal)
+export async function getClientByIdAction(clientId: string) {
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+
+  if (!user || user.app_metadata?.role !== "ADMIN") {
+    throw new Error("Acesso não autorizado.");
+  }
+
+  const c = await prisma.user.findUnique({
+    where: { id: clientId },
+    include: {
+      projects: {
+        include: {
+          contracts: {
+            include: {
+              installments: {
+                orderBy: { scheduledDate: "asc" },
+              },
+            },
+          },
+        },
+      },
+    },
+  });
+
+  if (!c) return null;
+
+  return {
+    id: c.id,
+    fullName: c.fullName,
+    companyName: c.companyName,
+    email: c.email,
+    secondaryEmail: c.secondaryEmail,
+    phone: c.phone,
+    document: c.document,
+    address: c.address,
+    autentiqueDocId: c.projects[0]?.contracts.find((con) => con.autentiqueDocId)?.autentiqueDocId || "",
+    projects: c.projects.map((p) => ({
+      id: p.id,
+      name: p.name,
+      domain: p.domain,
+      description: p.description,
+      contracts: p.contracts.map((con) => ({
+        id: con.id,
+        title: con.title,
+        contractType: con.contractType,
+        status: con.status,
+        totalAmount: Number(con.totalAmount),
+        paidAmount: Number(con.paidAmount),
+        autentiqueDocId: con.autentiqueDocId,
+        installments: con.installments.map((ins) => ({
+          id: ins.id,
+          installmentNumber: ins.installmentNumber,
+          amount: Number(ins.amount),
+          scheduledDate: ins.scheduledDate.toISOString(),
+          status: ins.status,
+          description: ins.description,
+        })),
+      })),
+    })),
+  };
+}
+
+// 4. Atualizar Dados Cadastrais com Mapeamento Fidedigno
+export async function updateClientAction(clientId: string, data: Partial<ClientDTO>) {
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+
+  if (!user || user.app_metadata?.role !== "ADMIN") {
+    return { success: false, error: "Acesso não autorizado." };
+  }
+
+  try {
+    await prisma.user.update({
+      where: { id: clientId },
+      data: {
+        fullName: data.fullName,
+        companyName: data.companyName,
+        secondaryEmail: data.secondaryEmail || null,
+        phone: data.phone || null,
+        document: data.document || null,
+        address: data.address || null,
+      },
+    });
+
+    if (data.autentiqueDocId?.trim()) {
+      await prisma.contract.updateMany({
+        where: { userId: clientId },
+        data: { autentiqueDocId: data.autentiqueDocId.trim() },
+      });
+    }
+
+    revalidatePath("/admin/dashboard");
+    revalidatePath("/admin/clients");
+    revalidatePath(`/admin/clients/${clientId}/edit`);
+    return { success: true };
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : "Erro desconhecido";
+    return { success: false, error: message };
+  }
+}
+
+// 5. Adicionar Novo Projeto a Cliente Existente
+export async function addProjectToClientAction(clientId: string, proj: ProjectInputDTO) {
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+
+  if (!user || user.app_metadata?.role !== "ADMIN") {
+    return { success: false, error: "Acesso não autorizado." };
+  }
+
+  try {
+    await prisma.$transaction(
+      async (tx) => {
         const slug = `${proj.name.toLowerCase().replace(/[^a-z0-9]+/g, "-")}-${Math.random().toString(36).substring(7)}`;
 
         const createdProject = await tx.project.create({
@@ -97,7 +424,8 @@ export async function createClientWithProjectsAction(data: ClientDTO) {
             name: proj.name,
             slug: slug,
             domain: proj.domain || null,
-            userId: userId,
+            description: proj.description || null,
+            userId: clientId,
           },
         });
 
@@ -107,7 +435,7 @@ export async function createClientWithProjectsAction(data: ClientDTO) {
               title: `Setup & Implantação — ${proj.name}`,
               contractType: ContractType.PROJECT_DEV,
               totalAmount: proj.setupAmount,
-              userId: userId,
+              userId: clientId,
               projectId: createdProject.id,
             },
           });
@@ -144,175 +472,35 @@ export async function createClientWithProjectsAction(data: ClientDTO) {
               contractType: ContractType.SUSTAINABILITY,
               totalAmount: planPrice,
               startDate: proj.sustainabilityStartDate ? new Date(proj.sustainabilityStartDate) : new Date(),
-              userId: userId,
+              userId: clientId,
               projectId: createdProject.id,
             },
           });
         }
-      }
-    });
-
-    revalidatePath("/admin/dashboard");
-    revalidatePath("/admin/clients");
-    return { success: true, userId };
-  } catch (err: any) {
-    await adminClient.auth.admin.deleteUser(data.primaryEmail).catch(() => {});
-    return { success: false, error: err.message };
-  }
-}
-
-export async function getClientsListAction(query?: string) {
-  const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
-
-  if (!user || user.app_metadata?.role !== "ADMIN") {
-    throw new Error("Acesso não autorizado.");
-  }
-
-  return await prisma.user.findMany({
-    where: {
-      role: UserRole.CLIENT,
-      ...(query
-        ? {
-            OR: [
-              { fullName: { contains: query, mode: "insensitive" } },
-              { companyName: { contains: query, mode: "insensitive" } },
-              { email: { contains: query, mode: "insensitive" } },
-              { document: { contains: query, mode: "insensitive" } },
-              { projects: { some: { name: { contains: query, mode: "insensitive" } } } },
-            ],
-          }
-        : {}),
-    },
-    include: {
-      projects: {
-        include: {
-          contracts: {
-            include: {
-              installments: true,
-            },
-          },
-        },
       },
-    },
-    orderBy: { createdAt: "desc" },
-  });
-}
+      { timeout: 15000 }
+    );
 
-export async function getClientByIdAction(clientId: string) {
-  const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
-
-  if (!user || user.app_metadata?.role !== "ADMIN") {
-    throw new Error("Acesso não autorizado.");
-  }
-
-  const client = await prisma.user.findUnique({
-    where: { id: clientId },
-    include: {
-      projects: {
-        include: {
-          contracts: {
-            include: {
-              installments: {
-                orderBy: { scheduledDate: "asc" },
-              },
-            },
-          },
-        },
-      },
-    },
-  });
-
-  if (!client) return null;
-
-  return {
-    ...client,
-    projects: client.projects.map((proj) => ({
-      ...proj,
-      contracts: proj.contracts.map((cont) => ({
-        ...cont,
-        totalAmount: Number(cont.totalAmount),
-        paidAmount: Number(cont.paidAmount),
-        startDate: cont.startDate.toISOString(),
-        endDate: cont.endDate ? cont.endDate.toISOString() : null,
-        createdAt: cont.createdAt.toISOString(),
-        updatedAt: cont.updatedAt.toISOString(),
-        installments: cont.installments.map((inst) => ({
-          ...inst,
-          amount: Number(inst.amount),
-          scheduledDate: inst.scheduledDate.toISOString(),
-          createdAt: inst.createdAt.toISOString(),
-          updatedAt: inst.updatedAt.toISOString(),
-        })),
-      })),
-    })),
-  };
-}
-
-export async function updateClientAction(clientId: string, data: Partial<ClientDTO>) {
-  const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
-
-  if (!user || user.app_metadata?.role !== "ADMIN") {
-    return { success: false, error: "Acesso não autorizado." };
-  }
-
-  try {
-    await prisma.user.update({
-      where: { id: clientId },
-      data: {
-        fullName: data.fullName,
-        companyName: data.companyName,
-        secondaryEmail: data.secondaryEmail,
-        phone: data.phone,
-        document: data.document,
-        address: data.address,
-      },
-    });
-
-    revalidatePath("/admin/dashboard");
-    revalidatePath("/admin/clients");
     revalidatePath(`/admin/clients/${clientId}/edit`);
+    revalidatePath("/admin/clients");
     return { success: true };
-  } catch (err: any) {
-    return { success: false, error: err.message };
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : "Erro desconhecido";
+    return { success: false, error: message };
   }
 }
 
-export async function resetClientPasswordAction(userId: string, newPassword: string) {
-  const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
-
-  if (!user || user.app_metadata?.role !== "ADMIN") {
-    return { success: false, error: "Acesso não autorizado." };
-  }
-
-  if (!newPassword || newPassword.length < 6) {
-    return { success: false, error: "A senha deve ter no mínimo 6 caracteres." };
-  }
-
-  const adminClient = createAdminClient();
-  const { error } = await adminClient.auth.admin.updateUserById(userId, {
-    password: newPassword,
-  });
-
-  if (error) return { success: false, error: error.message };
-  return { success: true, message: "Senha redefinida com sucesso!" };
-}
-
+// 6. Baixa Manual de Parcela
 export async function settleInstallmentManuallyAction(installmentId: string) {
   const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const { data: { user } } = await supabase.auth.getUser();
 
   if (!user) {
     return { success: false, error: "Não autenticado." };
   }
 
   const role = user.app_metadata?.role || user.user_metadata?.role;
-  const isDanilo = user.email === "danilo@mindsite.com.br";
+  const isDanilo = user.email === "contato@mindsite.com.br";
 
   if (!isDanilo && role !== "ADMIN") {
     const dbUser = await prisma.user.findUnique({ where: { id: user.id } });
@@ -332,12 +520,10 @@ export async function settleInstallmentManuallyAction(installmentId: string) {
     }
 
     await prisma.$transaction([
-      // 1. Marca a parcela como PAGA
       prisma.contractInstallment.update({
         where: { id: installmentId },
         data: { status: "PAID" },
       }),
-      // 2. Incrementa o montante pago no contrato correspondente
       prisma.contract.update({
         where: { id: installment.contractId },
         data: { paidAmount: { increment: installment.amount } },
@@ -347,70 +533,19 @@ export async function settleInstallmentManuallyAction(installmentId: string) {
     revalidatePath("/admin/dashboard");
     revalidatePath("/admin/clients");
     return { success: true, message: "Parcela baixada com sucesso!" };
-  } catch (err: any) {
-    return { success: false, error: err.message };
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : "Erro desconhecido";
+    return { success: false, error: message };
   }
 }
 
-export async function addProjectToClientAction(
-  clientId: string,
-  data: { name: string; domain?: string; description?: string }
-) {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  if (!user || user.app_metadata?.role !== "ADMIN") {
-    return { success: false, error: "Acesso não autorizado." };
-  }
-
-  if (!data.name?.trim()) {
-    return { success: false, error: "Nome do projeto é obrigatório." };
-  }
-
-  try {
-    const slug = `${data.name
-      .toLowerCase()
-      .replace(/[^a-z0-9]/g, "-")}-${Date.now().toString().slice(-4)}`;
-
-    const project = await prisma.project.create({
-      data: {
-        name: data.name.trim(),
-        domain: data.domain?.trim() || null,
-        description: data.description?.trim() || null,
-        slug,
-        userId: clientId,
-        contracts: {
-          create: {
-            title: `Implantação ${data.name.trim()}`,
-            contractType: "PROJECT_DEV",
-            totalAmount: 0.0,
-            paidAmount: 0.0,
-            userId: clientId,
-          },
-        },
-      },
-      include: { contracts: true },
-    });
-
-    revalidatePath("/admin/clients");
-    revalidatePath(`/admin/clients/${clientId}/edit`);
-    revalidatePath("/admin/dashboard");
-    return { success: true, project };
-  } catch (err: any) {
-    return { success: false, error: err.message };
-  }
-}
-
+// 7. Adicionar Parcela Avulsa a Contrato Existente
 export async function addInstallmentToContractAction(
   contractId: string,
   data: { amount: number; scheduledDate: string; description?: string }
 ) {
   const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const { data: { user } } = await supabase.auth.getUser();
 
   if (!user || user.app_metadata?.role !== "ADMIN") {
     return { success: false, error: "Acesso não autorizado." };
@@ -458,7 +593,30 @@ export async function addInstallmentToContractAction(
     revalidatePath(`/admin/clients/${contract.userId}/edit`);
     revalidatePath("/admin/dashboard");
     return { success: true, message: "Parcela adicionada com sucesso!" };
-  } catch (err: any) {
-    return { success: false, error: err.message };
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : "Erro desconhecido";
+    return { success: false, error: message };
   }
+}
+
+// 8. Redefinir Senha do Cliente pelo Dono
+export async function resetClientPasswordAction(userId: string, newPassword: string) {
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+
+  if (!user || user.app_metadata?.role !== "ADMIN") {
+    return { success: false, error: "Acesso não autorizado." };
+  }
+
+  if (!newPassword || newPassword.length < 6) {
+    return { success: false, error: "A senha deve ter no mínimo 6 caracteres." };
+  }
+
+  const adminClient = createAdminClient();
+  const { error } = await adminClient.auth.admin.updateUserById(userId, {
+    password: newPassword,
+  });
+
+  if (error) return { success: false, error: error.message };
+  return { success: true, message: "Senha redefinida com sucesso!" };
 }

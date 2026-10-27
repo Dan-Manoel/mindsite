@@ -6,7 +6,6 @@ import {
   CommonScrollAnimated,
   CommonScrollAnimatedLink,
 } from "@/components/animations/CommonScrollAnimated";
-import TextScramble from "@/components/animations/TextScramble";
 export default function Footer2({ name = "MINDSITE" }: { name?: string }) {
   return (
     <BlurSection as="footer" className="mxd-footer">
@@ -115,11 +114,11 @@ export default function Footer2({ name = "MINDSITE" }: { name?: string }) {
                               <li>
                                 <CommonScrollAnimated
                                   className="anim-uni-slide-down"
-                                  href="mailto:ola@mindsite.com.br?subject=Message%20from%20your%20site"
+                                  href="mailto:contato@mindsite.com.br?subject=Message%20from%20your%20site"
                                   as="a"
                                   animation="slideDownLine"
                                 >
-                                  <span>ola@mindsite.com.br</span>
+                                  <span>contato@mindsite.com.br</span>
                                 </CommonScrollAnimated>
                               </li>
                               <li>

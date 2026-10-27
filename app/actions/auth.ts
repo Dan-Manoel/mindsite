@@ -3,6 +3,7 @@
 import { createClient } from "@/lib/supabase/server";
 import { prisma } from "@/lib/prisma";
 import { redirect } from "next/navigation";
+import { UserRole } from "@prisma/client";
 
 export async function signInWithEmail(formData: FormData) {
   const email = formData.get("email") as string;
@@ -26,7 +27,7 @@ export async function signInWithEmail(formData: FormData) {
 
   if (data.user) {
     // Sincroniza usuário na tabela relacional Prisma (Postgres)
-    const role = (data.user.app_metadata?.role as any) || "CLIENT";
+    const role = (data.user.app_metadata?.role as UserRole) || UserRole.CLIENT;
     
     await prisma.user.upsert({
       where: { id: data.user.id },

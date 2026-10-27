@@ -24,7 +24,7 @@ export async function POST(req: Request) {
       );
     }
 
-    const recipient = process.env.CONTACT_RECIPIENT_EMAIL || "ola@mindsite.com.br";
+    const recipient = process.env.CONTACT_RECIPIENT_EMAIL || "contato@mindsite.com.br";
 
     const { error } = await resend.emails.send({
       from: "MindSite Leads <contato@mindsite.com.br>",

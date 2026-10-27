@@ -16,6 +16,7 @@ import {
   settleExpenseAction,
   updateTicketStatusAction,
   issueImmediateInvoiceAction,
+  addTicketCommentAction,
 } from "@/app/actions/admin";
 import { resetClientPasswordAction } from "@/app/actions/adminClients";
 import { signOut } from "@/app/actions/auth";
@@ -38,6 +39,19 @@ interface AdminDataProps {
       companyName: string;
       projectName: string;
       sustainabilityPlan: string;
+      sustainabilityDetails?: {
+        contractId: string;
+        planName: string;
+        monthlyAmount: number;
+      } | null;
+      pendingInstallments?: Array<{
+        id: string;
+        installmentNumber: number;
+        description: string;
+        amount: number;
+        scheduledDate: string;
+        projectName: string;
+      }>;
       setupTotal: number;
       setupPaid: number;
       setupDue: number;
@@ -89,6 +103,13 @@ interface AdminDataProps {
       fileName: string;
       fileUrl: string;
     }>;
+    comments?: Array<{
+      id: string;
+      message: string;
+      authorName: string;
+      isAdmin: boolean;
+      createdAt: string;
+    }>;
   }>;
   stats: {
     openTickets: number;
@@ -108,13 +129,13 @@ export default function AdminDashboardView({ initialData }: { initialData: Admin
   const [isExpenseModalOpen, setIsExpenseModalOpen] = useState(false);
   const [expenseName, setExpenseName] = useState("");
   const [expenseCategory, setExpenseCategory] = useState<ExpenseCategory>("INFRASTRUCTURE");
-  const [expenseFrequency, setExpenseFrequency] = useState<ExpenseFrequency>("RECURRENT_MONTHLY");
+  const expenseFrequency: ExpenseFrequency = "RECURRENT_MONTHLY";
   const [expenseCurrency, setExpenseCurrency] = useState<Currency>("BRL");
   const [expenseEstimated, setExpenseEstimated] = useState("");
   const [expenseActual, setExpenseActual] = useState("");
   const [expenseExchangeRate, setExpenseExchangeRate] = useState("5.85");
   const [expenseDueDate, setExpenseDueDate] = useState(new Date().toISOString().split("T")[0]);
-  const [expenseIsPaid, setExpenseIsPaid] = useState(false);
+  const expenseIsPaid = false;
   const [expenseNotes, setExpenseNotes] = useState("");
 
   const [settlingExpenseId, setSettlingExpenseId] = useState<string | null>(null);
@@ -123,15 +144,18 @@ export default function AdminDashboardView({ initialData }: { initialData: Admin
 
   // Estados locais com suporte a atualização otimista (Zero delay)
   const [tickets, setTickets] = useState(data.tickets);
-  const [expenses, setExpenses] = useState(data.expenses);
-  const [monthlyExpenses, setMonthlyExpenses] = useState(data.finance.monthlyExpenses);
 
-  // Modal Emissão Fatura Imediata
+  // Modal Emissão Fatura Contextual por Cliente
   const [isInvoiceModalOpen, setIsInvoiceModalOpen] = useState(false);
-  const [invUserId, setInvUserId] = useState(data.finance.clientBalances[0]?.userId || "");
-  const [invDescription, setInvDescription] = useState("");
-  const [invAmount, setInvAmount] = useState("");
-  const [invDueDays, setInvDueDays] = useState("3");
+  const [selectedClientForInvoice, setSelectedClientForInvoice] = useState<AdminDataProps["finance"]["clientBalances"][0] | null>(null);
+  const [includeSustainability, setIncludeSustainability] = useState(true);
+  const [selectedInstallmentIds, setSelectedInstallmentIds] = useState<string[]>([]);
+  const [extraDescription, setExtraDescription] = useState("");
+  const [extraAmount, setExtraAmount] = useState("");
+  const [invDueDateOption, setInvDueDateOption] = useState<"TODAY" | "24H" | "3D" | "5D">("3D");
+
+  // Thread de Comentários nos Chamados
+  const [ticketCommentInputs, setTicketCommentInputs] = useState<{ [ticketId: string]: string }>({});
 
   const [resetClient, setResetClient] = useState<{ id: string; name: string; email: string } | null>(null);
   const [newPassword, setNewPassword] = useState("");
@@ -191,19 +215,6 @@ export default function AdminDashboardView({ initialData }: { initialData: Admin
 
   const handleSettleExpense = (expenseId: string) => {
     const actualVal = parseFloat(settleActualAmount) || 0;
-
-    // Atualização otimista imediata na UI
-    setExpenses((prev) =>
-      prev.map((e) =>
-        e.id === expenseId
-          ? { ...e, isPaid: true, actualAmountPaid: actualVal || e.estimatedAmount, paymentDate: new Date().toISOString() }
-          : e
-      )
-    );
-    setMonthlyExpenses((prev) => ({
-      ...prev,
-      paid: prev.paid + (actualVal || 0),
-    }));
     setSettlingExpenseId(null);
     showNotification("Despesa liquidada!");
 
@@ -215,8 +226,6 @@ export default function AdminDashboardView({ initialData }: { initialData: Admin
       );
 
       if (!res.success) {
-        setExpenses(data.expenses);
-        setMonthlyExpenses(data.finance.monthlyExpenses);
         showNotification(res.error || "Erro ao liquidar despesa.", "error");
       } else {
         router.refresh();
@@ -254,29 +263,106 @@ export default function AdminDashboardView({ initialData }: { initialData: Admin
     });
   };
 
+  const openInvoiceModalForClient = (client: AdminDataProps["finance"]["clientBalances"][0]) => {
+    setSelectedClientForInvoice(client);
+    setIncludeSustainability(!!client.sustainabilityDetails);
+    setSelectedInstallmentIds(client.pendingInstallments?.map((i) => i.id) || []);
+    setExtraDescription("");
+    setExtraAmount("");
+    setInvDueDateOption("3D");
+    setIsInvoiceModalOpen(true);
+  };
+
   const handleIssueImmediateInvoice = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!invUserId || !invAmount || !invDescription) {
-      alert("Preencha todos os campos da fatura.");
+    if (!selectedClientForInvoice) {
+      alert("Nenhum cliente selecionado.");
+      return;
+    }
+
+    const items: Array<{ description: string; amount: number; installmentId?: string }> = [];
+
+    if (includeSustainability && selectedClientForInvoice.sustainabilityDetails) {
+      items.push({
+        description: `Sustentação Mensal - ${selectedClientForInvoice.sustainabilityDetails.planName}`,
+        amount: selectedClientForInvoice.sustainabilityDetails.monthlyAmount,
+      });
+    }
+
+    if (selectedClientForInvoice.pendingInstallments) {
+      for (const inst of selectedClientForInvoice.pendingInstallments) {
+        if (selectedInstallmentIds.includes(inst.id)) {
+          items.push({
+            description: `${inst.description} (${inst.projectName})`,
+            amount: inst.amount,
+            installmentId: inst.id,
+          });
+        }
+      }
+    }
+
+    const extraVal = parseFloat(extraAmount) || 0;
+    if (extraVal > 0 && extraDescription.trim()) {
+      items.push({
+        description: extraDescription.trim(),
+        amount: extraVal,
+      });
+    }
+
+    if (items.length === 0) {
+      alert("Selecione ao menos um item de cobrança para emitir a fatura.");
       return;
     }
 
     startTransition(async () => {
       const res = await issueImmediateInvoiceAction({
-        userId: invUserId,
-        description: invDescription,
-        amount: parseFloat(invAmount) || 0,
-        dueDateDays: parseInt(invDueDays) || 3,
+        userId: selectedClientForInvoice.userId,
+        items,
+        dueDateOption: invDueDateOption,
       });
 
       if (res.success) {
         setIsInvoiceModalOpen(false);
-        setInvDescription("");
-        setInvAmount("");
+        setSelectedClientForInvoice(null);
         showNotification(res.message || "Fatura emitida e enviada com sucesso!");
         router.refresh();
       } else {
         showNotification(res.error || "Falha ao emitir fatura.", "error");
+      }
+    });
+  };
+
+  const handleAdminComment = (ticketId: string) => {
+    const text = ticketCommentInputs[ticketId]?.trim();
+    if (!text) return;
+
+    startTransition(async () => {
+      const res = await addTicketCommentAction(ticketId, text);
+      if (res.success && res.comment) {
+        setTickets((prev) =>
+          prev.map((t) =>
+            t.id === ticketId
+              ? {
+                  ...t,
+                  status: TicketStatus.IN_PROGRESS,
+                  comments: [
+                    ...(t.comments || []),
+                    {
+                      id: res.comment.id,
+                      message: res.comment.message,
+                      authorName: res.comment.authorName,
+                      isAdmin: res.comment.isAdmin,
+                      createdAt: new Date().toISOString(),
+                    },
+                  ],
+                }
+              : t
+          )
+        );
+        setTicketCommentInputs((prev) => ({ ...prev, [ticketId]: "" }));
+        showNotification("Resposta enviada ao chamado!");
+      } else {
+        showNotification(res.error || "Erro ao responder chamado.", "error");
       }
     });
   };
@@ -309,70 +395,47 @@ export default function AdminDashboardView({ initialData }: { initialData: Admin
 
         {/* Header do Painel */}
         <div className="mxd-block" style={{ paddingTop: "4rem", paddingBottom: "3rem", borderBottom: "1px solid var(--st-medium)", marginBottom: "4rem" }}>
-          <div style={{ display: "flex", flexWrap: "wrap", justifyContent: "space-between", alignItems: "flex-end", gap: "2rem" }}>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end", flexWrap: "wrap", gap: "2rem", width: "100%" }}>
             <div>
-              <h1 style={{ fontSize: "clamp(2.6rem, 3.5vw, 4.2rem)", fontWeight: 700, lineHeight: 1.1, color: "var(--t-bright)", margin: 0, fontFamily: "var(--_font-default)" }}>
+              <span className="tag tag-s tag-medium" style={{ color: "var(--accent)", letterSpacing: "0.1rem", display: "inline-block", marginBottom: "0.5rem" }}>
+                MindSite Agência Digital — Painel Executivo
+              </span>
+              <h1 style={{ fontSize: "clamp(2.6rem, 3.5vw, 4.2rem)", fontWeight: 700, margin: 0, color: "var(--t-bright)" }}>
                 Gestão MindSite
               </h1>
-              <p style={{ color: "var(--t-medium)", fontSize: "1.4rem", marginTop: "0.8rem", margin: 0, fontFamily: "var(--_font-default)" }}>
-                Visão consolidada de MRR, projeção futura de contratos, despesas em USD/BRL e triagem de chamados.
+              <p style={{ color: "var(--t-medium)", fontSize: "1.4rem", margin: "0.5rem 0 0 0" }}>
+                Visão consolidada
               </p>
             </div>
 
-            <div style={{ display: "flex", alignItems: "center", gap: "1.5rem", marginLeft: "auto", justifyContent: "flex-end", flexWrap: "wrap" }}>
-              <button
-                type="button"
-                onClick={() => setIsInvoiceModalOpen(true)}
-                className="btn btn-default-icon btn-default-accent slide-right"
-                style={{ height: "4.4rem", padding: "0.4rem 0.4rem 0.4rem 1.6rem", fontSize: "1.4rem" }}
-              >
-                <span className="btn-caption" style={{ fontFamily: "var(--_font-accent)", fontWeight: 700 }}>⚡ Emitir Fatura</span>
-                <i className="btn-icon" style={{ width: "3.4rem", height: "3.4rem" }}>
-                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 18 18" width="14" height="14" fill="currentColor">
-                    <path d="M8,1h2v16H8V1z M1,8h16v2H1V8z" />
-                  </svg>
-                </i>
-              </button>
-
+            {/* Botões alinhados perfeitamente à direita */}
+            <div style={{ display: "flex", alignItems: "center", gap: "1.2rem", marginLeft: "auto" }}>
               <button
                 type="button"
                 onClick={() => setIsExpenseModalOpen(true)}
                 className="btn btn-default-icon btn-default-outline slide-right"
-                style={{ height: "4.4rem", padding: "0.4rem 0.4rem 0.4rem 1.6rem", fontSize: "1.4rem" }}
+                style={{ height: "4.4rem", padding: "0.4rem 0.4rem 0.4rem 1.6rem", fontSize: "1.3rem" }}
               >
-                <span className="btn-caption" style={{ fontFamily: "var(--_font-accent)" }}>Lançar Despesa</span>
-                <i className="btn-icon" style={{ width: "3.4rem", height: "3.4rem" }}>
-                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 18 18" width="14" height="14" fill="currentColor">
-                    <path d="M8,1h2v16H8V1z M1,8h16v2H1V8z" />
-                  </svg>
-                </i>
+                <span className="btn-caption">Lançar Despesa</span>
+                <i className="btn-icon" style={{ width: "3.4rem", height: "3.4rem" }}>+</i>
               </button>
 
               <Link
                 href="/admin/clients/new"
-                className="btn btn-default-icon btn-default-outline slide-right"
-                style={{ height: "4.4rem", padding: "0.4rem 0.4rem 0.4rem 1.6rem", fontSize: "1.4rem" }}
+                className="btn btn-default-icon btn-default-accent slide-right"
+                style={{ height: "4.4rem", padding: "0.4rem 0.4rem 0.4rem 1.6rem", fontSize: "1.3rem" }}
               >
-                <span className="btn-caption" style={{ fontFamily: "var(--_font-accent)" }}>+ Novo Cliente</span>
-                <i className="btn-icon" style={{ width: "3.4rem", height: "3.4rem" }}>
-                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 18 18" width="14" height="14" fill="currentColor">
-                    <path d="M8,1h2v16H8V1z M1,8h16v2H1V8z" />
-                  </svg>
-                </i>
+                <span className="btn-caption">+ Novo Cliente</span>
+                <i className="btn-icon" style={{ width: "3.4rem", height: "3.4rem" }}>+</i>
               </Link>
 
               <form action={signOut}>
                 <button
                   type="submit"
                   className="btn btn-line-icon btn-line-icon-small btn-line-medium slide-left"
-                  title="Sair do Painel"
+                  style={{ height: "4.4rem", padding: "0 1.6rem", fontSize: "1.3rem" }}
                 >
-                  <span className="btn-caption" style={{ fontSize: "1.3rem" }}>Sair</span>
-                  <i>
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" width="14" height="14" fill="currentColor">
-                      <path d="M120,216a8,8,0,0,1-8,8H48a16,16,0,0,1-16-16V48A16,16,0,0,1,48,32h64a8,8,0,0,1,0,16H48V208h64A8,8,0,0,1,120,216Zm109.66-93.66-40-40a8,8,0,0,0-11.32,11.32L204.69,120H112a8,8,0,0,0,0,16h92.69l-26.35,26.34a8,8,0,0,0,11.32,11.32l40-40A8,8,0,0,0,229.66,122.34Z" />
-                    </svg>
-                  </i>
+                  <span className="btn-caption">Sair [→</span>
                 </button>
               </form>
             </div>
@@ -447,16 +510,16 @@ export default function AdminDashboardView({ initialData }: { initialData: Admin
   <div className="mxd-block" style={{ borderBottom: "1px solid var(--st-medium)", marginBottom: "4rem" }}>
     <div style={{ display: "flex", gap: "3rem", overflowX: "auto" }}>
       {[
-        { key: "FINANCE", label: "Fluxo de Caixa & Projeção" },
-        { key: "TICKETS", label: `Triagem de Chamados (${data.tickets.length})` },
-        { key: "EXPENSES", label: `Despesas Operacionais (${data.expenses.length})` },
-        { key: "CLIENTS", label: `Saldos por Cliente (${data.finance.clientBalances.length})` },
+        { key: "FINANCE" as const, label: "Fluxo de Caixa & Projeção" },
+        { key: "TICKETS" as const, label: `Triagem de Chamados (${data.tickets.length})` },
+        { key: "EXPENSES" as const, label: `Despesas Operacionais (${data.expenses.length})` },
+        { key: "CLIENTS" as const, label: `Saldos por Cliente (${data.finance.clientBalances.length})` },
       ].map((tab) => {
         const isActive = activeTab === tab.key;
         return (
           <button
             key={tab.key}
-            onClick={() => setActiveTab(tab.key as any)}
+            onClick={() => setActiveTab(tab.key)}
             style={{
               backgroundColor: "transparent",
               border: "none",
@@ -526,8 +589,11 @@ export default function AdminDashboardView({ initialData }: { initialData: Admin
                 Controle de Setup em Aberto (sem misturar com sustentação fixa) e alerta automático de inadimplência.
               </p>
             </div>
-            <Link className="btn btn-line-icon btn-line-icon-small btn-line-medium slide-right" href="/admin/clients">
-              <span className="btn-caption" style={{ fontSize: "1.2rem" }}>Gerenciar Todos os Clientes</span>
+            <Link
+              href="/admin/clients"
+              style={{ color: "var(--accent)", fontWeight: 700, textDecoration: "underline", fontSize: "1.3rem", fontFamily: "var(--_font-accent)" }}
+            >
+              Gerenciar Todos os Clientes ➔
             </Link>
           </div>
 
@@ -591,22 +657,29 @@ export default function AdminDashboardView({ initialData }: { initialData: Admin
                         </span>
                       </td>
                       <td style={{ padding: "1.5rem", textAlign: "right" }}>
-                        <Link
-                          href={`/admin/clients/${client.userId}/edit`}
-                          style={{
-                            padding: "0.6rem 1.2rem",
-                            fontSize: "1.1rem",
-                            fontFamily: "var(--_font-accent)",
-                            backgroundColor: "var(--base)",
-                            border: "1px solid var(--st-medium)",
-                            borderRadius: "0.2rem",
-                            color: "var(--t-bright)",
-                            textDecoration: "none",
-                            display: "inline-block",
-                          }}
-                        >
-                          Editar
-                        </Link>
+                        <div style={{ display: "inline-flex", gap: "1rem", alignItems: "center" }}>
+                          <button
+                            type="button"
+                            onClick={() => openInvoiceModalForClient(client)}
+                            className="btn btn-default-icon btn-default-accent"
+                            style={{ height: "3.4rem", padding: "0 1.2rem", fontSize: "1.1rem" }}
+                          >
+                            Emitir Fatura
+                          </button>
+                          <Link
+                            href={`/admin/clients/${client.userId}/edit`}
+                            style={{
+                              padding: "0.6rem 1.2rem",
+                              fontSize: "1.1rem",
+                              color: "var(--t-bright)",
+                              border: "1px solid var(--st-medium)",
+                              borderRadius: "0.2rem",
+                              textDecoration: "none",
+                            }}
+                          >
+                            Editar
+                          </Link>
+                        </div>
                       </td>
                     </tr>
                   ))
@@ -712,7 +785,7 @@ export default function AdminDashboardView({ initialData }: { initialData: Admin
                   {/* Anexos com link direto abrindo em nova aba */}
                   {ticket.attachments && ticket.attachments.length > 0 && (
                     <div style={{ marginTop: "1.5rem", display: "flex", flexWrap: "wrap", gap: "1rem" }}>
-                      {ticket.attachments.map((att: any) => (
+                      {ticket.attachments.map((att: { id: string; fileUrl: string; fileName?: string }) => (
                         <a
                           key={att.id}
                           href={att.fileUrl}
@@ -793,6 +866,76 @@ export default function AdminDashboardView({ initialData }: { initialData: Admin
                           {st === "RESOLVED" && "Homologado"}
                         </button>
                       ))}
+                    </div>
+                  </div>
+
+                  {/* Histórico de Comentários / Timeline do Chamado */}
+                  <div style={{ marginTop: "2rem", borderTop: "1px dashed var(--st-medium)", paddingTop: "1.5rem" }}>
+                    <span style={{ fontFamily: "var(--_font-accent)", fontSize: "1.1rem", textTransform: "uppercase", color: "var(--t-muted)", display: "block", marginBottom: "1rem" }}>
+                      💬 Timeline de Interação ({ticket.comments?.length || 0})
+                    </span>
+
+                    {ticket.comments && ticket.comments.length > 0 && (
+                      <div style={{ display: "flex", flexDirection: "column", gap: "1rem", marginBottom: "1.5rem", maxHeight: "250px", overflowY: "auto", paddingRight: "0.5rem" }}>
+                        {ticket.comments.map((c) => (
+                          <div
+                            key={c.id}
+                            style={{
+                              padding: "1.2rem",
+                              backgroundColor: c.isAdmin ? "rgba(0, 43, 186, 0.08)" : "var(--base-tint)",
+                              border: `1px solid ${c.isAdmin ? "var(--accent)" : "var(--st-medium)"}`,
+                              borderRadius: "0.2rem",
+                            }}
+                          >
+                            <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "0.4rem", fontSize: "1.1rem", fontFamily: "var(--_font-accent)" }}>
+                              <strong style={{ color: c.isAdmin ? "var(--accent)" : "var(--t-bright)" }}>
+                                {c.authorName} {c.isAdmin && "• Equipe Técnica"}
+                              </strong>
+                              <span style={{ color: "var(--t-muted)" }}>
+                                {new Date(c.createdAt).toLocaleDateString("pt-BR")} às {new Date(c.createdAt).toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" })}
+                              </span>
+                            </div>
+                            <p style={{ margin: 0, fontSize: "1.25rem", color: "var(--t-bright)", whiteSpace: "pre-line" }}>
+                              {c.message}
+                            </p>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+
+                    <div style={{ display: "flex", gap: "1rem" }}>
+                      <input
+                        type="text"
+                        placeholder="Escrever resposta técnica ao cliente..."
+                        value={ticketCommentInputs[ticket.id] || ""}
+                        onChange={(e) => setTicketCommentInputs((prev) => ({ ...prev, [ticket.id]: e.target.value }))}
+                        onKeyDown={(e) => {
+                          if (e.key === "Enter" && !e.shiftKey) {
+                            e.preventDefault();
+                            handleAdminComment(ticket.id);
+                          }
+                        }}
+                        style={{
+                          flex: 1,
+                          height: "4rem",
+                          padding: "0 1.2rem",
+                          backgroundColor: "var(--base-tint)",
+                          border: "1px solid var(--st-medium)",
+                          color: "var(--t-bright)",
+                          fontFamily: "var(--_font-accent)",
+                          fontSize: "1.2rem",
+                          outline: "none",
+                        }}
+                      />
+                      <button
+                        type="button"
+                        disabled={isPending}
+                        onClick={() => handleAdminComment(ticket.id)}
+                        className="btn btn-default-icon btn-default-accent"
+                        style={{ height: "4rem", padding: "0 1.6rem", fontSize: "1.2rem", whiteSpace: "nowrap" }}
+                      >
+                        Responder
+                      </button>
                     </div>
                   </div>
                 </div>
@@ -1051,7 +1194,7 @@ export default function AdminDashboardView({ initialData }: { initialData: Admin
                   </label>
                   <select
                     value={expenseCategory}
-                    onChange={(e) => setExpenseCategory(e.target.value as any)}
+                    onChange={(e) => setExpenseCategory(e.target.value as ExpenseCategory)}
                     style={{ width: "100%", height: "4.5rem", padding: "0 1rem", backgroundColor: "var(--base)", border: "1px solid var(--st-medium)", color: "var(--t-bright)", fontFamily: "var(--_font-accent)", fontSize: "1.2rem", outline: "none" }}
                   >
                     <option value="INFRASTRUCTURE">INFRAESTRUTURA</option>
@@ -1069,7 +1212,7 @@ export default function AdminDashboardView({ initialData }: { initialData: Admin
                   </label>
                   <select
                     value={expenseCurrency}
-                    onChange={(e) => setExpenseCurrency(e.target.value as any)}
+                    onChange={(e) => setExpenseCurrency(e.target.value as Currency)}
                     style={{ width: "100%", height: "4.5rem", padding: "0 1rem", backgroundColor: "var(--base)", border: "1px solid var(--st-medium)", color: "var(--t-bright)", fontFamily: "var(--_font-accent)", fontSize: "1.2rem", outline: "none" }}
                   >
                     <option value="BRL">BRL (R$)</option>
@@ -1269,97 +1412,198 @@ export default function AdminDashboardView({ initialData }: { initialData: Admin
         </div>
       )}
 
-      {/* MODAL: EMITIR FATURA IMEDIATA */}
-      {isInvoiceModalOpen && (
+      {/* MODAL: EMITIR FATURA CONTEXTUAL */}
+      {isInvoiceModalOpen && selectedClientForInvoice && (
         <div style={{ position: "fixed", inset: 0, zIndex: 10000, backgroundColor: "rgba(0,0,0,0.8)", display: "flex", alignItems: "center", justifyContent: "center", padding: "2rem" }}>
-          <div style={{ backgroundColor: "var(--base-tint)", border: "1px solid var(--st-medium)", maxWidth: "520px", width: "100%", padding: "3.5rem", borderRadius: "0.4rem" }}>
+          <div style={{ backgroundColor: "var(--base-tint)", border: "1px solid var(--st-medium)", maxWidth: "620px", width: "100%", maxHeight: "90vh", overflowY: "auto", padding: "3.5rem", borderRadius: "0.4rem" }}>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "1rem" }}>
               <h3 style={{ fontSize: "2rem", fontFamily: "var(--_font-default)", fontWeight: 700, color: "var(--t-bright)", margin: 0 }}>
-                ⚡ Emitir Fatura Imediata
+                ⚡ Emitir Fatura Contextual
               </h3>
               <button
                 type="button"
-                onClick={() => setIsInvoiceModalOpen(false)}
+                onClick={() => {
+                  setIsInvoiceModalOpen(false);
+                  setSelectedClientForInvoice(null);
+                }}
                 style={{ background: "none", border: "none", color: "var(--t-muted)", fontSize: "2rem", cursor: "pointer" }}
               >
                 ✕
               </button>
             </div>
-            <p style={{ fontSize: "1.3rem", color: "var(--t-medium)", margin: "0 0 2rem 0" }}>
-              Gera checkout na InfinitePay com Pix/Cartão e dispara o e-mail de cobrança instantaneamente para o cliente via Resend.
-            </p>
 
-            <form onSubmit={handleIssueImmediateInvoice} className="form" style={{ display: "flex", flexDirection: "column", gap: "1.8rem" }}>
-              <div>
-                <label style={{ display: "block", fontFamily: "var(--_font-accent)", fontSize: "1.1rem", textTransform: "uppercase", color: "var(--t-medium)", marginBottom: "0.6rem" }}>
-                  Cliente Destinatário *
-                </label>
-                <select
-                  required
-                  value={invUserId}
-                  onChange={(e) => setInvUserId(e.target.value)}
-                  style={{ width: "100%", height: "4.5rem", padding: "0 1.5rem", backgroundColor: "var(--base)", border: "1px solid var(--st-medium)", color: "var(--t-bright)", fontFamily: "var(--_font-accent)", fontSize: "1.3rem", outline: "none" }}
-                >
-                  {data.finance.clientBalances.map((client) => (
-                    <option key={client.userId} value={client.userId}>
-                      {client.name} — {client.companyName || client.projectName || client.email}
-                    </option>
-                  ))}
-                </select>
-              </div>
+            <div style={{ padding: "1.2rem 1.6rem", backgroundColor: "var(--base)", border: "1px solid var(--st-medium)", borderRadius: "0.2rem", marginBottom: "2rem" }}>
+              <span style={{ fontSize: "1.1rem", fontFamily: "var(--_font-accent)", color: "var(--t-muted)", textTransform: "uppercase", display: "block" }}>
+                Cliente Selecionado
+              </span>
+              <strong style={{ fontSize: "1.5rem", color: "var(--t-bright)", display: "block" }}>
+                {selectedClientForInvoice.name} ({selectedClientForInvoice.companyName})
+              </strong>
+              <span style={{ fontSize: "1.2rem", color: "var(--accent)", fontFamily: "var(--_font-accent)" }}>
+                {selectedClientForInvoice.email}
+              </span>
+            </div>
 
-              <div>
-                <label style={{ display: "block", fontFamily: "var(--_font-accent)", fontSize: "1.1rem", textTransform: "uppercase", color: "var(--t-medium)", marginBottom: "0.6rem" }}>
-                  Descrição da Cobrança / Parcela *
-                </label>
-                <input
-                  type="text"
-                  required
-                  value={invDescription}
-                  onChange={(e) => setInvDescription(e.target.value)}
-                  placeholder="Ex: Adiantamento Parcela 02 - Setup Plataforma"
-                  style={{ width: "100%", height: "4.5rem", padding: "0 1.5rem", backgroundColor: "var(--base)", border: "1px solid var(--st-medium)", color: "var(--t-bright)", fontFamily: "var(--_font-accent)", fontSize: "1.3rem", outline: "none" }}
-                />
-              </div>
-
-              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1.5rem" }}>
-                <div>
-                  <label style={{ display: "block", fontFamily: "var(--_font-accent)", fontSize: "1.1rem", textTransform: "uppercase", color: "var(--t-medium)", marginBottom: "0.6rem" }}>
-                    Valor (R$) *
+            <form onSubmit={handleIssueImmediateInvoice} className="form" style={{ display: "flex", flexDirection: "column", gap: "2rem" }}>
+              {/* Checkbox Sustentação */}
+              <div style={{ padding: "1.5rem", backgroundColor: "var(--base)", border: "1px solid var(--st-medium)", borderRadius: "0.2rem" }}>
+                <span style={{ display: "block", fontFamily: "var(--_font-accent)", fontSize: "1.1rem", textTransform: "uppercase", color: "var(--t-muted)", marginBottom: "1rem", fontWeight: 700 }}>
+                  1. Sustentação Mensal Vigente
+                </span>
+                {selectedClientForInvoice.sustainabilityDetails ? (
+                  <label style={{ display: "flex", alignItems: "center", gap: "1.2rem", cursor: "pointer", fontFamily: "var(--_font-accent)", fontSize: "1.3rem", color: "var(--t-bright)" }}>
+                    <input
+                      type="checkbox"
+                      checked={includeSustainability}
+                      onChange={(e) => setIncludeSustainability(e.target.checked)}
+                      style={{ width: "1.8rem", height: "1.8rem", cursor: "pointer" }}
+                    />
+                    <span>
+                      Sustentação Mensal ({selectedClientForInvoice.sustainabilityDetails.planName}):{" "}
+                      <strong style={{ color: "var(--accent)" }}>
+                        R$ {selectedClientForInvoice.sustainabilityDetails.monthlyAmount.toFixed(2).replace(".", ",")}
+                      </strong>
+                    </span>
                   </label>
+                ) : (
+                  <span style={{ fontSize: "1.2rem", color: "var(--t-muted)", fontFamily: "var(--_font-accent)" }}>
+                    Nenhum plano de sustentação ativo cadastrado para este cliente.
+                  </span>
+                )}
+              </div>
+
+              {/* Checkboxes Parcelas de Setup em Aberto */}
+              <div style={{ padding: "1.5rem", backgroundColor: "var(--base)", border: "1px solid var(--st-medium)", borderRadius: "0.2rem" }}>
+                <span style={{ display: "block", fontFamily: "var(--_font-accent)", fontSize: "1.1rem", textTransform: "uppercase", color: "var(--t-muted)", marginBottom: "1rem", fontWeight: 700 }}>
+                  2. Parcelas de Setup / Implantação Agendadas
+                </span>
+                {selectedClientForInvoice.pendingInstallments && selectedClientForInvoice.pendingInstallments.length > 0 ? (
+                  <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
+                    {selectedClientForInvoice.pendingInstallments.map((inst) => {
+                      const isChecked = selectedInstallmentIds.includes(inst.id);
+                      return (
+                        <label key={inst.id} style={{ display: "flex", alignItems: "center", gap: "1.2rem", cursor: "pointer", fontFamily: "var(--_font-accent)", fontSize: "1.25rem", color: "var(--t-bright)" }}>
+                          <input
+                            type="checkbox"
+                            checked={isChecked}
+                            onChange={() => {
+                              setSelectedInstallmentIds((prev) =>
+                                prev.includes(inst.id) ? prev.filter((id) => id !== inst.id) : [...prev, inst.id]
+                              );
+                            }}
+                            style={{ width: "1.8rem", height: "1.8rem", cursor: "pointer" }}
+                          />
+                          <span>
+                            #{inst.installmentNumber} {inst.description} ({inst.projectName}) — Venc: {new Date(inst.scheduledDate).toLocaleDateString("pt-BR")}:{" "}
+                            <strong style={{ color: "var(--accent)" }}>
+                              R$ {inst.amount.toFixed(2).replace(".", ",")}
+                            </strong>
+                          </span>
+                        </label>
+                      );
+                    })}
+                  </div>
+                ) : (
+                  <span style={{ fontSize: "1.2rem", color: "var(--t-muted)", fontFamily: "var(--_font-accent)" }}>
+                    Nenhuma parcela de implantação em aberto para este cliente.
+                  </span>
+                )}
+              </div>
+
+              {/* Serviço Extra Avulso */}
+              <div style={{ padding: "1.5rem", backgroundColor: "var(--base)", border: "1px solid var(--st-medium)", borderRadius: "0.2rem" }}>
+                <span style={{ display: "block", fontFamily: "var(--_font-accent)", fontSize: "1.1rem", textTransform: "uppercase", color: "var(--t-muted)", marginBottom: "1rem", fontWeight: 700 }}>
+                  3. Adicionar Serviço ou Taxa Extra (Opcional)
+                </span>
+                <div style={{ display: "grid", gridTemplateColumns: "2fr 1fr", gap: "1.2rem" }}>
+                  <input
+                    type="text"
+                    placeholder="Ex: Landing Page Extra, Integração IA..."
+                    value={extraDescription}
+                    onChange={(e) => setExtraDescription(e.target.value)}
+                    style={{ height: "4.2rem", padding: "0 1.2rem", backgroundColor: "var(--base-tint)", border: "1px solid var(--st-medium)", color: "var(--t-bright)", fontFamily: "var(--_font-accent)", fontSize: "1.2rem", outline: "none" }}
+                  />
                   <input
                     type="number"
                     step="0.01"
-                    required
-                    value={invAmount}
-                    onChange={(e) => setInvAmount(e.target.value)}
-                    placeholder="0.00"
-                    style={{ width: "100%", height: "4.5rem", padding: "0 1.5rem", backgroundColor: "var(--base)", border: "1px solid var(--st-medium)", color: "var(--t-bright)", fontFamily: "var(--_font-accent)", fontSize: "1.4rem", outline: "none" }}
+                    placeholder="R$ 0,00"
+                    value={extraAmount}
+                    onChange={(e) => setExtraAmount(e.target.value)}
+                    style={{ height: "4.2rem", padding: "0 1.2rem", backgroundColor: "var(--base-tint)", border: "1px solid var(--st-medium)", color: "var(--t-bright)", fontFamily: "var(--_font-accent)", fontSize: "1.3rem", outline: "none" }}
                   />
                 </div>
+              </div>
 
-                <div>
-                  <label style={{ display: "block", fontFamily: "var(--_font-accent)", fontSize: "1.1rem", textTransform: "uppercase", color: "var(--t-medium)", marginBottom: "0.6rem" }}>
-                    Vencimento
-                  </label>
-                  <select
-                    value={invDueDays}
-                    onChange={(e) => setInvDueDays(e.target.value)}
-                    style={{ width: "100%", height: "4.5rem", padding: "0 1.5rem", backgroundColor: "var(--base)", border: "1px solid var(--st-medium)", color: "var(--t-bright)", fontFamily: "var(--_font-accent)", fontSize: "1.3rem", outline: "none" }}
-                  >
-                    <option value="1">Em 24 horas (Amanhã)</option>
-                    <option value="3">Em 3 dias</option>
-                    <option value="5">Em 5 dias</option>
-                    <option value="7">Em 7 dias (1 semana)</option>
-                    <option value="15">Em 15 dias</option>
-                  </select>
+              {/* Vencimento com Opções Rápidas */}
+              <div>
+                <label style={{ display: "block", fontFamily: "var(--_font-accent)", fontSize: "1.1rem", textTransform: "uppercase", color: "var(--t-medium)", marginBottom: "0.8rem", fontWeight: 700 }}>
+                  Opções Rápidas de Vencimento
+                </label>
+                <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: "1rem" }}>
+                  {[
+                    { id: "TODAY" as const, label: "Hoje" },
+                    { id: "24H" as const, label: "Em 24 horas" },
+                    { id: "3D" as const, label: "Em 3 dias" },
+                    { id: "5D" as const, label: "Em 5 dias" },
+                  ].map((opt) => (
+                    <button
+                      key={opt.id}
+                      type="button"
+                      onClick={() => setInvDueDateOption(opt.id)}
+                      style={{
+                        height: "4rem",
+                        padding: "0 0.5rem",
+                        fontFamily: "var(--_font-accent)",
+                        fontSize: "1.2rem",
+                        border: `1px solid ${invDueDateOption === opt.id ? "var(--accent)" : "var(--st-medium)"}`,
+                        backgroundColor: invDueDateOption === opt.id ? "var(--accent)" : "var(--base)",
+                        color: invDueDateOption === opt.id ? "#ffffff" : "var(--t-bright)",
+                        borderRadius: "0.2rem",
+                        cursor: "pointer",
+                        fontWeight: 600,
+                      }}
+                    >
+                      {opt.label}
+                    </button>
+                  ))}
                 </div>
               </div>
+
+              {/* Total Consolidado em Destaque */}
+              {(() => {
+                let calculatedTotal = 0;
+                if (includeSustainability && selectedClientForInvoice.sustainabilityDetails) {
+                  calculatedTotal += selectedClientForInvoice.sustainabilityDetails.monthlyAmount;
+                }
+                if (selectedClientForInvoice.pendingInstallments) {
+                  for (const inst of selectedClientForInvoice.pendingInstallments) {
+                    if (selectedInstallmentIds.includes(inst.id)) {
+                      calculatedTotal += inst.amount;
+                    }
+                  }
+                }
+                const exVal = parseFloat(extraAmount) || 0;
+                if (exVal > 0) calculatedTotal += exVal;
+
+                return (
+                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "1.5rem 2rem", backgroundColor: "var(--base)", border: "1px dashed var(--accent)", borderRadius: "0.4rem" }}>
+                    <span style={{ fontFamily: "var(--_font-accent)", fontSize: "1.3rem", color: "var(--t-bright)", textTransform: "uppercase", fontWeight: 700 }}>
+                      Total Consolidado da Fatura:
+                    </span>
+                    <strong style={{ fontFamily: "var(--_font-accent)", fontSize: "2.4rem", color: "var(--accent)" }}>
+                      R$ {calculatedTotal.toFixed(2).replace(".", ",")}
+                    </strong>
+                  </div>
+                );
+              })()}
 
               <div style={{ display: "flex", justifyContent: "flex-end", gap: "1.5rem", marginTop: "1rem" }}>
                 <button
                   type="button"
-                  onClick={() => setIsInvoiceModalOpen(false)}
+                  onClick={() => {
+                    setIsInvoiceModalOpen(false);
+                    setSelectedClientForInvoice(null);
+                  }}
                   style={{ padding: "1rem 2rem", background: "none", border: "none", fontFamily: "var(--_font-accent)", fontSize: "1.3rem", color: "var(--t-medium)", cursor: "pointer" }}
                 >
                   Cancelar
@@ -1368,7 +1612,7 @@ export default function AdminDashboardView({ initialData }: { initialData: Admin
                   type="submit"
                   disabled={isPending}
                   className="btn btn-default-icon btn-default-accent"
-                  style={{ height: "4.6rem", padding: "0.4rem 0.4rem 0.4rem 1.6rem", fontSize: "1.3rem" }}
+                  style={{ height: "4.8rem", padding: "0.4rem 0.4rem 0.4rem 2rem", fontSize: "1.3rem" }}
                 >
                   <span className="btn-caption">{isPending ? "Processando..." : "Gerar Link & Enviar E-mail"}</span>
                   <i className="btn-icon" style={{ width: "3.4rem", height: "3.4rem" }}>

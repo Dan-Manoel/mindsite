@@ -132,11 +132,11 @@ export default function Hero() {
                         <CommonLoadItem index={12}>
                           <li className="loading-item">
                             <a
-                              href="mailto:ola@mindsite.com.br?subject=Message%20from%20your%20site"
+                              href="mailto:contato@mindsite.com.br?subject=Message%20from%20your%20site"
                               className="tag tag-s-mobile"
                             >
                               <TextScramble className="mxd-scramble">
-                                ola@mindsite.com.br
+                                contato@mindsite.com.br
                               </TextScramble>
                             </a>
                           </li>

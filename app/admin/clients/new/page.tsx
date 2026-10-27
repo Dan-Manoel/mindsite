@@ -50,7 +50,7 @@ export default function NewClientPage() {
     setProjects((prev) => prev.filter((_, i) => i !== index));
   };
 
-  const updateProject = (index: number, field: keyof ProjectInputDTO, value: any) => {
+  const updateProject = <K extends keyof ProjectInputDTO>(index: number, field: K, value: ProjectInputDTO[K]) => {
     setProjects((prev) => {
       const copy = [...prev];
       copy[index] = { ...copy[index], [field]: value };
@@ -91,14 +91,14 @@ export default function NewClientPage() {
     projectIndex: number,
     installmentIndex: number,
     field: "amount" | "scheduledDate" | "description",
-    value: any
+    value: string | number
   ) => {
     setProjects((prev) => {
       const copy = [...prev];
       const instCopy = [...copy[projectIndex].installments];
       instCopy[installmentIndex] = {
         ...instCopy[installmentIndex],
-        [field]: field === "amount" ? (value === "" ? 0 : parseFloat(value) || 0) : value,
+        [field]: field === "amount" ? (value === "" ? 0 : parseFloat(String(value)) || 0) : value,
       };
       copy[projectIndex].installments = instCopy;
       return copy;
@@ -481,7 +481,7 @@ export default function NewClientPage() {
                       </label>
                       <select
                         value={proj.sustainabilityPlan}
-                        onChange={(e) => updateProject(pIdx, "sustainabilityPlan", e.target.value)}
+                        onChange={(e) => updateProject(pIdx, "sustainabilityPlan", e.target.value as "NONE" | "ESSENTIAL" | "DEVELOPMENT" | "ADVANCED")}
                         style={{ width: "100%", height: "4.5rem", padding: "0 1rem", backgroundColor: "var(--base)", border: "1px solid var(--st-medium)", color: "var(--t-bright)", fontFamily: "var(--_font-accent)", fontSize: "1.2rem", outline: "none" }}
                       >
                         <option value="NONE">Sem Sustentação (R$ 0,00/mês)</option>

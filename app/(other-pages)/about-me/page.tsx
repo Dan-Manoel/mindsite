@@ -5,7 +5,6 @@ import StatisticsLines from "@/components/other-pages/about-me/StatisticsLines";
 import ParallaxDividerImage from "@/components/other-pages/about-me/ParallaxDividerImage";
 import Resume from "@/components/other-pages/about-me/Resume";
 import ParallaxDividerImage2 from "@/components/other-pages/about-me/ParallaxDividerImage2";
-import TestimonialsSlider from "@/components/other-pages/about-me/TestimonialsSlider";
 import CTAWithMarquee from "@/components/other-pages/about-me/CTAWithMarquee";
 export const metadata: Metadata = {
   title: "About Me | Mindsite - Agencia digital",

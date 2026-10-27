@@ -9,11 +9,14 @@ export const metadata: Metadata = {
 };
 
 export default async function AdminDashboardPage() {
+  let data;
   try {
-    const data = await getAdminDashboardData();
-    return <AdminDashboardView initialData={data} />;
-  } catch (error: any) {
-    console.error("Acesso negado ao painel executivo:", error.message);
+    data = await getAdminDashboardData();
+  } catch (error: unknown) {
+    const message = error instanceof Error ? error.message : "Erro desconhecido";
+    console.error("Acesso negado ao painel executivo:", message);
     redirect("/portal/dashboard");
   }
+
+  return <AdminDashboardView initialData={data} />;
 }

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useTransition, use } from "react";
+import { useState, useEffect, useCallback, useTransition, use } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import {
@@ -22,17 +22,49 @@ export default function EditClientPage({ params }: { params: Promise<{ id: strin
   const [fullName, setFullName] = useState("");
   const [companyName, setCompanyName] = useState("");
   const [primaryEmail, setPrimaryEmail] = useState("");
+interface ContractInstallmentItem {
+  id: string;
+  installmentNumber: number;
+  description?: string | null;
+  scheduledDate: string | Date;
+  amount: number | string;
+  status: string;
+}
+
+interface ContractItem {
+  id: string;
+  contractType: string;
+  status?: string;
+  notes?: string | null;
+  totalAmount?: number | string | null;
+  paidAmount?: number | string | null;
+  installments?: ContractInstallmentItem[];
+}
+
+interface ProjectItem {
+  id: string;
+  name: string;
+  domain?: string | null;
+  description?: string | null;
+  contracts?: ContractItem[];
+}
+
   const [secondaryEmail, setSecondaryEmail] = useState("");
   const [phone, setPhone] = useState("");
   const [document, setDocument] = useState("");
   const [address, setAddress] = useState("");
-  const [projects, setProjects] = useState<any[]>([]);
+  const [autentiqueDocId, setAutentiqueDocId] = useState("");
+  const [projects, setProjects] = useState<ProjectItem[]>([]);
 
   // Modais
   const [isNewProjectModalOpen, setIsNewProjectModalOpen] = useState(false);
   const [newProjName, setNewProjName] = useState("");
   const [newProjDomain, setNewProjDomain] = useState("");
   const [newProjDesc, setNewProjDesc] = useState("");
+  const [newProjSetup, setNewProjSetup] = useState<number>(0);
+  const [newProjInstallments, setNewProjInstallments] = useState<Array<{ amount: number; scheduledDate: string; description: string }>>([]);
+  const [newProjSustPlan, setNewProjSustPlan] = useState<"NONE" | "ESSENTIAL" | "DEVELOPMENT" | "ADVANCED">("NONE");
+  const [newProjSustStartDate, setNewProjSustStartDate] = useState(new Date().toISOString().split("T")[0]);
 
   const [newInstallmentContractId, setNewInstallmentContractId] = useState<string | null>(null);
   const [instAmount, setInstAmount] = useState("");
@@ -54,7 +86,7 @@ export default function EditClientPage({ params }: { params: Promise<{ id: strin
     setTimeout(() => setFeedbackMsg(null), 4000);
   };
 
-  const reloadClient = async () => {
+  const reloadClient = useCallback(async () => {
     const client = await getClientByIdAction(resolvedParams.id);
     if (client) {
       setFullName(client.fullName || "");
@@ -64,15 +96,16 @@ export default function EditClientPage({ params }: { params: Promise<{ id: strin
       setPhone(client.phone || "");
       setDocument(client.document || "");
       setAddress(client.address || "");
-      setProjects(client.projects || []);
+      setAutentiqueDocId(client.autentiqueDocId || "");
+      setProjects((client.projects as unknown as ProjectItem[]) || []);
     }
-  };
+  }, [resolvedParams.id]);
 
   useEffect(() => {
     startTransition(async () => {
       await reloadClient();
     });
-  }, [resolvedParams.id]);
+  }, [reloadClient]);
 
   const handleSettleInstallment = async (installmentId: string) => {
     if (!confirm("Confirmar baixa manual desta parcela? O valor será contabilizado como pago no contrato correspondente.")) {
@@ -105,6 +138,7 @@ export default function EditClientPage({ params }: { params: Promise<{ id: strin
         phone,
         document,
         address,
+        autentiqueDocId,
       });
 
       if (res.success) {
@@ -116,6 +150,33 @@ export default function EditClientPage({ params }: { params: Promise<{ id: strin
     });
   };
 
+  const handleAddDynamicInstallment = () => {
+    const currentSum = newProjInstallments.reduce((sum, item) => sum + (Number(item.amount) || 0), 0);
+    const remaining = Math.max(0, (Number(newProjSetup) || 0) - currentSum);
+    const nextIndex = newProjInstallments.length + 1;
+    const nextDate = new Date();
+    nextDate.setMonth(nextDate.getMonth() + nextIndex);
+
+    setNewProjInstallments([
+      ...newProjInstallments,
+      {
+        amount: remaining,
+        scheduledDate: nextDate.toISOString().split("T")[0],
+        description: `Parcela 0${nextIndex} - Setup`,
+      },
+    ]);
+  };
+
+  const handleRemoveDynamicInstallment = (index: number) => {
+    setNewProjInstallments(newProjInstallments.filter((_, i) => i !== index));
+  };
+
+  const handleUpdateDynamicInstallment = (index: number, field: string, val: string | number) => {
+    const updated = [...newProjInstallments];
+    updated[index] = { ...updated[index], [field]: val };
+    setNewProjInstallments(updated);
+  };
+
   const handleCreateProject = (e: React.FormEvent) => {
     e.preventDefault();
     if (!newProjName.trim()) {
@@ -123,11 +184,31 @@ export default function EditClientPage({ params }: { params: Promise<{ id: strin
       return;
     }
 
+    const setupVal = Number(newProjSetup) || 0;
+    if (setupVal > 0 && newProjInstallments.length > 0) {
+      const sum = newProjInstallments.reduce((acc, curr) => acc + (Number(curr.amount) || 0), 0);
+      if (Math.abs(sum - setupVal) > 0.01) {
+        showNotification(
+          `A soma das parcelas (R$ ${sum.toFixed(2)}) não confere com o setup (R$ ${setupVal.toFixed(2)}).`,
+          "error"
+        );
+        return;
+      }
+    }
+
     startTransition(async () => {
       const res = await addProjectToClientAction(resolvedParams.id, {
         name: newProjName,
         domain: newProjDomain,
         description: newProjDesc,
+        setupAmount: setupVal,
+        installments: newProjInstallments.map((inst) => ({
+          amount: Number(inst.amount) || 0,
+          scheduledDate: inst.scheduledDate,
+          description: inst.description,
+        })),
+        sustainabilityPlan: newProjSustPlan,
+        sustainabilityStartDate: newProjSustStartDate,
       });
 
       if (res.success) {
@@ -136,6 +217,9 @@ export default function EditClientPage({ params }: { params: Promise<{ id: strin
         setNewProjName("");
         setNewProjDomain("");
         setNewProjDesc("");
+        setNewProjSetup(0);
+        setNewProjInstallments([]);
+        setNewProjSustPlan("NONE");
         await reloadClient();
       } else {
         showNotification(res.error || "Erro ao criar projeto.", "error");
@@ -381,6 +465,24 @@ export default function EditClientPage({ params }: { params: Promise<{ id: strin
                   style={{ width: "100%", height: "4.5rem", padding: "0 1.5rem", backgroundColor: "var(--base)", border: "1px solid var(--st-medium)", color: "var(--t-bright)", fontFamily: "var(--_font-accent)", fontSize: "1.3rem", outline: "none" }}
                 />
               </div>
+
+              <div style={{ gridColumn: "1 / -1" }}>
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginBottom: "0.6rem", flexWrap: "wrap", gap: "0.5rem" }}>
+                  <label style={{ fontFamily: "var(--_font-accent)", fontSize: "1.1rem", textTransform: "uppercase", color: "var(--t-medium)" }}>
+                    ID do Documento Autentique (Contrato Digital)
+                  </label>
+                  <span style={{ fontSize: "1.1rem", color: "var(--accent)", fontFamily: "var(--_font-accent)" }}>
+                    * Ao salvar com novo ID, o cliente recebe e-mail automático com link de assinatura
+                  </span>
+                </div>
+                <input
+                  type="text"
+                  placeholder="Ex: c7a9e34b-1234-5678-9abc-def012345678"
+                  value={autentiqueDocId}
+                  onChange={(e) => setAutentiqueDocId(e.target.value)}
+                  style={{ width: "100%", height: "4.5rem", padding: "0 1.5rem", backgroundColor: "var(--base)", border: "1px solid var(--st-medium)", color: "var(--t-bright)", fontFamily: "var(--_font-accent)", fontSize: "1.3rem", outline: "none" }}
+                />
+              </div>
             </div>
           </div>
 
@@ -440,21 +542,70 @@ export default function EditClientPage({ params }: { params: Promise<{ id: strin
                       </span>
                     </div>
 
-                    {p.contracts?.map((c: any) => (
+                    {/* Exibição em Tempo Real do Setup */}
+                    {(() => {
+                      const devContract = p.contracts?.find((c) => c.contractType === "PROJECT_DEV");
+                      const setupTotal = devContract ? Number(devContract.totalAmount || 0) : 0;
+                      const setupPaid = devContract ? Number(devContract.paidAmount || 0) : 0;
+                      const setupRemaining = Math.max(0, setupTotal - setupPaid);
+
+                      return (
+                        <div
+                          style={{
+                            display: "flex",
+                            alignItems: "center",
+                            gap: "1.5rem",
+                            flexWrap: "wrap",
+                            padding: "1.2rem 1.6rem",
+                            backgroundColor: "var(--base-tint)",
+                            border: "1px solid var(--st-medium)",
+                            borderRadius: "0.4rem",
+                            marginBottom: "1.5rem",
+                            fontFamily: "var(--_font-accent)",
+                            fontSize: "1.2rem",
+                          }}
+                        >
+                          <div>
+                            <span style={{ color: "var(--t-muted)", textTransform: "uppercase", fontSize: "1rem", display: "block" }}>Custo de Setup</span>
+                            <strong style={{ color: "var(--t-bright)", fontSize: "1.4rem" }}>R$ {setupTotal.toFixed(2).replace(".", ",")}</strong>
+                          </div>
+                          <span style={{ color: "var(--st-medium)" }}>|</span>
+                          <div>
+                            <span style={{ color: "var(--t-muted)", textTransform: "uppercase", fontSize: "1rem", display: "block" }}>Total Liquidado</span>
+                            <strong style={{ color: "#10b981", fontSize: "1.4rem" }}>R$ {setupPaid.toFixed(2).replace(".", ",")}</strong>
+                          </div>
+                          <span style={{ color: "var(--st-medium)" }}>|</span>
+                          <div>
+                            <span style={{ color: "var(--t-muted)", textTransform: "uppercase", fontSize: "1rem", display: "block" }}>Saldo Restante do Setup</span>
+                            <strong style={{ color: "var(--accent)", fontSize: "1.5rem", fontWeight: 700 }}>R$ {setupRemaining.toFixed(2).replace(".", ",")}</strong>
+                          </div>
+                        </div>
+                      );
+                    })()}
+
+                    {p.contracts?.map((c) => (
                       <div key={c.id} style={{ marginTop: "1.5rem", padding: "2rem", backgroundColor: "var(--base-tint)", border: "1px solid var(--st-medium)", borderRadius: "0.4rem" }}>
                         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: "1rem", marginBottom: "1.5rem" }}>
-                          <div>
+                          <div style={{ display: "flex", alignItems: "center", gap: "1.2rem", flexWrap: "wrap" }}>
                             <span style={{ fontSize: "1.1rem", textTransform: "uppercase", color: "var(--t-muted)", fontFamily: "var(--_font-accent)" }}>
                               Tipo: <strong style={{ color: "var(--t-bright)" }}>{c.contractType}</strong>
                             </span>
-                            <span style={{ margin: "0 1rem", color: "var(--st-medium)" }}>|</span>
+                            <span style={{ color: "var(--st-medium)" }}>|</span>
                             <span style={{ fontSize: "1.1rem", color: "var(--t-muted)", fontFamily: "var(--_font-accent)" }}>
-                              Total: <strong style={{ color: "var(--t-bright)" }}>R$ {Number(c.totalAmount).toFixed(2).replace(".", ",")}</strong>
+                              Valor Total Contratado: <strong style={{ color: "var(--t-bright)" }}>R$ {Number(c.totalAmount || 0).toFixed(2).replace(".", ",")}</strong>
                             </span>
-                            <span style={{ margin: "0 1rem", color: "var(--st-medium)" }}>|</span>
+                            <span style={{ color: "var(--st-medium)" }}>|</span>
                             <span style={{ fontSize: "1.1rem", color: "var(--t-muted)", fontFamily: "var(--_font-accent)" }}>
-                              Liquidado: <strong style={{ color: "#10b981" }}>R$ {Number(c.paidAmount).toFixed(2).replace(".", ",")}</strong>
+                              Total Liquidado: <strong style={{ color: "#10b981" }}>R$ {Number(c.paidAmount || 0).toFixed(2).replace(".", ",")}</strong>
                             </span>
+                            {c.contractType === "PROJECT_DEV" && (
+                              <>
+                                <span style={{ color: "var(--st-medium)" }}>|</span>
+                                <span style={{ fontSize: "1.2rem", color: "var(--t-muted)", fontFamily: "var(--_font-accent)" }}>
+                                  Saldo em Aberto: <strong style={{ color: "var(--accent)", fontWeight: 700, fontSize: "1.3rem" }}>R$ {Math.max(0, Number(c.totalAmount || 0) - Number(c.paidAmount || 0)).toFixed(2).replace(".", ",")}</strong>
+                                </span>
+                              </>
+                            )}
                           </div>
 
                           <div style={{ display: "flex", alignItems: "center", gap: "1rem" }}>
@@ -506,7 +657,7 @@ export default function EditClientPage({ params }: { params: Promise<{ id: strin
                                 </tr>
                               </thead>
                               <tbody>
-                                {c.installments.map((inst: any) => {
+                                {c.installments?.map((inst) => {
                                   const isPaid = inst.status === "PAID";
                                   const dateStr = new Date(inst.scheduledDate).toLocaleDateString("pt-BR");
                                   return (
@@ -626,11 +777,11 @@ export default function EditClientPage({ params }: { params: Promise<{ id: strin
 
         {/* MODAL: ADICIONAR NOVO PROJETO */}
         {isNewProjectModalOpen && (
-          <div style={{ position: "fixed", inset: 0, zIndex: 10000, backgroundColor: "rgba(0,0,0,0.8)", display: "flex", alignItems: "center", justifyContent: "center", padding: "2rem" }}>
-            <div style={{ backgroundColor: "var(--base-tint)", border: "1px solid var(--st-medium)", maxWidth: "520px", width: "100%", padding: "3.5rem", borderRadius: "0.4rem" }}>
+          <div style={{ position: "fixed", inset: 0, zIndex: 10000, backgroundColor: "rgba(0,0,0,0.85)", display: "flex", alignItems: "center", justifyContent: "center", padding: "2rem" }}>
+            <div style={{ backgroundColor: "var(--base-tint)", border: "1px solid var(--st-medium)", maxWidth: "680px", width: "100%", maxHeight: "90vh", overflowY: "auto", padding: "3rem", borderRadius: "0.4rem" }}>
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "1rem" }}>
                 <h3 style={{ fontSize: "2rem", fontFamily: "var(--_font-default)", fontWeight: 700, color: "var(--t-bright)", margin: 0 }}>
-                  + Adicionar Novo Projeto
+                  + Adicionar Novo Projeto ao Cliente
                 </h3>
                 <button
                   type="button"
@@ -641,48 +792,198 @@ export default function EditClientPage({ params }: { params: Promise<{ id: strin
                 </button>
               </div>
               <p style={{ fontSize: "1.3rem", color: "var(--t-medium)", margin: "0 0 2rem 0" }}>
-                Cadastre um novo projeto para este cliente. Um contrato de implantação será gerado automaticamente.
+                Cadastre o escopo, cronograma de setup e plano de sustentação deste projeto.
               </p>
 
-              <form onSubmit={handleCreateProject} className="form" style={{ display: "flex", flexDirection: "column", gap: "1.8rem" }}>
-                <div>
-                  <label style={{ display: "block", fontFamily: "var(--_font-accent)", fontSize: "1.1rem", textTransform: "uppercase", color: "var(--t-medium)", marginBottom: "0.6rem" }}>
-                    Nome do Projeto *
-                  </label>
-                  <input
-                    type="text"
-                    required
-                    value={newProjName}
-                    onChange={(e) => setNewProjName(e.target.value)}
-                    placeholder="Ex: E-commerce Brand X, Portal Médico"
-                    style={{ width: "100%", height: "4.5rem", padding: "0 1.5rem", backgroundColor: "var(--base)", border: "1px solid var(--st-medium)", color: "var(--t-bright)", fontFamily: "var(--_font-accent)", fontSize: "1.3rem", outline: "none" }}
-                  />
+              <form onSubmit={handleCreateProject} className="form" style={{ display: "flex", flexDirection: "column", gap: "2rem" }}>
+                {/* 1. Dados do Projeto */}
+                <div style={{ padding: "1.5rem", backgroundColor: "var(--base)", border: "1px solid var(--st-medium)", borderRadius: "0.4rem" }}>
+                  <span style={{ display: "block", fontFamily: "var(--_font-accent)", fontSize: "1.1rem", textTransform: "uppercase", color: "var(--accent)", fontWeight: 700, marginBottom: "1.2rem" }}>
+                    1. Identificação do Projeto
+                  </span>
+                  <div style={{ display: "flex", flexDirection: "column", gap: "1.4rem" }}>
+                    <div>
+                      <label style={{ display: "block", fontFamily: "var(--_font-accent)", fontSize: "1.1rem", textTransform: "uppercase", color: "var(--t-medium)", marginBottom: "0.6rem" }}>
+                        Nome do Projeto *
+                      </label>
+                      <input
+                        type="text"
+                        required
+                        value={newProjName}
+                        onChange={(e) => setNewProjName(e.target.value)}
+                        placeholder="Ex: Plataforma E-commerce, Landing Page Institucional"
+                        style={{ width: "100%", height: "4.2rem", padding: "0 1.4rem", backgroundColor: "var(--base-tint)", border: "1px solid var(--st-medium)", color: "var(--t-bright)", fontFamily: "var(--_font-accent)", fontSize: "1.3rem", outline: "none" }}
+                      />
+                    </div>
+
+                    <div>
+                      <label style={{ display: "block", fontFamily: "var(--_font-accent)", fontSize: "1.1rem", textTransform: "uppercase", color: "var(--t-medium)", marginBottom: "0.6rem" }}>
+                        Domínio Oficial (URL)
+                      </label>
+                      <input
+                        type="text"
+                        value={newProjDomain}
+                        onChange={(e) => setNewProjDomain(e.target.value)}
+                        placeholder="Ex: www.cliente.com.br"
+                        style={{ width: "100%", height: "4.2rem", padding: "0 1.4rem", backgroundColor: "var(--base-tint)", border: "1px solid var(--st-medium)", color: "var(--t-bright)", fontFamily: "var(--_font-accent)", fontSize: "1.3rem", outline: "none" }}
+                      />
+                    </div>
+
+                    <div>
+                      <label style={{ display: "block", fontFamily: "var(--_font-accent)", fontSize: "1.1rem", textTransform: "uppercase", color: "var(--t-medium)", marginBottom: "0.6rem" }}>
+                        Descrição Detalhada do Escopo
+                      </label>
+                      <textarea
+                        rows={3}
+                        value={newProjDesc}
+                        onChange={(e) => setNewProjDesc(e.target.value)}
+                        placeholder="Ex: Desenvolvimento completo de front-end e back-end, integração com gateways de pagamento e entrega de CMS."
+                        style={{ width: "100%", padding: "1rem 1.4rem", backgroundColor: "var(--base-tint)", border: "1px solid var(--st-medium)", color: "var(--t-bright)", fontFamily: "var(--_font-accent)", fontSize: "1.3rem", outline: "none" }}
+                      />
+                    </div>
+                  </div>
                 </div>
 
-                <div>
-                  <label style={{ display: "block", fontFamily: "var(--_font-accent)", fontSize: "1.1rem", textTransform: "uppercase", color: "var(--t-medium)", marginBottom: "0.6rem" }}>
-                    Domínio Oficial (URL)
-                  </label>
-                  <input
-                    type="text"
-                    value={newProjDomain}
-                    onChange={(e) => setNewProjDomain(e.target.value)}
-                    placeholder="Ex: www.cliente.com.br"
-                    style={{ width: "100%", height: "4.5rem", padding: "0 1.5rem", backgroundColor: "var(--base)", border: "1px solid var(--st-medium)", color: "var(--t-bright)", fontFamily: "var(--_font-accent)", fontSize: "1.3rem", outline: "none" }}
-                  />
+                {/* 2. Custo de Setup & Parcelamento Dinâmico */}
+                <div style={{ padding: "1.5rem", backgroundColor: "var(--base)", border: "1px solid var(--st-medium)", borderRadius: "0.4rem" }}>
+                  <span style={{ display: "block", fontFamily: "var(--_font-accent)", fontSize: "1.1rem", textTransform: "uppercase", color: "var(--accent)", fontWeight: 700, marginBottom: "1.2rem" }}>
+                    2. Custo de Setup & Parcelamento
+                  </span>
+
+                  <div style={{ marginBottom: "1.5rem" }}>
+                    <label style={{ display: "block", fontFamily: "var(--_font-accent)", fontSize: "1.1rem", textTransform: "uppercase", color: "var(--t-medium)", marginBottom: "0.6rem" }}>
+                      Valor Total Contratado (Setup / Implantação) - R$
+                    </label>
+                    <input
+                      type="number"
+                      step="any"
+                      min="0"
+                      value={newProjSetup === 0 ? "" : newProjSetup}
+                      onChange={(e) => setNewProjSetup(parseFloat(e.target.value) || 0)}
+                      placeholder="0,00"
+                      style={{ width: "100%", height: "4.2rem", padding: "0 1.4rem", backgroundColor: "var(--base-tint)", border: "1px solid var(--st-medium)", color: "var(--t-bright)", fontFamily: "var(--_font-accent)", fontSize: "1.4rem", fontWeight: 700, outline: "none" }}
+                    />
+                  </div>
+
+                  {newProjSetup > 0 && (
+                    <div style={{ display: "flex", flexDirection: "column", gap: "1.2rem" }}>
+                      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: "1rem", padding: "1rem 1.2rem", backgroundColor: "var(--base-tint)", border: "1px solid var(--st-medium)", borderRadius: "0.3rem" }}>
+                        <div style={{ fontSize: "1.2rem", fontFamily: "var(--_font-accent)" }}>
+                          <span style={{ color: "var(--t-muted)" }}>Total Setup: </span>
+                          <strong style={{ color: "var(--t-bright)" }}>R$ {newProjSetup.toFixed(2).replace(".", ",")}</strong>
+                          <span style={{ margin: "0 0.8rem", color: "var(--st-medium)" }}>|</span>
+                          <span style={{ color: "var(--t-muted)" }}>Parcelado: </span>
+                          <strong style={{ color: "#10b981" }}>
+                            R$ {newProjInstallments.reduce((sum, i) => sum + (Number(i.amount) || 0), 0).toFixed(2).replace(".", ",")}
+                          </strong>
+                          <span style={{ margin: "0 0.8rem", color: "var(--st-medium)" }}>|</span>
+                          <span style={{ color: "var(--t-muted)" }}>Saldo Restante: </span>
+                          <strong style={{
+                            color: Math.abs(newProjSetup - newProjInstallments.reduce((sum, i) => sum + (Number(i.amount) || 0), 0)) < 0.01
+                              ? "#10b981"
+                              : "var(--accent)"
+                          }}>
+                            R$ {(newProjSetup - newProjInstallments.reduce((sum, i) => sum + (Number(i.amount) || 0), 0)).toFixed(2).replace(".", ",")}
+                          </strong>
+                        </div>
+
+                        <button
+                          type="button"
+                          onClick={handleAddDynamicInstallment}
+                          style={{
+                            padding: "0.5rem 1.2rem",
+                            fontSize: "1.1rem",
+                            backgroundColor: "transparent",
+                            color: "var(--accent)",
+                            border: "1px solid var(--accent)",
+                            borderRadius: "0.3rem",
+                            cursor: "pointer",
+                            fontFamily: "var(--_font-accent)",
+                            fontWeight: 700,
+                          }}
+                        >
+                          + Adicionar Parcela
+                        </button>
+                      </div>
+
+                      {newProjInstallments.length > 0 && (
+                        <div style={{ display: "flex", flexDirection: "column", gap: "0.8rem" }}>
+                          {newProjInstallments.map((inst, idx) => (
+                            <div key={idx} style={{ display: "grid", gridTemplateColumns: "2fr 1.5fr 1.5fr auto", gap: "0.8rem", alignItems: "center" }}>
+                              <input
+                                type="text"
+                                value={inst.description}
+                                onChange={(e) => handleUpdateDynamicInstallment(idx, "description", e.target.value)}
+                                placeholder="Descrição da parcela"
+                                style={{ height: "3.8rem", padding: "0 1rem", backgroundColor: "var(--base-tint)", border: "1px solid var(--st-medium)", color: "var(--t-bright)", fontFamily: "var(--_font-accent)", fontSize: "1.2rem" }}
+                              />
+                              <input
+                                type="date"
+                                value={inst.scheduledDate}
+                                onChange={(e) => handleUpdateDynamicInstallment(idx, "scheduledDate", e.target.value)}
+                                style={{ height: "3.8rem", padding: "0 1rem", backgroundColor: "var(--base-tint)", border: "1px solid var(--st-medium)", color: "var(--t-bright)", fontFamily: "var(--_font-accent)", fontSize: "1.2rem" }}
+                              />
+                              <input
+                                type="number"
+                                step="any"
+                                min="0"
+                                value={inst.amount === 0 ? "" : inst.amount}
+                                onChange={(e) => handleUpdateDynamicInstallment(idx, "amount", parseFloat(e.target.value) || 0)}
+                                placeholder="Valor (R$)"
+                                style={{ height: "3.8rem", padding: "0 1rem", backgroundColor: "var(--base-tint)", border: "1px solid var(--st-medium)", color: "var(--t-bright)", fontFamily: "var(--_font-accent)", fontSize: "1.2rem", textAlign: "right" }}
+                              />
+                              <button
+                                type="button"
+                                onClick={() => handleRemoveDynamicInstallment(idx)}
+                                style={{ background: "none", border: "none", color: "#ef4444", fontSize: "1.6rem", cursor: "pointer", padding: "0 0.5rem" }}
+                                title="Remover Parcela"
+                              >
+                                ✕
+                              </button>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  )}
                 </div>
 
-                <div>
-                  <label style={{ display: "block", fontFamily: "var(--_font-accent)", fontSize: "1.1rem", textTransform: "uppercase", color: "var(--t-medium)", marginBottom: "0.6rem" }}>
-                    Descrição / Escopo Resumido
-                  </label>
-                  <textarea
-                    rows={3}
-                    value={newProjDesc}
-                    onChange={(e) => setNewProjDesc(e.target.value)}
-                    placeholder="Ex: Plataforma SaaS com painel administrativo e checkout integrado."
-                    style={{ width: "100%", padding: "1.2rem 1.5rem", backgroundColor: "var(--base)", border: "1px solid var(--st-medium)", color: "var(--t-bright)", fontFamily: "var(--_font-accent)", fontSize: "1.3rem", outline: "none" }}
-                  />
+                {/* 3. Plano de Sustentação Mensal */}
+                <div style={{ padding: "1.5rem", backgroundColor: "var(--base)", border: "1px solid var(--st-medium)", borderRadius: "0.4rem" }}>
+                  <span style={{ display: "block", fontFamily: "var(--_font-accent)", fontSize: "1.1rem", textTransform: "uppercase", color: "var(--accent)", fontWeight: 700, marginBottom: "1.2rem" }}>
+                    3. Plano de Sustentação Mensal
+                  </span>
+                  <div style={{ display: "grid", gridTemplateColumns: newProjSustPlan !== "NONE" ? "1fr 1fr" : "1fr", gap: "1.4rem" }}>
+                    <div>
+                      <label style={{ display: "block", fontFamily: "var(--_font-accent)", fontSize: "1.1rem", textTransform: "uppercase", color: "var(--t-medium)", marginBottom: "0.6rem" }}>
+                        Plano Selecionado
+                      </label>
+                      <select
+                        value={newProjSustPlan}
+                        onChange={(e) => setNewProjSustPlan(e.target.value as "NONE" | "ESSENTIAL" | "DEVELOPMENT" | "ADVANCED")}
+                        style={{ width: "100%", height: "4.2rem", padding: "0 1.2rem", backgroundColor: "var(--base-tint)", border: "1px solid var(--st-medium)", color: "var(--t-bright)", fontFamily: "var(--_font-accent)", fontSize: "1.3rem", outline: "none" }}
+                      >
+                        <option value="NONE">Nenhum (Somente Setup)</option>
+                        <option value="ESSENTIAL">Essential — R$ 100,00 / mês</option>
+                        <option value="DEVELOPMENT">Development — R$ 300,00 / mês</option>
+                        <option value="ADVANCED">Advanced — R$ 700,00 / mês</option>
+                      </select>
+                    </div>
+
+                    {newProjSustPlan !== "NONE" && (
+                      <div>
+                        <label style={{ display: "block", fontFamily: "var(--_font-accent)", fontSize: "1.1rem", textTransform: "uppercase", color: "var(--t-medium)", marginBottom: "0.6rem" }}>
+                          Início da Vigência Mensal
+                        </label>
+                        <input
+                          type="date"
+                          value={newProjSustStartDate}
+                          onChange={(e) => setNewProjSustStartDate(e.target.value)}
+                          style={{ width: "100%", height: "4.2rem", padding: "0 1.2rem", backgroundColor: "var(--base-tint)", border: "1px solid var(--st-medium)", color: "var(--t-bright)", fontFamily: "var(--_font-accent)", fontSize: "1.3rem", outline: "none" }}
+                        />
+                      </div>
+                    )}
+                  </div>
                 </div>
 
                 <div style={{ display: "flex", justifyContent: "flex-end", gap: "1.5rem", marginTop: "1rem" }}>
@@ -699,7 +1000,7 @@ export default function EditClientPage({ params }: { params: Promise<{ id: strin
                     className="btn btn-default-icon btn-default-accent"
                     style={{ height: "4.6rem", padding: "0.4rem 0.4rem 0.4rem 1.6rem", fontSize: "1.3rem" }}
                   >
-                    <span className="btn-caption">{isPending ? "Criando..." : "Criar Projeto"}</span>
+                    <span className="btn-caption">{isPending ? "Criando..." : "Criar Projeto Completo"}</span>
                     <i className="btn-icon" style={{ width: "3.4rem", height: "3.4rem" }}>
                       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 18 18" width="14" height="14" fill="currentColor">
                         <path d="M10.8,0v3.6h-3.6V0h3.6ZM14.4,10.8h3.6v-3.6h-3.6v-3.6h-3.6v3.6H0v3.6h10.8v3.6h3.6v-3.6ZM10.8,14.4h-3.6v3.6h3.6v-3.6Z" />

@@ -255,7 +255,6 @@ function CustomCursorInner() {
       </p>
       <div ref={imageRef} className={imageClass}>
         {v.showImage && v.imageSrc ? (
-          // eslint-disable-next-line @next/next/no-img-element -- matches template cursor preview
           <img src={v.imageSrc} alt="" />
         ) : null}
       </div>

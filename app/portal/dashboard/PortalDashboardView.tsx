@@ -2,8 +2,14 @@
 
 import { useState, useEffect, useTransition } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { TicketCategory } from "@prisma/client";
-import { createTicketAction, generateConsolidatedPaymentAction, addTicketCommentAction } from "@/app/actions/portal";
+import {
+  createTicketAction,
+  generateConsolidatedPaymentAction,
+  addTicketCommentAction,
+  completeFirstLoginAction,
+} from "@/app/actions/portal";
 import { createClient } from "@/lib/supabase/client";
 import { signOut } from "@/app/actions/auth";
 
@@ -118,11 +124,17 @@ function SLACountdownBadge({
 }
 
 interface PortalProps {
+  isFirstLogin?: boolean;
   data: {
     client: {
       id: string;
       fullName: string | null;
       email: string;
+      secondaryEmail?: string | null;
+      phone?: string | null;
+      document?: string | null;
+      address?: string | null;
+      avatarUrl?: string | null;
       companyName: string | null;
       activeProject: {
         id: string;
@@ -131,6 +143,13 @@ interface PortalProps {
         description?: string | null;
       } | null;
     };
+    autentiqueContract?: {
+      docId: string | null;
+      name: string;
+      signed: boolean;
+      signUrl: string | null;
+      downloadUrl: string | null;
+    } | null;
     sustainability?: {
       planName: string;
       monthlyPrice: number;
@@ -160,6 +179,13 @@ interface PortalProps {
       isOverdue: boolean;
       projectName: string;
       attachments: Array<{ id: string; fileName: string; fileUrl: string }>;
+      comments?: Array<{
+        id: string;
+        message: string;
+        authorName: string;
+        isAdmin: boolean;
+        createdAt: string;
+      }>;
     }>;
     activeInvoice: {
       id: string;
@@ -193,12 +219,20 @@ interface PortalProps {
   };
 }
 
-export default function PortalDashboardView({ data }: PortalProps) {
+export default function PortalDashboardView({ data, isFirstLogin }: PortalProps) {
   const router = useRouter();
-  const [activeTab, setActiveTab] = useState<"TICKETS" | "BILLING">("TICKETS");
+  const [activeTab, setActiveTab] = useState<"TICKETS" | "BILLING" | "EMAILS">("TICKETS");
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isUpgradeModalOpen, setIsUpgradeModalOpen] = useState(false);
   const [isPending, startTransition] = useTransition();
+
+  // Estados de Primeiro Login
+  const [showFirstLoginModal, setShowFirstLoginModal] = useState(isFirstLogin ?? false);
+  const [firstLoginStep, setFirstLoginStep] = useState<"CHOICE" | "SET_PASSWORD">("CHOICE");
+  const [firstLoginPassword, setFirstLoginPassword] = useState("");
+  const [firstLoginConfirm, setFirstLoginConfirm] = useState("");
+  const [firstLoginError, setFirstLoginError] = useState("");
+  const [firstLoginLoading, setFirstLoginLoading] = useState(false);
 
   // Estados de Chamados & Comentários
   const [title, setTitle] = useState("");
@@ -241,8 +275,9 @@ export default function PortalDashboardView({ data }: PortalProps) {
       } else {
         alert(res.error || "Erro ao gerar link de pagamento.");
       }
-    } catch (err: any) {
-      alert(err.message || "Erro de conexão ao gerar adiantamento.");
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : "Erro de conexão ao gerar adiantamento.";
+      alert(message);
     } finally {
       setIsConsolidating(false);
     }
@@ -254,42 +289,46 @@ export default function PortalDashboardView({ data }: PortalProps) {
     const supabase = createClient();
     const files = Array.from(e.target.files);
 
-    for (const file of files) {
-      const fileExt = file.name.split(".").pop();
-      const fileName = `${Date.now()}-${Math.random().toString(36).substring(7)}.${fileExt}`;
-      const filePath = `${data.client.id}/${fileName}`;
+    try {
+      for (const file of files) {
+        const fileExt = file.name.split(".").pop();
+        const fileName = `${Date.now()}-${Math.random().toString(36).substring(7)}.${fileExt}`;
+        const filePath = `${data.client.id}/${fileName}`;
 
-      const { data: uploadData, error } = await supabase.storage
-        .from("ticket-attachments")
-        .upload(filePath, file);
-
-      if (!error && uploadData) {
-        const { data: publicUrlData } = supabase.storage
+        const { data: uploadData, error } = await supabase.storage
           .from("ticket-attachments")
-          .getPublicUrl(filePath);
+          .upload(filePath, file);
 
-        setUploadedFiles((prev) => [
-          ...prev,
-          {
-            fileName: file.name,
-            fileUrl: publicUrlData.publicUrl,
-            fileSize: file.size,
-            mimeType: file.type,
-          },
-        ]);
-      } else {
-        setUploadedFiles((prev) => [
-          ...prev,
-          {
-            fileName: file.name,
-            fileUrl: URL.createObjectURL(file),
-            fileSize: file.size,
-            mimeType: file.type,
-          },
-        ]);
+        if (error) {
+          console.error("Erro no upload do anexo:", error);
+          alert(
+            `Aviso de Armazenamento: Não foi possível enviar o anexo "${file.name}" para o bucket 'ticket-attachments' (${error.message}). Verifique as permissões de Storage no Supabase.`
+          );
+          continue;
+        }
+
+        if (uploadData) {
+          const { data: publicUrlData } = supabase.storage
+            .from("ticket-attachments")
+            .getPublicUrl(filePath);
+
+          setUploadedFiles((prev) => [
+            ...prev,
+            {
+              fileName: file.name,
+              fileUrl: publicUrlData.publicUrl,
+              fileSize: file.size,
+              mimeType: file.type,
+            },
+          ]);
+        }
       }
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : "Erro desconhecido";
+      alert(`Falha de conexão com o Supabase Storage: ${message}`);
+    } finally {
+      setUploading(false);
     }
-    setUploading(false);
   };
 
   const handleCreateTicket = (e: React.FormEvent) => {
@@ -490,6 +529,41 @@ export default function PortalDashboardView({ data }: PortalProps) {
                 </i>
               </button>
 
+              <Link
+                href="/portal/perfil"
+                className="btn btn-line-icon btn-line-icon-small btn-line-medium slide-left"
+                style={{
+                  textDecoration: "none",
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: "0.8rem",
+                  padding: "0.8rem 1.4rem",
+                }}
+                title="Meu Perfil"
+              >
+                {data.client.avatarUrl ? (
+                  <img
+                    src={data.client.avatarUrl}
+                    alt="Foto de perfil"
+                    style={{
+                      width: "2.4rem",
+                      height: "2.4rem",
+                      borderRadius: "50%",
+                      objectFit: "cover",
+                    }}
+                  />
+                ) : (
+                  <i>
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" width="14" height="14" fill="currentColor">
+                      <path d="M128,24A104,104,0,1,0,232,128,104.11,104.11,0,0,0,128,24ZM74.08,197.5a64,64,0,0,1,107.84,0,87.83,87.83,0,0,1-107.84,0ZM96,120a32,32,0,1,1,32,32A32,32,0,0,1,96,120Zm97.76,66.41a79.66,79.66,0,0,0-36.06-28.75,48,48,0,1,0-59.4,0,79.66,79.66,0,0,0-36.06,28.75,88,88,0,1,1,131.52,0Z" />
+                    </svg>
+                  </i>
+                )}
+                <span className="btn-caption" style={{ fontSize: "1.3rem" }}>
+                  Meu Perfil
+                </span>
+              </Link>
+
               <form action={signOut}>
                 <button
                   type="submit"
@@ -548,7 +622,7 @@ export default function PortalDashboardView({ data }: PortalProps) {
               <h3 style={{ fontSize: "2.2rem", fontWeight: 700, color: "var(--t-bright)", margin: "0 0 0.6rem 0", fontFamily: "var(--_font-default)" }}>
                 {data.client.activeProject?.name || "Projeto MindSite"}
               </h3>
-              <p style={{ fontSize: "1.3rem", color: "var(--t-medium)", margin: 0, lineHeight: 1.5 }}>
+              <p style={{ fontSize: "1.3rem", color: "var(--t-medium)", margin: 0, lineHeight: 1.6, whiteSpace: "pre-line" }}>
                 {data.client.activeProject?.description || "Desenvolvimento web, arquitetura serverless e suporte contínuo."}
               </p>
             </div>
@@ -583,8 +657,8 @@ export default function PortalDashboardView({ data }: PortalProps) {
               </div>
 
               <div style={{ display: "flex", flexDirection: "column", gap: "0.6rem", fontSize: "1.2rem", fontFamily: "var(--_font-accent)", color: "var(--t-medium)" }}>
-                <div>📧 {plan?.emailBoxes || "Caixas de e-mail sob demanda"}</div>
-                <div>🛠 {plan?.features || "Suporte técnico sob demanda"}</div>
+                <div>📧 <strong style={{ color: "var(--t-bright)" }}>E-mails:</strong> {plan?.emailBoxes || "Caixas de e-mail sob demanda"}</div>
+                <div>🛠 <strong style={{ color: "var(--t-bright)" }}>Cota Mensal:</strong> {plan?.features || "Suporte técnico sob demanda"}</div>
                 <div style={{ color: "var(--t-bright)", fontWeight: 600, marginTop: "0.5rem" }}>
                   📊 Você consumiu <strong style={{ color: "var(--accent)" }}>{plan?.ticketsConsumedThisMonth || 0}</strong> chamados de sua cota neste ciclo
                 </div>
@@ -609,6 +683,124 @@ export default function PortalDashboardView({ data }: PortalProps) {
               >
                 ⚡ Fazer Upgrade de Plano
               </button>
+            </div>
+          </div>
+
+          {/* Card de Contrato Digital & Termos de Sustentação (Autentique) */}
+          <div
+            style={{
+              marginTop: "2.5rem",
+              paddingTop: "2rem",
+              borderTop: "1px solid var(--st-medium)",
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+              flexWrap: "wrap",
+              gap: "1.5rem",
+            }}
+          >
+            <div>
+              <div style={{ display: "flex", alignItems: "center", gap: "1rem", marginBottom: "0.5rem", flexWrap: "wrap" }}>
+                <span style={{ fontSize: "1.2rem", fontFamily: "var(--_font-accent)", textTransform: "uppercase", color: "var(--t-muted)", fontWeight: 700 }}>
+                  Contrato Digital & Termos de Sustentação
+                </span>
+                {data.autentiqueContract?.signed ? (
+                  <span
+                    style={{
+                      padding: "0.2rem 0.8rem",
+                      fontSize: "1.1rem",
+                      fontFamily: "var(--_font-accent)",
+                      fontWeight: 700,
+                      backgroundColor: "rgba(16, 185, 129, 0.15)",
+                      color: "#10b981",
+                      border: "1px solid #10b981",
+                      borderRadius: "0.2rem",
+                    }}
+                  >
+                    ✓ Assinado via Autentique
+                  </span>
+                ) : data.autentiqueContract?.docId ? (
+                  <span
+                    style={{
+                      padding: "0.2rem 0.8rem",
+                      fontSize: "1.1rem",
+                      fontFamily: "var(--_font-accent)",
+                      fontWeight: 700,
+                      backgroundColor: "rgba(234, 179, 8, 0.15)",
+                      color: "#eab308",
+                      border: "1px solid #eab308",
+                      borderRadius: "0.2rem",
+                    }}
+                  >
+                    ⚠️ Assinatura Pendente
+                  </span>
+                ) : (
+                  <span
+                    style={{
+                      padding: "0.2rem 0.8rem",
+                      fontSize: "1.1rem",
+                      fontFamily: "var(--_font-accent)",
+                      color: "var(--t-muted)",
+                      backgroundColor: "var(--base)",
+                      border: "1px solid var(--st-medium)",
+                      borderRadius: "0.2rem",
+                    }}
+                  >
+                    Termo de adesão em confecção pelo setor jurídico
+                  </span>
+                )}
+              </div>
+              <p style={{ margin: 0, fontSize: "1.2rem", color: "var(--t-medium)", fontFamily: "var(--_font-accent)" }}>
+                {data.autentiqueContract?.name || "Termo de Prestação de Serviços Digitais, Suporte Técnico e Acordo de SLA"}
+              </p>
+            </div>
+
+            <div>
+              {data.autentiqueContract?.signed && data.autentiqueContract.downloadUrl ? (
+                <a
+                  href={data.autentiqueContract.downloadUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="btn btn-default-icon btn-default-outline slide-right"
+                  style={{
+                    height: "3.8rem",
+                    padding: "0.2rem 0.2rem 0.2rem 1.4rem",
+                    fontSize: "1.2rem",
+                    textDecoration: "none",
+                  }}
+                >
+                  <span className="btn-caption" style={{ fontFamily: "var(--_font-accent)" }}>
+                    Baixar Contrato Assinado (PDF)
+                  </span>
+                  <i className="btn-icon" style={{ width: "2.8rem", height: "2.8rem" }}>
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" width="12" height="12" fill="currentColor">
+                      <path d="M224,144v64a8,8,0,0,1-8,8H40a8,8,0,0,1-8-8V144a8,8,0,0,1,16,0v56H208V144a8,8,0,0,1,16,0Zm-101.66,5.66a8,8,0,0,0,11.32,0l40-40a8,8,0,0,0-11.32-11.32L136,124.69V32a8,8,0,0,0-16,0v92.69L93.66,98.34a8,8,0,0,0-11.32,11.32Z" />
+                    </svg>
+                  </i>
+                </a>
+              ) : data.autentiqueContract?.docId && data.autentiqueContract.signUrl ? (
+                <a
+                  href={data.autentiqueContract.signUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="btn btn-default-icon btn-default-accent slide-right"
+                  style={{
+                    height: "3.8rem",
+                    padding: "0.2rem 0.2rem 0.2rem 1.4rem",
+                    fontSize: "1.2rem",
+                    textDecoration: "none",
+                  }}
+                >
+                  <span className="btn-caption" style={{ fontFamily: "var(--_font-accent)", fontWeight: 700 }}>
+                    ✍️ Assinar Contrato Digital
+                  </span>
+                  <i className="btn-icon" style={{ width: "2.8rem", height: "2.8rem" }}>
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" width="12" height="12" fill="currentColor">
+                      <path d="M227.32,28.68a16,16,0,0,0-22.63,0L176,57.37,198.63,80l28.69-28.68A16,16,0,0,0,227.32,28.68ZM164.69,68.69,59.32,174.05a15.86,15.86,0,0,0-4.69,11.31V216a8,8,0,0,0,8,8h30.63a15.86,15.86,0,0,0,11.31-4.69L210,114ZM40,232H216a8,8,0,0,0,0-16H40a8,8,0,0,0,0,16Z" />
+                    </svg>
+                  </i>
+                </a>
+              ) : null}
             </div>
           </div>
         </div>
@@ -822,6 +1014,25 @@ export default function PortalDashboardView({ data }: PortalProps) {
             >
               Faturas
             </button>
+            <button
+              type="button"
+              onClick={() => setActiveTab("EMAILS")}
+              style={{
+                backgroundColor: "transparent",
+                border: "none",
+                borderBottom: activeTab === "EMAILS" ? "2px solid var(--accent)" : "2px solid transparent",
+                padding: "1.2rem 0",
+                fontFamily: "var(--_font-accent)",
+                fontSize: "1.3rem",
+                textTransform: "uppercase",
+                letterSpacing: "0.08rem",
+                fontWeight: 700,
+                color: activeTab === "EMAILS" ? "var(--accent)" : "var(--t-medium)",
+                cursor: "pointer",
+              }}
+            >
+              E-mails Corporativos
+            </button>
           </div>
         </div>
 
@@ -991,14 +1202,16 @@ export default function PortalDashboardView({ data }: PortalProps) {
                       </p>
 
                       {/* Anexos */}
-                      {t.attachments.length > 0 && (
+                      {t.attachments && t.attachments.length > 0 && (
                         <div style={{ marginTop: "1.5rem", display: "flex", flexWrap: "wrap", gap: "1rem" }}>
                           {t.attachments.map((att) => (
                             <a
                               key={att.id}
                               href={att.fileUrl}
+                              download={att.fileName}
                               target="_blank"
                               rel="noopener noreferrer"
+                              className="btn btn-line-icon btn-line-icon-small btn-line-default"
                               style={{
                                 fontSize: "1.1rem",
                                 fontFamily: "var(--_font-accent)",
@@ -1008,15 +1221,18 @@ export default function PortalDashboardView({ data }: PortalProps) {
                                 color: "var(--t-bright)",
                                 textDecoration: "none",
                                 borderRadius: "0.2rem",
+                                display: "inline-flex",
+                                alignItems: "center",
+                                gap: "0.6rem",
                               }}
                             >
-                              📎 {att.fileName} ↗
+                              📥 {att.fileName}
                             </a>
                           ))}
                         </div>
                       )}
 
-                      {/* Thread Expandida: Envio de Novo Comentário */}
+                      {/* Thread Expandida: Timeline e Envio de Novo Comentário */}
                       {isExpanded && (
                         <div
                           style={{
@@ -1025,6 +1241,47 @@ export default function PortalDashboardView({ data }: PortalProps) {
                             borderTop: "1px solid var(--st-medium)",
                           }}
                         >
+                          {/* Timeline de Comentários Anteriores */}
+                          {t.comments && t.comments.length > 0 && (
+                            <div style={{ display: "flex", flexDirection: "column", gap: "1.2rem", marginBottom: "2rem" }}>
+                              <span
+                                style={{
+                                  display: "block",
+                                  fontFamily: "var(--_font-accent)",
+                                  fontSize: "1.1rem",
+                                  textTransform: "uppercase",
+                                  color: "var(--accent)",
+                                  fontWeight: 700,
+                                }}
+                              >
+                                Timeline de Interações ({t.comments.length}):
+                              </span>
+                              {t.comments.map((comm) => (
+                                <div
+                                  key={comm.id}
+                                  style={{
+                                    padding: "1.2rem 1.4rem",
+                                    backgroundColor: comm.isAdmin ? "rgba(0, 43, 186, 0.08)" : "var(--base)",
+                                    border: `1px solid ${comm.isAdmin ? "var(--accent)" : "var(--st-medium)"}`,
+                                    borderRadius: "0.3rem",
+                                  }}
+                                >
+                                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "0.4rem" }}>
+                                    <strong style={{ fontSize: "1.2rem", color: comm.isAdmin ? "var(--accent)" : "var(--t-bright)", fontFamily: "var(--_font-accent)" }}>
+                                      {comm.authorName} {comm.isAdmin ? "(Equipe MindSite)" : "(Você)"}
+                                    </strong>
+                                    <span style={{ fontSize: "1.1rem", color: "var(--t-muted)", fontFamily: "var(--_font-accent)" }}>
+                                      {new Date(comm.createdAt).toLocaleString("pt-BR")}
+                                    </span>
+                                  </div>
+                                  <p style={{ fontSize: "1.3rem", color: "var(--t-medium)", margin: 0, whiteSpace: "pre-line", fontFamily: "var(--_font-default)" }}>
+                                    {comm.message}
+                                  </p>
+                                </div>
+                              ))}
+                            </div>
+                          )}
+
                           <label
                             style={{
                               display: "block",
@@ -1116,7 +1373,7 @@ export default function PortalDashboardView({ data }: PortalProps) {
                 {[
                   {
                     title: "Landing Page de Alta Conversão",
-                    price: "A partir de R$ 1.500,00",
+                    price: "R$ 1.000,00",
                     desc: "Página moderna otimizada para captação de leads, integrações analíticas e WhatsApp.",
                   },
                   {
@@ -1363,7 +1620,7 @@ export default function PortalDashboardView({ data }: PortalProps) {
               </div>
             )}
 
-            {/* Seção "Próximos Pagamentos Acordados" (Parcelas de Setup com Visão Transparente) */}
+            {/* Seção "Próximos pagamentos agendados" (Parcelas de Setup com Visão Transparente) */}
             <div
               style={{
                 backgroundColor: "var(--base-tint)",
@@ -1392,7 +1649,7 @@ export default function PortalDashboardView({ data }: PortalProps) {
                       fontFamily: "var(--_font-default)",
                     }}
                   >
-                    Próximos Pagamentos Acordados
+                    Próximos pagamentos agendados
                   </h4>
                   <p style={{ fontSize: "1.3rem", color: "var(--t-medium)", margin: 0 }}>
                     Cronograma de parcelas futuras de implantação/setup contratadas com a agência.
@@ -1654,6 +1911,204 @@ export default function PortalDashboardView({ data }: PortalProps) {
                   )}
                 </tbody>
               </table>
+            </div>
+          </div>
+        )}
+
+        {/* ABA 3: E-MAILS CORPORATIVOS (TITAN MAIL) */}
+        {activeTab === "EMAILS" && (
+          <div style={{ display: "flex", flexDirection: "column", gap: "3rem" }}>
+            {/* Header & Quick Action */}
+            <div
+              style={{
+                backgroundColor: "var(--base-tint)",
+                border: "1px solid var(--st-medium)",
+                padding: "3.5rem",
+                borderRadius: "0.4rem",
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+                flexWrap: "wrap",
+                gap: "2rem",
+              }}
+            >
+              <div>
+                <span className="tag tag-s tag-medium" style={{ color: "var(--accent)", fontFamily: "var(--_font-accent)", marginBottom: "0.8rem", display: "inline-block" }}>
+                  Titan Email Suite
+                </span>
+                <h3 style={{ fontSize: "2.4rem", fontWeight: 700, color: "var(--t-bright)", margin: "0 0 0.8rem 0", fontFamily: "var(--_font-default)" }}>
+                  Caixas de E-mail Corporativas
+                </h3>
+                <p style={{ fontSize: "1.4rem", color: "var(--t-medium)", margin: 0, lineHeight: 1.6, maxWidth: "650px" }}>
+                  Acesse sua caixa postal corporativa Titan via web ou solicite a criação de novos endereços vinculados ao seu domínio <strong>{data.client.activeProject?.domain || "corporativo"}</strong>.
+                </p>
+              </div>
+
+              <div style={{ display: "flex", alignItems: "center", gap: "1.5rem", flexWrap: "wrap" }}>
+                <a
+                  href="https://app.titan.email"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="btn btn-default-icon btn-default-accent slide-right"
+                  style={{
+                    height: "4.4rem",
+                    padding: "0.4rem 0.4rem 0.4rem 1.6rem",
+                    fontSize: "1.3rem",
+                    textDecoration: "none",
+                  }}
+                >
+                  <span className="btn-caption" style={{ fontFamily: "var(--_font-accent)", fontWeight: 700 }}>
+                    Acessar Webmail Titan ↗
+                  </span>
+                  <i className="btn-icon" style={{ width: "3.4rem", height: "3.4rem" }}>
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" width="14" height="14" fill="currentColor">
+                      <path d="M224,104a8,8,0,0,1-16,0V59.31l-82.34,82.35a8,8,0,0,1-11.32-11.32L196.69,48H152a8,8,0,0,1,0-16h72a8,8,0,0,1,8,8Zm-32,80a8,8,0,0,0-8,8v24H48V72H72a8,8,0,0,0,0-16H48A16,16,0,0,0,32,72V216a16,16,0,0,0,16,16H184a16,16,0,0,0,16-16V192A8,8,0,0,0,192,184Z" />
+                    </svg>
+                  </i>
+                </a>
+
+                <button
+                  type="button"
+                  onClick={() => {
+                    setTitle("Criação de Conta de E-mail Corporativo");
+                    setDescription(
+                      `Solicito a criação de uma nova caixa de e-mail corporativo:\n\n- Nome Completo do Colaborador:\n- Prefixo desejado: _______@${data.client.activeProject?.domain || "meudominio.com.br"}\n- E-mail pessoal para envio da senha provisória:`
+                    );
+                    setCategory("BASIC");
+                    setIsModalOpen(true);
+                  }}
+                  className="btn btn-default-icon btn-default-outline slide-right"
+                  style={{
+                    height: "4.4rem",
+                    padding: "0.4rem 0.4rem 0.4rem 1.6rem",
+                    fontSize: "1.3rem",
+                  }}
+                >
+                  <span className="btn-caption" style={{ fontFamily: "var(--_font-accent)", fontWeight: 700 }}>
+                    + Solicitar Nova Caixa
+                  </span>
+                  <i className="btn-icon" style={{ width: "3.4rem", height: "3.4rem" }}>
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 18 18" width="12" height="12" fill="currentColor">
+                      <path d="M8,1h2v16H8V1z M1,8h16v2H1V8z" />
+                    </svg>
+                  </i>
+                </button>
+              </div>
+            </div>
+
+            {/* Card com Guia de Configuração Rápida */}
+            <div
+              style={{
+                backgroundColor: "var(--base-tint)",
+                border: "1px solid var(--st-medium)",
+                padding: "3.5rem",
+                borderRadius: "0.4rem",
+              }}
+            >
+              <div style={{ marginBottom: "2.5rem" }}>
+                <h4 style={{ fontSize: "1.8rem", fontWeight: 700, color: "var(--t-bright)", margin: "0 0 0.5rem 0", fontFamily: "var(--_font-accent)" }}>
+                  Guia de Configuração Rápida (Outlook, Thunderbird, Apple Mail e Mobile)
+                </h4>
+                <p style={{ fontSize: "1.3rem", color: "var(--t-medium)", margin: 0 }}>
+                  Utilize as credenciais e parâmetros criptografados abaixo para sincronizar suas mensagens em qualquer cliente de e-mail.
+                </p>
+              </div>
+
+              <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))", gap: "2.5rem" }}>
+                {/* Servidor de Entrada (IMAP) */}
+                <div
+                  style={{
+                    backgroundColor: "var(--base)",
+                    border: "1px solid var(--st-medium)",
+                    padding: "2.5rem",
+                    borderRadius: "0.4rem",
+                  }}
+                >
+                  <div style={{ display: "flex", alignItems: "center", gap: "1rem", marginBottom: "1.5rem" }}>
+                    <span
+                      style={{
+                        padding: "0.4rem 1rem",
+                        fontSize: "1.1rem",
+                        fontFamily: "var(--_font-accent)",
+                        fontWeight: 700,
+                        backgroundColor: "rgba(0, 43, 186, 0.1)",
+                        color: "var(--accent)",
+                        border: "1px solid var(--accent)",
+                        borderRadius: "0.2rem",
+                      }}
+                    >
+                      Entrada (IMAP)
+                    </span>
+                    <strong style={{ fontSize: "1.4rem", color: "var(--t-bright)" }}>Servidor de Entrada</strong>
+                  </div>
+
+                  <div style={{ display: "flex", flexDirection: "column", gap: "1.2rem", fontFamily: "var(--_font-accent)", fontSize: "1.3rem" }}>
+                    <div>
+                      <span style={{ color: "var(--t-muted)", display: "block", fontSize: "1.1rem" }}>SERVIDOR / HOST:</span>
+                      <strong style={{ color: "var(--t-bright)" }}>imap.titan.email</strong>
+                    </div>
+                    <div>
+                      <span style={{ color: "var(--t-muted)", display: "block", fontSize: "1.1rem" }}>PORTA:</span>
+                      <strong style={{ color: "var(--accent)" }}>993</strong>
+                    </div>
+                    <div>
+                      <span style={{ color: "var(--t-muted)", display: "block", fontSize: "1.1rem" }}>SEGURANÇA / CRIPTOGRAFIA:</span>
+                      <strong style={{ color: "#10b981" }}>SSL / TLS</strong>
+                    </div>
+                    <div>
+                      <span style={{ color: "var(--t-muted)", display: "block", fontSize: "1.1rem" }}>NOME DE USUÁRIO:</span>
+                      <span style={{ color: "var(--t-medium)" }}>Seu e-mail corporativo completo</span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Servidor de Saída (SMTP) */}
+                <div
+                  style={{
+                    backgroundColor: "var(--base)",
+                    border: "1px solid var(--st-medium)",
+                    padding: "2.5rem",
+                    borderRadius: "0.4rem",
+                  }}
+                >
+                  <div style={{ display: "flex", alignItems: "center", gap: "1rem", marginBottom: "1.5rem" }}>
+                    <span
+                      style={{
+                        padding: "0.4rem 1rem",
+                        fontSize: "1.1rem",
+                        fontFamily: "var(--_font-accent)",
+                        fontWeight: 700,
+                        backgroundColor: "rgba(16, 185, 129, 0.1)",
+                        color: "#10b981",
+                        border: "1px solid #10b981",
+                        borderRadius: "0.2rem",
+                      }}
+                    >
+                      Saída (SMTP)
+                    </span>
+                    <strong style={{ fontSize: "1.4rem", color: "var(--t-bright)" }}>Servidor de Saída</strong>
+                  </div>
+
+                  <div style={{ display: "flex", flexDirection: "column", gap: "1.2rem", fontFamily: "var(--_font-accent)", fontSize: "1.3rem" }}>
+                    <div>
+                      <span style={{ color: "var(--t-muted)", display: "block", fontSize: "1.1rem" }}>SERVIDOR / HOST:</span>
+                      <strong style={{ color: "var(--t-bright)" }}>smtp.titan.email</strong>
+                    </div>
+                    <div>
+                      <span style={{ color: "var(--t-muted)", display: "block", fontSize: "1.1rem" }}>PORTA:</span>
+                      <strong style={{ color: "var(--accent)" }}>465</strong>
+                    </div>
+                    <div>
+                      <span style={{ color: "var(--t-muted)", display: "block", fontSize: "1.1rem" }}>SEGURANÇA / CRIPTOGRAFIA:</span>
+                      <strong style={{ color: "#10b981" }}>SSL / TLS</strong>
+                    </div>
+                    <div>
+                      <span style={{ color: "var(--t-muted)", display: "block", fontSize: "1.1rem" }}>AUTENTICAÇÃO:</span>
+                      <span style={{ color: "var(--t-medium)" }}>Requerida (mesmo e-mail e senha)</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         )}
@@ -1955,7 +2410,7 @@ export default function PortalDashboardView({ data }: PortalProps) {
                   name: "Development",
                   price: "R$ 300/mês",
                   emails: "15 caixas de e-mail corporativas",
-                  tickets: "Chamados básicos e intermediários (layout e código)",
+                  tickets: "10 chamados básicos e 2 intermediários",
                   sla: "SLA ágil de 24h a 72h",
                   current: plan?.planName === "Development",
                 },
@@ -1963,7 +2418,7 @@ export default function PortalDashboardView({ data }: PortalProps) {
                   name: "Advanced",
                   price: "R$ 700/mês",
                   emails: "30+ caixas de e-mail corporativas",
-                  tickets: "Regras de negócio, integrações de APIs e novas rotas",
+                  tickets: "25 chamados básicos, 5 intermediários e 1 landing page inclusa",
                   sla: "SLA prioritário de até 7 dias",
                   current: plan?.planName === "Advanced",
                 },
@@ -2022,6 +2477,235 @@ export default function PortalDashboardView({ data }: PortalProps) {
                 </div>
               ))}
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* MODAL: BOAS-VINDAS / PRIMEIRO LOGIN & TROCA DE SENHA */}
+      {showFirstLoginModal && (
+        <div
+          style={{
+            position: "fixed",
+            inset: 0,
+            zIndex: 10001,
+            backgroundColor: "rgba(0,0,0,0.85)",
+            backdropFilter: "blur(6px)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            padding: "2rem",
+          }}
+        >
+          <div
+            style={{
+              backgroundColor: "var(--base-tint)",
+              border: "1px solid var(--accent)",
+              borderRadius: "0.4rem",
+              width: "100%",
+              maxWidth: "520px",
+              padding: "3.5rem",
+              boxShadow: "0 25px 50px rgba(0,0,0,0.5)",
+            }}
+          >
+            {firstLoginStep === "CHOICE" ? (
+              <div>
+                <span className="tag tag-s tag-medium" style={{ color: "var(--accent)", fontFamily: "var(--_font-accent)", marginBottom: "1rem", display: "inline-block" }}>
+                  Primeiro Acesso
+                </span>
+                <h3 style={{ fontSize: "2.4rem", fontWeight: 700, color: "var(--t-bright)", margin: "0 0 1.2rem 0", fontFamily: "var(--_font-default)" }}>
+                  Bem-vindo(a) ao seu Portal!
+                </h3>
+                <p style={{ fontSize: "1.4rem", color: "var(--t-medium)", lineHeight: 1.6, marginBottom: "3rem" }}>
+                  Deseja definir sua senha pessoal agora ou continuar com a senha atual recebida por e-mail?
+                </p>
+
+                <div style={{ display: "flex", flexDirection: "column", gap: "1.2rem" }}>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setFirstLoginError("");
+                      setFirstLoginStep("SET_PASSWORD");
+                    }}
+                    className="btn btn-default-icon btn-default-accent slide-right"
+                    style={{ height: "4.6rem", fontSize: "1.3rem", width: "100%", justifyContent: "center" }}
+                  >
+                    <span className="btn-caption" style={{ fontFamily: "var(--_font-accent)", fontWeight: 700 }}>
+                      Definir Nova Senha
+                    </span>
+                  </button>
+
+                  <button
+                    type="button"
+                    disabled={firstLoginLoading}
+                    onClick={async () => {
+                      setFirstLoginLoading(true);
+                      try {
+                        await completeFirstLoginAction({ passwordChanged: false });
+                        setShowFirstLoginModal(false);
+                      } catch {
+                        setShowFirstLoginModal(false);
+                      } finally {
+                        setFirstLoginLoading(false);
+                      }
+                    }}
+                    style={{
+                      height: "4.4rem",
+                      backgroundColor: "transparent",
+                      border: "1px solid var(--st-medium)",
+                      color: "var(--t-medium)",
+                      fontFamily: "var(--_font-accent)",
+                      fontSize: "1.3rem",
+                      borderRadius: "0.2rem",
+                      cursor: "pointer",
+                      transition: "all 0.2s ease",
+                    }}
+                  >
+                    {firstLoginLoading ? "Atualizando..." : "Continuar com a senha atual"}
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <div>
+                <span className="tag tag-s tag-medium" style={{ color: "var(--accent)", fontFamily: "var(--_font-accent)", marginBottom: "1rem", display: "inline-block" }}>
+                  Segurança
+                </span>
+                <h3 style={{ fontSize: "2.2rem", fontWeight: 700, color: "var(--t-bright)", margin: "0 0 1rem 0", fontFamily: "var(--_font-default)" }}>
+                  Definir Senha Pessoal
+                </h3>
+                <p style={{ fontSize: "1.3rem", color: "var(--t-medium)", marginBottom: "2rem" }}>
+                  Crie uma nova senha de no mínimo 6 caracteres para os seus próximos acessos ao portal.
+                </p>
+
+                {firstLoginError && (
+                  <div
+                    style={{
+                      padding: "1rem 1.4rem",
+                      backgroundColor: "rgba(239, 68, 68, 0.15)",
+                      border: "1px solid #ef4444",
+                      color: "#ef4444",
+                      fontSize: "1.2rem",
+                      fontFamily: "var(--_font-accent)",
+                      marginBottom: "1.5rem",
+                      borderRadius: "0.2rem",
+                    }}
+                  >
+                    {firstLoginError}
+                  </div>
+                )}
+
+                <div style={{ display: "flex", flexDirection: "column", gap: "1.5rem", marginBottom: "2.5rem" }}>
+                  <div>
+                    <label style={{ display: "block", fontFamily: "var(--_font-accent)", fontSize: "1.1rem", textTransform: "uppercase", color: "var(--t-medium)", marginBottom: "0.6rem" }}>
+                      Nova Senha *
+                    </label>
+                    <input
+                      type="password"
+                      value={firstLoginPassword}
+                      onChange={(e) => setFirstLoginPassword(e.target.value)}
+                      placeholder="Mínimo 6 caracteres"
+                      style={{
+                        width: "100%",
+                        height: "4.4rem",
+                        padding: "0 1.5rem",
+                        backgroundColor: "var(--base)",
+                        border: "1px solid var(--st-medium)",
+                        color: "var(--t-bright)",
+                        fontFamily: "var(--_font-accent)",
+                        fontSize: "1.3rem",
+                        outline: "none",
+                      }}
+                    />
+                  </div>
+
+                  <div>
+                    <label style={{ display: "block", fontFamily: "var(--_font-accent)", fontSize: "1.1rem", textTransform: "uppercase", color: "var(--t-medium)", marginBottom: "0.6rem" }}>
+                      Confirmar Nova Senha *
+                    </label>
+                    <input
+                      type="password"
+                      value={firstLoginConfirm}
+                      onChange={(e) => setFirstLoginConfirm(e.target.value)}
+                      placeholder="Repita a nova senha"
+                      style={{
+                        width: "100%",
+                        height: "4.4rem",
+                        padding: "0 1.5rem",
+                        backgroundColor: "var(--base)",
+                        border: "1px solid var(--st-medium)",
+                        color: "var(--t-bright)",
+                        fontFamily: "var(--_font-accent)",
+                        fontSize: "1.3rem",
+                        outline: "none",
+                      }}
+                    />
+                  </div>
+                </div>
+
+                <div style={{ display: "flex", gap: "1.2rem" }}>
+                  <button
+                    type="button"
+                    disabled={firstLoginLoading}
+                    onClick={async () => {
+                      if (!firstLoginPassword || firstLoginPassword.length < 6) {
+                        setFirstLoginError("A senha deve ter no mínimo 6 caracteres.");
+                        return;
+                      }
+                      if (firstLoginPassword !== firstLoginConfirm) {
+                        setFirstLoginError("As senhas digitadas não coincidem.");
+                        return;
+                      }
+
+                      setFirstLoginLoading(true);
+                      setFirstLoginError("");
+                      try {
+                        const supabase = createClient();
+                        const { error } = await supabase.auth.updateUser({
+                          password: firstLoginPassword,
+                        });
+                        if (error) {
+                          setFirstLoginError(error.message);
+                          setFirstLoginLoading(false);
+                          return;
+                        }
+
+                        await completeFirstLoginAction({ passwordChanged: true });
+                        setShowFirstLoginModal(false);
+                      } catch (err: unknown) {
+                        const message = err instanceof Error ? err.message : "Erro ao salvar nova senha.";
+                        setFirstLoginError(message);
+                      } finally {
+                        setFirstLoginLoading(false);
+                      }
+                    }}
+                    className="btn btn-default-icon btn-default-accent slide-right"
+                    style={{ flex: 1, height: "4.4rem", fontSize: "1.3rem" }}
+                  >
+                    <span className="btn-caption" style={{ fontFamily: "var(--_font-accent)", fontWeight: 700 }}>
+                      {firstLoginLoading ? "Salvando..." : "Salvar Senha"}
+                    </span>
+                  </button>
+
+                  <button
+                    type="button"
+                    disabled={firstLoginLoading}
+                    onClick={() => setFirstLoginStep("CHOICE")}
+                    style={{
+                      height: "4.4rem",
+                      padding: "0 2rem",
+                      backgroundColor: "transparent",
+                      border: "1px solid var(--st-medium)",
+                      color: "var(--t-medium)",
+                      fontFamily: "var(--_font-accent)",
+                      fontSize: "1.3rem",
+                      borderRadius: "0.2rem",
+                      cursor: "pointer",
+                    }}
+                  >
+                    Voltar
+                  </button>
+                </div>
+              </div>
+            )}
           </div>
         </div>
       )}

@@ -342,13 +342,13 @@ export default function Nav({
                         <a
                           ref={contactSlots[0]}
                           className="tag tag-m"
-                          href="mailto:ola@mindsite.com.br?subject=Message%20from%20your%20site"
+                          href="mailto:contato@mindsite.com.br?subject=Message%20from%20your%20site"
                         >
                           <TextScramble
                             ref={contactRevealSlots[0]}
                             className="mxd-scramble"
                           >
-                            ola@mindsite.com.br
+                            contato@mindsite.com.br
                           </TextScramble>
                         </a>
                       </li>

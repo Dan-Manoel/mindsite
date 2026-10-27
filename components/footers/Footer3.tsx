@@ -83,12 +83,12 @@ export default function Footer3({ name = "MINDSITE" }: { name?: string }) {
                 <p className="footer-data">
                   <CommonScrollAnimated
                     className="anim-uni-slide-down"
-                    href="mailto:ola@mindsite.com.br?subject=Message%20from%20your%20site"
+                    href="mailto:contato@mindsite.com.br?subject=Message%20from%20your%20site"
                     as="a"
                     animation="slideDownLine"
                   >
                     <TextScramble className="mxd-scramble">
-                      ola@mindsite.com.br
+                      contato@mindsite.com.br
                     </TextScramble>
                   </CommonScrollAnimated>
                 </p>

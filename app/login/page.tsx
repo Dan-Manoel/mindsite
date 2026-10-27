@@ -7,7 +7,7 @@ import CommonLoadAnimation, { CommonLoadFade } from "@/components/animations/Com
 
 export default function LoginPage() {
   const [state, formAction, isPending] = useActionState(
-    async (_prevState: any, formData: FormData) => {
+    async (_prevState: { error?: string } | null, formData: FormData) => {
       const res = await signInWithEmail(formData);
       return res || null;
     },
@@ -31,7 +31,7 @@ export default function LoginPage() {
           <div className="container-fluid p-0">
             <div className="row g-0 justify-content-center">
               <div className="col-12 col-md-10 col-lg-7 col-xl-6 mxd-grid-item">
-                
+
                 {/* Voltar para Início */}
                 <CommonLoadFade index={0}>
                   <div style={{ marginBottom: "2.5rem" }} className="loading-fade">
@@ -291,7 +291,7 @@ export default function LoginPage() {
                       >
                         Dúvidas ou solicitação de acesso? Entre em contato via{" "}
                         <a
-                          href="mailto:ola@mindsite.com.br"
+                          href="mailto:contato@mindsite.com.br"
                           style={{
                             color: "var(--t-bright)",
                             textDecoration: "underline",
@@ -299,7 +299,7 @@ export default function LoginPage() {
                             fontWeight: 600,
                           }}
                         >
-                          ola@mindsite.com.br
+                          contato@mindsite.com.br
                         </a>
                       </p>
                     </div>

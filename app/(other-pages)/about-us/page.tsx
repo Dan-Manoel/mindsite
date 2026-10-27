@@ -3,7 +3,6 @@ import InnerHeadline from "@/components/other-pages/about-us/InnerHeadline";
 import ParallaxDividerImage from "@/components/other-pages/about-us/ParallaxDividerImage";
 import Process from "@/components/other-pages/about-us/Process";
 import DoubleMarqueeDivider from "@/components/other-pages/about-us/DoubleMarqueeDivider";
-import Awards from "@/components/other-pages/about-us/Awards";
 import PartnersGrid from "@/components/other-pages/about-us/PartnersGrid";
 import ParallaxDividerImage2 from "@/components/other-pages/about-us/ParallaxDividerImage2";
 import Approach from "@/components/other-pages/about-us/Approach";

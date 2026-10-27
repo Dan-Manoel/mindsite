@@ -1,7 +1,6 @@
 import BlurSection from "@/components/animations/BlurSection";
 
 import CommonAnimatedText from "../animations/CommonAnimatedText";
-import TextScramble from "@/components/animations/TextScramble";
 import FooterBackToTop from "@/components/footers/FooterBackToTop";
 import {
   CommonScrollAnimated,
@@ -115,11 +114,11 @@ export default function Footer4() {
                               <li>
                                 <CommonScrollAnimated
                                   className="anim-uni-slide-down"
-                                  href="mailto:ola@mindsite.com.br?subject=Message%20from%20your%20site"
+                                  href="mailto:contato@mindsite.com.br?subject=Message%20from%20your%20site"
                                   as="a"
                                   animation="slideDownLine"
                                 >
-                                  <span>ola@mindsite.com.br</span>
+                                  <span>contato@mindsite.com.br</span>
                                 </CommonScrollAnimated>
                               </li>
                               <li>

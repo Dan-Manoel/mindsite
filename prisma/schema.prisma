@@ -104,6 +104,7 @@ model User {
   document        String?     // CPF ou CNPJ
   address         String?     // Endereço completo
   avatarUrl       String?
+  autentiqueDocId String?
   role            UserRole    @default(CLIENT)
   createdAt       DateTime    @default(now())
   updatedAt       DateTime    @updatedAt
@@ -112,6 +113,7 @@ model User {
   tickets         Ticket[]
   contracts       Contract[]
   invoices        Invoice[]
+  auditLogs       AuditLog[]
 
   @@map("users")
 }
@@ -157,6 +159,7 @@ model Ticket {
   project         Project         @relation(fields: [projectId], references: [id], onDelete: Cascade)
 
   attachments     TicketAttachment[]
+  comments        TicketComment[]
   createdAt       DateTime        @default(now())
   updatedAt       DateTime        @updatedAt
 
@@ -175,6 +178,18 @@ model TicketAttachment {
   ticket      Ticket   @relation(fields: [ticketId], references: [id], onDelete: Cascade)
 
   @@map("ticket_attachments")
+}
+
+model TicketComment {
+  id         String   @id @default(uuid())
+  message    String   @db.Text
+  authorName String
+  isAdmin    Boolean  @default(false)
+  createdAt  DateTime @default(now())
+  ticketId   String
+  ticket     Ticket   @relation(fields: [ticketId], references: [id], onDelete: Cascade)
+
+  @@map("ticket_comments")
 }
 
 // ----------------------------------------------------
@@ -300,3 +315,23 @@ model CompanyExpense {
 
   @@map("company_expenses")
 }
+
+// ----------------------------------------------------
+// AUDITORIA LGPD & SEGURANÇA
+// ----------------------------------------------------
+model AuditLog {
+  id        String   @id @default(uuid())
+  action    String   // LOGIN, PASSWORD_CHANGE, TICKET_OPEN, CONTRACT_SIGN, PROFILE_EDIT
+  ipAddress String?
+  userAgent String?
+  details   Json?
+  createdAt DateTime @default(now())
+
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([action])
+  @@map("audit_logs")
+}
+

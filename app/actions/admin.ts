@@ -5,6 +5,7 @@ import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
 import { Resend } from "resend";
 import { createInfinitePayCheckoutLink } from "@/lib/payment/infinitepay";
+import { renderInvoiceEmailHtml } from "@/lib/mail/invoiceTemplate";
 import {
   Currency,
   ExpenseCategory,
@@ -29,7 +30,7 @@ export async function assertAdmin() {
   }
 
   const role = user.app_metadata?.role || user.user_metadata?.role;
-  const isDanilo = user.email === "danilo@mindsite.com.br";
+  const isDanilo = user.email === "contato@mindsite.com.br";
 
   if (!isDanilo && role !== "ADMIN") {
     // Verifica no banco de dados também
@@ -83,6 +84,21 @@ export async function getAdminDashboardData() {
     let hasOverdueInstallment = false;
     let hasOverdueInvoice = false;
 
+    let sustainabilityContract: {
+      contractId: string;
+      planName: string;
+      monthlyAmount: number;
+    } | null = null;
+
+    const pendingInstallments: Array<{
+      id: string;
+      installmentNumber: number;
+      description: string;
+      amount: number;
+      scheduledDate: string;
+      projectName: string;
+    }> = [];
+
     // Checa faturas vencidas do cliente
     client.invoices.forEach((inv) => {
       if (new Date(inv.dueDate) < now) {
@@ -97,10 +113,25 @@ export async function getAdminDashboardData() {
           const val = Number(contract.totalAmount);
           mrrTotal += val;
           activeSustainabilityCount++;
-          if (val === 100) sustainabilityPlanLabel = "Essential (R$ 100/mês)";
-          else if (val === 300) sustainabilityPlanLabel = "Development (R$ 300/mês)";
-          else if (val === 700) sustainabilityPlanLabel = "Advanced (R$ 700/mês)";
-          else sustainabilityPlanLabel = `Custom (R$ ${val}/mês)`;
+          let pName = "Personalizado";
+          if (val === 100) {
+            sustainabilityPlanLabel = "Essential (R$ 100/mês)";
+            pName = "Essential";
+          } else if (val === 300) {
+            sustainabilityPlanLabel = "Development (R$ 300/mês)";
+            pName = "Development";
+          } else if (val === 700) {
+            sustainabilityPlanLabel = "Advanced (R$ 700/mês)";
+            pName = "Advanced";
+          } else {
+            sustainabilityPlanLabel = `Custom (R$ ${val}/mês)`;
+          }
+
+          sustainabilityContract = {
+            contractId: contract.id,
+            planName: pName,
+            monthlyAmount: val,
+          };
         }
 
         // Setup e Implantação
@@ -114,6 +145,17 @@ export async function getAdminDashboardData() {
 
             if (inst.status !== InstallmentStatus.PAID && inst.status !== InstallmentStatus.CANCELLED) {
               setupPending += instAmount;
+
+              if (inst.status === InstallmentStatus.SCHEDULED) {
+                pendingInstallments.push({
+                  id: inst.id,
+                  installmentNumber: inst.installmentNumber,
+                  description: inst.description || `Parcela 0${inst.installmentNumber}`,
+                  amount: instAmount,
+                  scheduledDate: inst.scheduledDate.toISOString(),
+                  projectName: proj.name,
+                });
+              }
 
               // Verifica se a parcela passou da data prevista sem baixa
               if (instDate < now) {
@@ -149,6 +191,8 @@ export async function getAdminDashboardData() {
       companyName: client.companyName || client.fullName || "Não informado",
       projectName: client.projects[0]?.name || "Nenhum projeto",
       sustainabilityPlan: sustainabilityPlanLabel,
+      sustainabilityDetails: sustainabilityContract,
+      pendingInstallments,
       setupTotal,
       setupPaid,
       setupDue: setupPending,
@@ -166,6 +210,9 @@ export async function getAdminDashboardData() {
       user: true,
       project: true,
       attachments: true,
+      comments: {
+        orderBy: { createdAt: "asc" },
+      },
     },
     orderBy: { createdAt: "desc" },
   });
@@ -203,6 +250,13 @@ export async function getAdminDashboardData() {
       project: { name: t.project.name, domain: t.project.domain },
       attachmentsCount: t.attachments.length,
       attachments: t.attachments,
+      comments: (t.comments || []).map((c) => ({
+        id: c.id,
+        message: c.message,
+        authorName: c.authorName,
+        isAdmin: c.isAdmin,
+        createdAt: c.createdAt.toISOString(),
+      })),
     })),
     stats: {
       openTickets: tickets.filter((t) => t.status === "OPEN").length,
@@ -267,7 +321,7 @@ export async function updateTicketStatusAction(
 ) {
   await assertAdmin();
 
-  const dataToUpdate: any = { status: newStatus };
+  const dataToUpdate: { status: TicketStatus; resolvedAt?: Date | null } = { status: newStatus };
   if (newStatus === "RESOLVED") {
     dataToUpdate.resolvedAt = new Date();
   } else {
@@ -326,9 +380,10 @@ export async function createExpenseAction(input: CreateExpenseInput) {
 
     revalidatePath("/admin/dashboard");
     return { success: true, expenseId: expense.id };
-  } catch (err: any) {
-    console.error("Erro ao criar despesa:", err);
-    return { success: false, error: err.message || "Erro ao registrar despesa." };
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : "Erro ao registrar despesa.";
+    console.error("Erro ao criar despesa:", message);
+    return { success: false, error: message };
   }
 }
 
@@ -354,8 +409,9 @@ export async function settleExpenseAction(
 
     revalidatePath("/admin/dashboard");
     return { success: true };
-  } catch (err: any) {
-    return { success: false, error: err.message || "Erro ao liquidar despesa." };
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : "Erro ao liquidar despesa.";
+    return { success: false, error: message };
   }
 }
 
@@ -423,23 +479,45 @@ export async function createInvoiceWithItemsAction(input: CreateInvoiceInput) {
     revalidatePath("/admin/dashboard");
     revalidatePath("/portal/dashboard");
     return { success: true, invoiceId: invoice.id, invoiceNumber: invoice.invoiceNumber };
-  } catch (err: any) {
-    console.error("Erro na transação de fatura:", err);
-    return { success: false, error: err.message || "Erro ao gerar fatura consolidada." };
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : "Erro ao gerar fatura consolidada.";
+    console.error("Erro na transação de fatura:", message);
+    return { success: false, error: message };
   }
+}
+
+export interface IssueInvoiceItemInput {
+  description: string;
+  amount: number;
+  installmentId?: string;
 }
 
 export async function issueImmediateInvoiceAction(data: {
   userId: string;
-  description: string;
-  amount: number;
+  description?: string;
+  amount?: number;
   installmentId?: string;
+  items?: IssueInvoiceItemInput[];
+  dueDateOption?: "TODAY" | "24H" | "3D" | "5D" | string | number;
   dueDateDays?: number;
 }) {
   await assertAdmin();
 
-  if (!data.userId || data.amount <= 0 || !data.description?.trim()) {
-    return { success: false, error: "Preencha a descrição e um valor válido." };
+  const items: IssueInvoiceItemInput[] =
+    data.items && data.items.length > 0
+      ? data.items
+      : [
+        {
+          description: data.description || "Fatura Avulsa",
+          amount: data.amount || 0,
+          installmentId: data.installmentId,
+        },
+      ];
+
+  const totalAmount = items.reduce((acc, curr) => acc + (Number(curr.amount) || 0), 0);
+
+  if (!data.userId || totalAmount <= 0) {
+    return { success: false, error: "A fatura precisa de itens válidos com valor total maior que zero." };
   }
 
   const client = await prisma.user.findUnique({
@@ -451,20 +529,30 @@ export async function issueImmediateInvoiceAction(data: {
   }
 
   const invoiceNumber = `INV-${Date.now().toString().slice(-6)}`;
-  const days = data.dueDateDays || 3;
-  const dueDate = new Date(Date.now() + days * 24 * 60 * 60 * 1000);
+
+  let dueDate = new Date();
+  if (data.dueDateOption === "TODAY") {
+    dueDate = new Date();
+  } else if (data.dueDateOption === "24H" || data.dueDateOption === "1") {
+    dueDate = new Date(Date.now() + 1 * 24 * 60 * 60 * 1000);
+  } else if (data.dueDateOption === "3D" || data.dueDateOption === "3") {
+    dueDate = new Date(Date.now() + 3 * 24 * 60 * 60 * 1000);
+  } else if (data.dueDateOption === "5D" || data.dueDateOption === "5") {
+    dueDate = new Date(Date.now() + 5 * 24 * 60 * 60 * 1000);
+  } else {
+    const days = typeof data.dueDateOption === "number" ? data.dueDateOption : (data.dueDateDays || 3);
+    dueDate = new Date(Date.now() + days * 24 * 60 * 60 * 1000);
+  }
 
   // 1. Gera link oficial na InfinitePay
   const checkoutRes = await createInfinitePayCheckoutLink({
     orderNsu: invoiceNumber,
-    amountInCents: Math.round(data.amount * 100),
-    items: [
-      {
-        description: data.description.trim(),
-        price: Math.round(data.amount * 100),
-        quantity: 1,
-      },
-    ],
+    amountInCents: Math.round(totalAmount * 100),
+    items: items.map((it) => ({
+      description: it.description.trim(),
+      price: Math.round(it.amount * 100),
+      quantity: 1,
+    })),
     customer: {
       name: client.fullName || "Cliente",
       email: client.email,
@@ -477,65 +565,64 @@ export async function issueImmediateInvoiceAction(data: {
       ? checkoutRes.url
       : `https://pay.infinitepay.io/checkout/${invoiceNumber}`;
 
-  // 2. Salva a fatura no Prisma
+  // 2. Salva a fatura no Prisma com múltiplos itens
   const invoice = await prisma.invoice.create({
     data: {
       invoiceNumber,
       dueDate,
-      totalAmount: data.amount,
+      totalAmount,
       status: "PENDING",
       gatewayPaymentId: checkoutRes.slug || invoiceNumber,
       gatewayInvoiceUrl: checkoutUrl,
       userId: client.id,
       items: {
-        create: [
-          {
-            description: data.description.trim(),
-            amount: data.amount,
-          },
-        ],
+        create: items.map((it) => ({
+          description: it.description.trim(),
+          amount: it.amount,
+        })),
       },
     },
     include: { items: true },
   });
 
-  // Se vinculada a uma parcela agendada
-  if (data.installmentId && invoice.items[0]) {
-    await prisma.contractInstallment.update({
-      where: { id: data.installmentId },
-      data: {
-        status: "BILLED",
-        invoiceItemId: invoice.items[0].id,
-      },
-    });
+  // Vincula as parcelas agendadas aos respectivos invoice items
+  for (let idx = 0; idx < items.length; idx++) {
+    const it = items[idx];
+    if (it.installmentId && invoice.items[idx]) {
+      await prisma.contractInstallment.update({
+        where: { id: it.installmentId },
+        data: {
+          status: "BILLED",
+          invoiceItemId: invoice.items[idx].id,
+        },
+      });
+    }
   }
 
-  // 3. Dispara e-mail imediato via Resend
-  const valorFormatado = `R$ ${data.amount.toFixed(2).replace(".", ",")}`;
+  // 3. Dispara e-mail profissional via Resend usando o template estilizado
   try {
     const resend = new Resend(process.env.RESEND_API_KEY);
+    const emailHtml = renderInvoiceEmailHtml({
+      clientName: client.fullName || "Cliente",
+      invoiceNumber,
+      totalAmount,
+      dueDate: dueDate.toLocaleDateString("pt-BR"),
+      items: items.map((it) => ({
+        description: it.description.trim(),
+        amount: it.amount,
+      })),
+      paymentUrl: checkoutUrl,
+    });
+
     await resend.emails.send({
       from: "MindSite Financeiro <financeiro@mindsite.com.br>",
       to: client.email,
-      subject: `Fatura Emitida: ${data.description} (${valorFormatado})`,
-      html: `
-        <div style="font-family: sans-serif; padding: 25px; max-width: 600px; margin: auto; border: 1px solid #e2e8f0; border-radius: 4px;">
-          <h2 style="color: #002bba; margin-top: 0;">Nova Fatura Emitida</h2>
-          <p>Olá, <strong>${client.fullName || "Cliente"}</strong>.</p>
-          <p>Informamos que foi gerada uma nova fatura (<strong>${invoiceNumber}</strong>) no valor de <strong>${valorFormatado}</strong> com vencimento para <strong>${dueDate.toLocaleDateString("pt-BR")}</strong>.</p>
-          <p><strong>Item / Descrição:</strong> ${data.description}</p>
-          <p style="margin: 30px 0;">
-            <a href="${checkoutUrl}" target="_blank" rel="noopener noreferrer" style="background:#002bba; color:#ffffff; padding:12px 24px; text-decoration:none; border-radius:4px; font-weight:bold; display:inline-block;">
-              Pagar com Cartão ou Pix na InfinitePay ➔
-            </a>
-          </p>
-          <hr style="border: none; border-top: 1px solid #e2e8f0; margin: 20px 0;" />
-          <p style="font-size: 12px; color: #64748b; margin-bottom: 0;">MindSite Agência Digital — CNPJ 19.725.535/0001-58</p>
-        </div>
-      `,
+      subject: `Nova Fatura Disponível: #${invoiceNumber} (R$ ${totalAmount.toFixed(2).replace(".", ",")})`,
+      html: emailHtml,
     });
-  } catch (emailErr: any) {
-    console.error("Falha ao disparar e-mail da fatura imediata:", emailErr.message);
+  } catch (emailErr: unknown) {
+    const message = emailErr instanceof Error ? emailErr.message : "Erro desconhecido";
+    console.error("Falha ao disparar e-mail da fatura imediata:", message);
   }
 
   revalidatePath("/admin/dashboard");
@@ -548,4 +635,51 @@ export async function issueImmediateInvoiceAction(data: {
     checkoutUrl,
     message: "Fatura emitida e enviada por e-mail com sucesso!",
   };
+}
+
+export async function addTicketCommentAction(ticketId: string, message: string) {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    return { success: false, error: "Não autenticado." };
+  }
+
+  if (!message?.trim()) {
+    return { success: false, error: "O comentário não pode ser vazio." };
+  }
+
+  const isAdmin = user.app_metadata?.role === "ADMIN" || user.email === "contato@mindsite.com.br";
+  const authorName = isAdmin
+    ? "Danilo (MindSite)"
+    : user.user_metadata?.full_name || user.email || "Cliente";
+
+  try {
+    const comment = await prisma.ticketComment.create({
+      data: {
+        ticketId,
+        message: message.trim(),
+        authorName,
+        isAdmin,
+      },
+    });
+
+    // Atualiza status do chamado
+    await prisma.ticket.update({
+      where: { id: ticketId },
+      data: {
+        updatedAt: new Date(),
+        ...(isAdmin ? { status: TicketStatus.IN_PROGRESS } : { status: TicketStatus.OPEN }),
+      },
+    });
+
+    revalidatePath("/admin/dashboard");
+    revalidatePath("/portal/dashboard");
+    return { success: true, comment };
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : "Erro ao comentar chamado";
+    return { success: false, error: message };
+  }
 }

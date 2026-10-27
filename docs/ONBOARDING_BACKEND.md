@@ -139,7 +139,7 @@ Crie um arquivo `.env.local` na raiz do projeto com a seguinte estrutura:
 # Resend (E-mails transacionais)
 RESEND_API_KEY=re_xxxxxxxxxxxxxxxxxxxx
 CONTACT_EMAIL_TO=contato@mindsite.com.br
-CONTACT_EMAIL_FROM=onboarding@resend.dev # ou noreply@mindsite.com.br após validar domínio
+CONTACT_EMAIL_FROM=contato@mindsite.com.br # ou noreply@mindsite.com.br após validar domínio
 
 # Supabase (PostgreSQL & BaaS)
 NEXT_PUBLIC_SUPABASE_URL=https://xxxxxxxxxxxx.supabase.co

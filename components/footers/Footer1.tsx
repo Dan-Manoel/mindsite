@@ -13,7 +13,6 @@ import {
   footer1BackgroundImages,
   footer1ForegroundImages,
   footer1NavColumns,
-  footer1PromoItems,
 } from "@/data/footer";
 
 const navLinkClass = "anim-uni-slide-down";

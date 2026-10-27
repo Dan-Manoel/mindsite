@@ -98,7 +98,7 @@ interface PortalDataProps {
 
 export default function ClientPortalView({ initialData }: { initialData: PortalDataProps }) {
   const router = useRouter();
-  const [data, setData] = useState(initialData);
+  const data = initialData;
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [ticketFilter, setTicketFilter] = useState<string>("ALL");
   const [copiedPix, setCopiedPix] = useState(false);
@@ -162,8 +162,9 @@ export default function ClientPortalView({ initialData }: { initialData: PortalD
             mimeType: file.type,
           });
         }
-      } catch (err: any) {
-        console.error("Erro ao subir arquivo:", err);
+      } catch (err: unknown) {
+        const message = err instanceof Error ? err.message : "Erro desconhecido";
+        console.error("Erro ao subir arquivo:", message);
       }
     }
 
@@ -495,7 +496,6 @@ export default function ClientPortalView({ initialData }: { initialData: PortalD
                   const slaDate = new Date(ticket.slaDueAt);
                   const isBasic = ticket.category === "BASIC";
                   const isIntermediate = ticket.category === "INTERMEDIATE";
-                  const isAdvanced = ticket.category === "ADVANCED";
 
                   return (
                     <div

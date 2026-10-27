@@ -4,8 +4,10 @@ import { useState, useEffect, useTransition } from "react";
 import Link from "next/link";
 import { getClientsListAction } from "@/app/actions/adminClients";
 
+type ClientListItem = Awaited<ReturnType<typeof getClientsListAction>>[number];
+
 export default function ClientsListPage() {
-  const [clients, setClients] = useState<any[]>([]);
+  const [clients, setClients] = useState<ClientListItem[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [isPending, startTransition] = useTransition();
 
@@ -30,11 +32,11 @@ export default function ClientsListPage() {
     const emailMatch = (c.email || "").toLowerCase().includes(query);
     const docMatch = (c.document || "").toLowerCase().includes(query);
 
-    const projectMatch = (c.projects || []).some((p: any) =>
+    const projectMatch = (c.projects || []).some((p) =>
       (p.name || "").toLowerCase().includes(query) ||
       (p.domain || "").toLowerCase().includes(query) ||
       (p.contracts || []).some(
-        (cont: any) =>
+        (cont) =>
           (cont.title || "").toLowerCase().includes(query) ||
           (cont.contractType || "").toLowerCase().includes(query)
       )
@@ -244,7 +246,7 @@ export default function ClientsListPage() {
                     </td>
                     <td style={{ padding: "1.5rem" }}>
                       <div style={{ display: "flex", flexWrap: "wrap", gap: "0.5rem" }}>
-                        {(c.projects || []).map((p: any) => (
+                        {(c.projects || []).map((p) => (
                           <span
                             key={p.id}
                             style={{
