@@ -46,7 +46,7 @@ export default function InnerHeadline() {
                                 <div className="inner-headline__title no-sup pre-subtitle-large loading-item">
                                   <CommonHeroTyped className="large animated-type">
                                     <b>Arquiteto de Software</b>
-                                    <b>Cyber Scientist</b>
+                                    <b>Cyber Scientist </b>
                                     <b>Engenheiro SaaS</b>
                                   </CommonHeroTyped>
                                 </div>
