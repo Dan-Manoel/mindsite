@@ -645,7 +645,7 @@ export default function ClientPortalView({ initialData }: { initialData: PortalD
                     <span className="text-[11px] font-mono text-[var(--t-muted)] block uppercase">
                       Vencimento:{" "}
                       <strong className="text-[var(--t-bright)]">
-                        {new Date(data.pendingInvoice.dueDate).toLocaleDateString("pt-BR")}
+                        {new Date(data.pendingInvoice.dueDate).toLocaleDateString("pt-BR", { timeZone: "America/Sao_Paulo" })}
                       </strong>
                     </span>
                     <div className="text-3xl font-mono font-bold text-[var(--t-bright)] mt-1">
@@ -754,7 +754,7 @@ export default function ClientPortalView({ initialData }: { initialData: PortalD
                           {inv.invoiceNumber}
                         </span>
                         <span className="text-[10px] text-[var(--t-muted)]">
-                          {new Date(inv.dueDate).toLocaleDateString("pt-BR")}
+                          {new Date(inv.dueDate).toLocaleDateString("pt-BR", { timeZone: "America/Sao_Paulo" })}
                         </span>
                       </div>
                       <div className="text-right">

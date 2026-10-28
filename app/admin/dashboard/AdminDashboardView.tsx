@@ -23,7 +23,14 @@ import {
 } from "@/app/actions/admin";
 import { resetClientPasswordAction } from "@/app/actions/adminClients";
 import { setTicketAwaitingClientAction } from "@/app/actions/tickets";
+import {
+  getExpenseReceiptSignedUrlAction,
+  attachExpenseReceiptAction,
+  updateExpenseAction,
+} from "@/app/actions/expenses";
 import { signOut } from "@/app/actions/auth";
+import RealizedRevenueChart from "@/src/components/admin/RealizedRevenueChart";
+import type { MonthlyRealizedRevenue } from "@/app/actions/finance.types";
 
 export interface AdminDataProps {
   finance: {
@@ -50,6 +57,9 @@ export interface AdminDataProps {
       projected: number;
       actual: number;
     }>;
+    realizedRevenue12Months?: MonthlyRealizedRevenue[];
+    total12MonthsRealized?: number;
+    averageMonthlyRealized?: number;
     clientBalances: Array<{
       userId: string;
       name: string;
@@ -85,6 +95,15 @@ export interface AdminDataProps {
         amount: number;
         scheduledDate: string;
         projectName: string;
+        invoiceNumber?: string | null;
+        invoiceStatus?: string | null;
+      }>;
+      invoices?: Array<{
+        id: string;
+        invoiceNumber: string;
+        status: string;
+        totalAmount: number;
+        dueDate: string;
       }>;
       setupTotal: number;
       setupPaid: number;
@@ -226,6 +245,26 @@ export default function AdminDashboardView({ initialData }: { initialData: Admin
   const [settleReceiptFile, setSettleReceiptFile] = useState<File | null>(null);
   const [isUploadingReceipt, setIsUploadingReceipt] = useState(false);
 
+  // Comprovantes e Edição de Despesas
+  const [loadingReceiptExpenseId, setLoadingReceiptExpenseId] = useState<string | null>(null);
+  const [attachReceiptExpense, setAttachReceiptExpense] = useState<AdminDataProps["expenses"][0] | null>(null);
+  const [attachReceiptFile, setAttachReceiptFile] = useState<File | null>(null);
+  const [isAttachingReceipt, setIsAttachingReceipt] = useState(false);
+
+  const [editingExpense, setEditingExpense] = useState<AdminDataProps["expenses"][0] | null>(null);
+  const [editExpenseName, setEditExpenseName] = useState("");
+  const [editExpenseCategory, setEditExpenseCategory] = useState<ExpenseCategory>("INFRASTRUCTURE");
+  const [editExpenseFrequency, setEditExpenseFrequency] = useState<ExpenseFrequency>("RECURRENT_MONTHLY");
+  const [editExpenseCurrency, setEditExpenseCurrency] = useState<Currency>("BRL");
+  const [editExpenseEstimated, setEditExpenseEstimated] = useState("");
+  const [editExpenseActual, setEditExpenseActual] = useState("");
+  const [editExpenseDueDate, setEditExpenseDueDate] = useState("");
+  const [editExpensePaymentDate, setEditExpensePaymentDate] = useState("");
+  const [editExpenseIsPaid, setEditExpenseIsPaid] = useState(false);
+  const [editExpenseNotes, setEditExpenseNotes] = useState("");
+  const [editExpenseReceiptFile, setEditExpenseReceiptFile] = useState<File | null>(null);
+  const [isSavingEditExpense, setIsSavingEditExpense] = useState(false);
+
   // Modal: Abertura Administrativa de Chamado
   const [isNewTicketModalOpen, setIsNewTicketModalOpen] = useState(false);
   const [ticketClientId, setTicketClientId] = useState("");
@@ -311,6 +350,7 @@ export default function AdminDashboardView({ initialData }: { initialData: Admin
   const filteredClients = useMemo(() => {
     if (!clientSearchTerm.trim()) return data.finance.clientBalances;
     const term = clientSearchTerm.toLowerCase();
+    const cleanTerm = term.replace(/[#[\]]/g, "").trim();
     return data.finance.clientBalances.filter(
       (c) =>
         c.name.toLowerCase().includes(term) ||
@@ -318,7 +358,15 @@ export default function AdminDashboardView({ initialData }: { initialData: Admin
         c.email.toLowerCase().includes(term) ||
         (c.document && c.document.toLowerCase().includes(term)) ||
         c.projectName.toLowerCase().includes(term) ||
-        c.sustainabilityPlan.toLowerCase().includes(term)
+        c.sustainabilityPlan.toLowerCase().includes(term) ||
+        (c.invoices && c.invoices.some((inv) =>
+          inv.invoiceNumber.toLowerCase().includes(term) ||
+          inv.invoiceNumber.toLowerCase().includes(cleanTerm)
+        )) ||
+        (c.pendingInstallments && c.pendingInstallments.some((inst) =>
+          inst.invoiceNumber?.toLowerCase().includes(term) ||
+          inst.invoiceNumber?.toLowerCase().includes(cleanTerm)
+        ))
     );
   }, [data.finance.clientBalances, clientSearchTerm]);
 
@@ -488,6 +536,158 @@ export default function AdminDashboardView({ initialData }: { initialData: Admin
       showNotification(msg, "error");
     } finally {
       setIsUploadingReceipt(false);
+    }
+  };
+
+  // 1. Abrir Comprovante de Pagamento via Signed URL temporária (60 min)
+  const handleOpenReceipt = async (receiptUrl: string, expenseId: string) => {
+    setLoadingReceiptExpenseId(expenseId);
+    try {
+      const res = await getExpenseReceiptSignedUrlAction(receiptUrl);
+      if (res.success && res.signedUrl) {
+        window.open(res.signedUrl, "_blank");
+      } else {
+        showNotification(res.error || "Não foi possível abrir o comprovante.", "error");
+      }
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : "Erro ao abrir comprovante.";
+      showNotification(msg, "error");
+    } finally {
+      setLoadingReceiptExpenseId(null);
+    }
+  };
+
+  // 2. Anexar Comprovante a uma Despesa sem Recibo
+  const handleAttachReceiptSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!attachReceiptExpense || !attachReceiptFile) {
+      showNotification("Selecione um arquivo de comprovante.", "error");
+      return;
+    }
+
+    setIsAttachingReceipt(true);
+    try {
+      const formData = new FormData();
+      formData.append("expenseId", attachReceiptExpense.id);
+      formData.append("file", attachReceiptFile);
+
+      const res = await attachExpenseReceiptAction(formData);
+      if (res.success && res.receiptUrl) {
+        setExpenses((prev) =>
+          prev.map((exp) =>
+            exp.id === attachReceiptExpense.id
+              ? { ...exp, receiptUrl: res.receiptUrl }
+              : exp
+          )
+        );
+        showNotification("Comprovante anexado com sucesso!");
+        setAttachReceiptExpense(null);
+        setAttachReceiptFile(null);
+        router.refresh();
+      } else {
+        showNotification(res.error || "Erro ao anexar comprovante.", "error");
+      }
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : "Erro ao anexar comprovante.";
+      showNotification(msg, "error");
+    } finally {
+      setIsAttachingReceipt(false);
+    }
+  };
+
+  // 3. Abrir Modal de Edição de Despesa
+  const handleOpenEditExpense = (exp: AdminDataProps["expenses"][0]) => {
+    setEditingExpense(exp);
+    setEditExpenseName(exp.name);
+    setEditExpenseCategory(exp.category as ExpenseCategory);
+    setEditExpenseFrequency((exp.frequency as ExpenseFrequency) || "RECURRENT_MONTHLY");
+    setEditExpenseCurrency(exp.currency as Currency);
+    setEditExpenseEstimated(exp.estimatedAmount.toString());
+    setEditExpenseActual(exp.actualAmountPaid ? exp.actualAmountPaid.toString() : "");
+    setEditExpenseDueDate(exp.dueDate.split("T")[0]);
+    setEditExpensePaymentDate(exp.paymentDate ? exp.paymentDate.split("T")[0] : "");
+    setEditExpenseIsPaid(Boolean(exp.isPaid));
+    setEditExpenseNotes(exp.notes || "");
+    setEditExpenseReceiptFile(null);
+  };
+
+  // 4. Salvar Edição de Despesa
+  const handleSaveEditExpenseSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!editingExpense) return;
+
+    const estAmount = parseFloat(editExpenseEstimated) || 0;
+    const actualAmount = editExpenseActual ? parseFloat(editExpenseActual) : null;
+
+    if (!editExpenseName.trim() || estAmount <= 0) {
+      showNotification("Nome e valor estimado válido são obrigatórios.", "error");
+      return;
+    }
+
+    setIsSavingEditExpense(true);
+    try {
+      let updatedReceiptUrl = editingExpense.receiptUrl;
+
+      // Se enviou novo comprovante na edição
+      if (editExpenseReceiptFile) {
+        const formData = new FormData();
+        formData.append("expenseId", editingExpense.id);
+        formData.append("file", editExpenseReceiptFile);
+
+        const upRes = await attachExpenseReceiptAction(formData);
+        if (upRes.success && upRes.receiptUrl) {
+          updatedReceiptUrl = upRes.receiptUrl;
+        } else {
+          showNotification(upRes.error || "Falha ao enviar comprovante.", "error");
+        }
+      }
+
+      const res = await updateExpenseAction(editingExpense.id, {
+        name: editExpenseName,
+        category: editExpenseCategory,
+        frequency: editExpenseFrequency,
+        currency: editExpenseCurrency,
+        estimatedAmount: estAmount,
+        actualAmountPaid: editExpenseIsPaid ? actualAmount : null,
+        dueDate: editExpenseDueDate,
+        paymentDate: editExpenseIsPaid && editExpensePaymentDate ? editExpensePaymentDate : null,
+        isPaid: editExpenseIsPaid,
+        notes: editExpenseNotes,
+        receiptUrl: updatedReceiptUrl,
+      });
+
+      if (res.success) {
+        setExpenses((prev) =>
+          prev.map((exp) =>
+            exp.id === editingExpense.id
+              ? {
+                  ...exp,
+                  name: editExpenseName,
+                  category: editExpenseCategory,
+                  frequency: editExpenseFrequency,
+                  currency: editExpenseCurrency,
+                  estimatedAmount: estAmount,
+                  actualAmountPaid: editExpenseIsPaid ? actualAmount : null,
+                  dueDate: new Date(editExpenseDueDate).toISOString(),
+                  paymentDate: editExpenseIsPaid && editExpensePaymentDate ? new Date(editExpensePaymentDate).toISOString() : null,
+                  isPaid: editExpenseIsPaid,
+                  notes: editExpenseNotes,
+                  receiptUrl: updatedReceiptUrl,
+                }
+              : exp
+          )
+        );
+        showNotification("Despesa atualizada com sucesso!");
+        setEditingExpense(null);
+        router.refresh();
+      } else {
+        showNotification(res.error || "Erro ao atualizar despesa.", "error");
+      }
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : "Erro ao salvar despesa.";
+      showNotification(msg, "error");
+    } finally {
+      setIsSavingEditExpense(false);
     }
   };
 
@@ -1101,6 +1301,13 @@ export default function AdminDashboardView({ initialData }: { initialData: Admin
                 </div>
               </div>
             </div>
+
+            {/* GRÁFICO 1.5: RECEITA CONFIRMADA / LIQUIDADA (ÚLTIMOS 12 MESES) */}
+            <RealizedRevenueChart
+              data={data.finance.realizedRevenue12Months}
+              totalRealized={data.finance.total12MonthsRealized}
+              averageMonthlyRealized={data.finance.averageMonthlyRealized}
+            />
 
             {/* GRÁFICO 2: DESPESAS PROJETADAS VS. REALIZADAS */}
             <div style={{ backgroundColor: "var(--base-tint)", border: "1px solid var(--st-medium)", padding: "3.5rem", borderRadius: "0.4rem" }}>
@@ -1815,27 +2022,74 @@ export default function AdminDashboardView({ initialData }: { initialData: Admin
                         </td>
                         <td style={{ padding: "1.5rem", textAlign: "center" }}>
                           {exp.receiptUrl ? (
-                            <a
-                              href={exp.receiptUrl}
-                              target="_blank"
-                              rel="noopener noreferrer"
+                            <div style={{ display: "inline-flex", alignItems: "center", gap: "0.6rem", justifyContent: "center" }}>
+                              <button
+                                type="button"
+                                onClick={() => handleOpenReceipt(exp.receiptUrl!, exp.id)}
+                                disabled={loadingReceiptExpenseId === exp.id}
+                                style={{
+                                  display: "inline-flex",
+                                  alignItems: "center",
+                                  gap: "0.4rem",
+                                  padding: "0.4rem 0.9rem",
+                                  backgroundColor: "rgba(0, 43, 186, 0.12)",
+                                  border: "1px solid var(--accent)",
+                                  color: "#819ffe",
+                                  borderRadius: "0.2rem",
+                                  fontSize: "1.1rem",
+                                  fontFamily: "var(--_font-accent)",
+                                  cursor: "pointer",
+                                  fontWeight: 600,
+                                }}
+                                title="Visualizar recibo seguro (Signed URL)"
+                              >
+                                {loadingReceiptExpenseId === exp.id ? "Abrindo..." : "Recibo ↗"}
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  setAttachReceiptExpense(exp);
+                                  setAttachReceiptFile(null);
+                                }}
+                                style={{
+                                  padding: "0.4rem 0.6rem",
+                                  backgroundColor: "var(--base)",
+                                  border: "1px solid var(--st-medium)",
+                                  color: "var(--t-medium)",
+                                  borderRadius: "0.2rem",
+                                  fontSize: "1.1rem",
+                                  cursor: "pointer",
+                                }}
+                                title="Substituir comprovante"
+                              >
+                                ↺
+                              </button>
+                            </div>
+                          ) : (
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setAttachReceiptExpense(exp);
+                                setAttachReceiptFile(null);
+                              }}
                               style={{
                                 display: "inline-flex",
                                 alignItems: "center",
                                 gap: "0.4rem",
-                                padding: "0.3rem 0.8rem",
-                                backgroundColor: "rgba(0, 43, 186, 0.15)",
-                                border: "1px solid var(--accent)",
-                                color: "#819ffe",
+                                padding: "0.4rem 0.9rem",
+                                backgroundColor: "var(--base)",
+                                border: "1px solid var(--st-medium)",
+                                color: "var(--t-bright)",
                                 borderRadius: "0.2rem",
                                 fontSize: "1.1rem",
-                                textDecoration: "none",
+                                fontFamily: "var(--_font-accent)",
+                                cursor: "pointer",
+                                fontWeight: 600,
                               }}
+                              title="Anexar comprovante de despesa"
                             >
-                              📄 Ver
-                            </a>
-                          ) : (
-                            <span style={{ color: "var(--t-muted)" }}>-</span>
+                              + Anexar
+                            </button>
                           )}
                         </td>
                         <td style={{ padding: "1.5rem", textAlign: "center" }}>
@@ -1851,32 +2105,51 @@ export default function AdminDashboardView({ initialData }: { initialData: Admin
                           </span>
                         </td>
                         <td style={{ padding: "1.5rem", textAlign: "right" }}>
-                          {!exp.isPaid ? (
+                          <div style={{ display: "inline-flex", alignItems: "center", gap: "0.8rem", justifyContent: "flex-end" }}>
+                            {!exp.isPaid && (
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  setSettlingExpenseId(exp.id);
+                                  setSettleActualAmount(exp.estimatedAmount.toString());
+                                  setSettlePaymentDate(new Date().toISOString().split("T")[0]);
+                                  setSettleReceiptFile(null);
+                                }}
+                                style={{
+                                  padding: "0.5rem 1.2rem",
+                                  fontSize: "1.1rem",
+                                  fontFamily: "var(--_font-accent)",
+                                  textTransform: "uppercase",
+                                  backgroundColor: "var(--accent)",
+                                  color: "#ffffff",
+                                  border: "none",
+                                  cursor: "pointer",
+                                  borderRadius: "0.2rem",
+                                  fontWeight: 700,
+                                }}
+                              >
+                                Baixar
+                              </button>
+                            )}
                             <button
-                              onClick={() => {
-                                setSettlingExpenseId(exp.id);
-                                setSettleActualAmount(exp.estimatedAmount.toString());
-                                setSettlePaymentDate(new Date().toISOString().split("T")[0]);
-                                setSettleReceiptFile(null);
-                              }}
+                              type="button"
+                              onClick={() => handleOpenEditExpense(exp)}
                               style={{
-                                padding: "0.5rem 1.2rem",
+                                padding: "0.5rem 1rem",
                                 fontSize: "1.1rem",
                                 fontFamily: "var(--_font-accent)",
-                                textTransform: "uppercase",
-                                backgroundColor: "var(--accent)",
-                                color: "#ffffff",
-                                border: "none",
+                                backgroundColor: "transparent",
+                                color: "var(--t-medium)",
+                                border: "1px solid var(--st-medium)",
                                 cursor: "pointer",
                                 borderRadius: "0.2rem",
-                                fontWeight: 700,
+                                fontWeight: 600,
                               }}
+                              title="Editar despesa"
                             >
-                              Baixar
+                              Editar
                             </button>
-                          ) : (
-                            <span style={{ fontSize: "1.1rem", color: "#10b981" }}>OK</span>
-                          )}
+                          </div>
                         </td>
                       </tr>
                     ))
@@ -1918,7 +2191,7 @@ export default function AdminDashboardView({ initialData }: { initialData: Admin
             <div style={{ marginBottom: "2.5rem" }}>
               <input
                 type="text"
-                placeholder="Buscar por Nome, Empresa, E-mail, CNPJ/CPF ou Projeto..."
+                placeholder="Buscar por Nome, Empresa, E-mail, CNPJ/CPF, Projeto ou Fatura (#INV-XXXXXX)..."
                 value={clientSearchTerm}
                 onChange={(e) => setClientSearchTerm(e.target.value)}
                 style={{
@@ -2004,6 +2277,30 @@ export default function AdminDashboardView({ initialData }: { initialData: Admin
                             R$ {client.setupDue.toFixed(2).replace(".", ",")}
                           </strong>
                         </div>
+                        {client.invoices && client.invoices.length > 0 && (
+                          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: "0.4rem", paddingTop: "0.4rem" }}>
+                            <span style={{ color: "var(--t-medium)", fontSize: "1.1rem" }}>Faturas:</span>
+                            <div style={{ display: "flex", flexWrap: "wrap", gap: "0.4rem" }}>
+                              {client.invoices.slice(0, 3).map((inv) => (
+                                <span
+                                  key={inv.id}
+                                  style={{
+                                    fontFamily: "var(--_font-mono, monospace)",
+                                    fontSize: "1rem",
+                                    fontWeight: 700,
+                                    padding: "0.1rem 0.5rem",
+                                    borderRadius: "0.2rem",
+                                    backgroundColor: inv.status === "PAID" ? "rgba(16, 185, 129, 0.1)" : "rgba(0, 43, 186, 0.08)",
+                                    color: inv.status === "PAID" ? "#10b981" : "var(--accent)",
+                                    border: `1px solid ${inv.status === "PAID" ? "rgba(16, 185, 129, 0.3)" : "rgba(0, 43, 186, 0.25)"}`,
+                                  }}
+                                >
+                                  [ #{inv.invoiceNumber} ]
+                                </span>
+                              ))}
+                            </div>
+                          </div>
+                        )}
                       </div>
                     </div>
 
@@ -2587,11 +2884,39 @@ export default function AdminDashboardView({ initialData }: { initialData: Admin
                             style={{ width: "1.8rem", height: "1.8rem", accentColor: "var(--accent)" }}
                           />
                           <div style={{ flex: 1 }}>
-                            <strong style={{ color: "var(--t-bright)", fontSize: "1.3rem", display: "block" }}>
-                              {inst.description}
-                            </strong>
+                            <div style={{ display: "flex", alignItems: "center", gap: "0.8rem", marginBottom: "0.3rem" }}>
+                              <strong style={{ color: "var(--t-bright)", fontSize: "1.3rem" }}>
+                                {inst.description}
+                              </strong>
+                              {inst.invoiceNumber ? (
+                                <span style={{
+                                  fontFamily: "var(--_font-mono, monospace)",
+                                  fontSize: "1.05rem",
+                                  fontWeight: 700,
+                                  color: "var(--accent)",
+                                  backgroundColor: "rgba(0, 43, 186, 0.08)",
+                                  border: "1px solid rgba(0, 43, 186, 0.25)",
+                                  padding: "0.1rem 0.6rem",
+                                  borderRadius: "0.2rem",
+                                }}>
+                                  [ #{inst.invoiceNumber} ]
+                                </span>
+                              ) : (
+                                <span style={{
+                                  fontFamily: "var(--_font-mono, monospace)",
+                                  fontSize: "1rem",
+                                  color: "var(--t-muted)",
+                                  backgroundColor: "rgba(255, 255, 255, 0.05)",
+                                  border: "1px solid var(--st-medium)",
+                                  padding: "0.1rem 0.5rem",
+                                  borderRadius: "0.2rem",
+                                }}>
+                                  #AGENDADO
+                                </span>
+                              )}
+                            </div>
                             <span style={{ fontSize: "1.1rem", color: "var(--t-muted)" }}>
-                              Previsto para: {new Date(inst.scheduledDate).toLocaleDateString("pt-BR")}
+                              Previsto para: {new Date(inst.scheduledDate).toLocaleDateString("pt-BR", { timeZone: "America/Sao_Paulo" })}
                             </span>
                           </div>
                           <span style={{ fontFamily: "var(--_font-accent)", fontSize: "1.4rem", fontWeight: 700, color: "var(--t-bright)" }}>
@@ -2857,6 +3182,278 @@ export default function AdminDashboardView({ initialData }: { initialData: Admin
                   <span className="btn-caption">
                     {isResolving ? "Enviando..." : "Enviar para Aceite do Cliente"}
                   </span>
+                  <i className="btn-icon" style={{ width: "3.4rem", height: "3.4rem" }}>✓</i>
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* ==================================================== */}
+      {/* MODAL: ANEXAR COMPROVANTE A DESPESA EXISTENTE */}
+      {/* ==================================================== */}
+      {attachReceiptExpense && (
+        <div style={{ position: "fixed", inset: 0, zIndex: 10000, backgroundColor: "rgba(0,0,0,0.85)", display: "flex", alignItems: "center", justifyContent: "center", padding: "2rem" }}>
+          <div style={{ backgroundColor: "var(--base-tint)", border: "1px solid var(--st-medium)", maxWidth: "480px", width: "100%", padding: "3.5rem", borderRadius: "0.4rem" }}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "0.8rem" }}>
+              <h3 style={{ fontSize: "2rem", fontFamily: "var(--_font-default)", fontWeight: 700, color: "var(--t-bright)", margin: 0 }}>
+                Anexar Comprovante
+              </h3>
+              <button
+                type="button"
+                onClick={() => setAttachReceiptExpense(null)}
+                style={{ background: "none", border: "none", color: "var(--t-muted)", fontSize: "1.8rem", cursor: "pointer" }}
+              >
+                ✕
+              </button>
+            </div>
+            <p style={{ fontSize: "1.3rem", color: "var(--t-medium)", margin: "0 0 2rem 0" }}>
+              Despesa: <strong style={{ color: "var(--t-bright)" }}>{attachReceiptExpense.name}</strong> ({attachReceiptExpense.currency === "USD" ? "$" : "R$"} {attachReceiptExpense.estimatedAmount.toFixed(2).replace(".", ",")})
+            </p>
+
+            <form onSubmit={handleAttachReceiptSubmit} className="form" style={{ display: "flex", flexDirection: "column", gap: "1.8rem" }}>
+              <div>
+                <label style={{ display: "block", fontFamily: "var(--_font-accent)", fontSize: "1.1rem", textTransform: "uppercase", color: "var(--t-medium)", marginBottom: "0.6rem", fontWeight: 700 }}>
+                  Arquivo do Comprovante (PDF, PNG, JPG ou WEBP) *
+                </label>
+                <input
+                  type="file"
+                  required
+                  accept=".pdf,image/png,image/jpeg,image/webp"
+                  onChange={(e) => setAttachReceiptFile(e.target.files?.[0] || null)}
+                  style={{
+                    width: "100%",
+                    padding: "1rem",
+                    backgroundColor: "var(--base)",
+                    border: "1px solid var(--st-medium)",
+                    color: "var(--t-bright)",
+                    fontFamily: "var(--_font-accent)",
+                    fontSize: "1.2rem",
+                  }}
+                />
+                <span style={{ fontSize: "1.1rem", color: "var(--t-muted)", marginTop: "0.5rem", display: "block" }}>
+                  O arquivo será salvo com segurança no bucket privado com link assinado sob demanda.
+                </span>
+              </div>
+
+              <div style={{ display: "flex", justifyContent: "flex-end", gap: "1.5rem", marginTop: "1rem" }}>
+                <button
+                  type="button"
+                  onClick={() => setAttachReceiptExpense(null)}
+                  disabled={isAttachingReceipt}
+                  style={{ padding: "1rem 2rem", background: "none", border: "none", fontFamily: "var(--_font-accent)", fontSize: "1.3rem", color: "var(--t-medium)", cursor: "pointer" }}
+                >
+                  Cancelar
+                </button>
+                <button
+                  type="submit"
+                  disabled={isAttachingReceipt || !attachReceiptFile}
+                  className="btn btn-default-icon btn-default-accent"
+                  style={{ height: "4.6rem", padding: "0.4rem 1.8rem", fontSize: "1.3rem" }}
+                >
+                  <span className="btn-caption">{isAttachingReceipt ? "Enviando..." : "Salvar Comprovante"}</span>
+                  <i className="btn-icon" style={{ width: "3.4rem", height: "3.4rem" }}>✓</i>
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* ==================================================== */}
+      {/* MODAL: EDITAR DESPESA OPERACIONAL */}
+      {/* ==================================================== */}
+      {editingExpense && (
+        <div style={{ position: "fixed", inset: 0, zIndex: 10000, backgroundColor: "rgba(0,0,0,0.85)", display: "flex", alignItems: "center", justifyContent: "center", padding: "2rem" }}>
+          <div style={{ backgroundColor: "var(--base-tint)", border: "1px solid var(--st-medium)", maxWidth: "560px", width: "100%", maxHeight: "90vh", overflowY: "auto", padding: "3.5rem", borderRadius: "0.4rem" }}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "0.8rem" }}>
+              <h3 style={{ fontSize: "2rem", fontFamily: "var(--_font-default)", fontWeight: 700, color: "var(--t-bright)", margin: 0 }}>
+                Editar Despesa
+              </h3>
+              <button
+                type="button"
+                onClick={() => setEditingExpense(null)}
+                style={{ background: "none", border: "none", color: "var(--t-muted)", fontSize: "1.8rem", cursor: "pointer" }}
+              >
+                ✕
+              </button>
+            </div>
+            <p style={{ fontSize: "1.3rem", color: "var(--t-medium)", margin: "0 0 2rem 0" }}>
+              Atualize os dados comerciais, vencimento ou status da despesa.
+            </p>
+
+            <form onSubmit={handleSaveEditExpenseSubmit} className="form" style={{ display: "flex", flexDirection: "column", gap: "1.6rem" }}>
+              <div>
+                <label style={{ display: "block", fontFamily: "var(--_font-accent)", fontSize: "1.1rem", textTransform: "uppercase", color: "var(--t-medium)", marginBottom: "0.6rem", fontWeight: 700 }}>
+                  Nome da Despesa *
+                </label>
+                <input
+                  type="text"
+                  required
+                  value={editExpenseName}
+                  onChange={(e) => setEditExpenseName(e.target.value)}
+                  style={{ width: "100%", height: "4.5rem", padding: "0 1.5rem", backgroundColor: "var(--base)", border: "1px solid var(--st-medium)", color: "var(--t-bright)", fontFamily: "var(--_font-accent)", fontSize: "1.4rem", outline: "none" }}
+                />
+              </div>
+
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1.2rem" }}>
+                <div>
+                  <label style={{ display: "block", fontFamily: "var(--_font-accent)", fontSize: "1.1rem", textTransform: "uppercase", color: "var(--t-medium)", marginBottom: "0.6rem", fontWeight: 700 }}>
+                    Categoria
+                  </label>
+                  <select
+                    value={editExpenseCategory}
+                    onChange={(e) => setEditExpenseCategory(e.target.value as ExpenseCategory)}
+                    style={{ width: "100%", height: "4.5rem", padding: "0 1.2rem", backgroundColor: "var(--base)", border: "1px solid var(--st-medium)", color: "var(--t-bright)", fontFamily: "var(--_font-accent)", fontSize: "1.3rem", outline: "none" }}
+                  >
+                    <option value="INFRASTRUCTURE">Infraestrutura</option>
+                    <option value="SAAS_TOOLS">SaaS / Ferramentas</option>
+                    <option value="MARKETING_ADS">Marketing / Tráfego</option>
+                    <option value="LEGAL_TAXES">Jurídico / Impostos</option>
+                    <option value="OPERATIONAL">Operacional</option>
+                    <option value="OTHER">Outros</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label style={{ display: "block", fontFamily: "var(--_font-accent)", fontSize: "1.1rem", textTransform: "uppercase", color: "var(--t-medium)", marginBottom: "0.6rem", fontWeight: 700 }}>
+                    Moeda
+                  </label>
+                  <select
+                    value={editExpenseCurrency}
+                    onChange={(e) => setEditExpenseCurrency(e.target.value as Currency)}
+                    style={{ width: "100%", height: "4.5rem", padding: "0 1.2rem", backgroundColor: "var(--base)", border: "1px solid var(--st-medium)", color: "var(--t-bright)", fontFamily: "var(--_font-accent)", fontSize: "1.3rem", outline: "none" }}
+                  >
+                    <option value="BRL">Real (BRL - R$)</option>
+                    <option value="USD">Dólar (USD - $)</option>
+                  </select>
+                </div>
+              </div>
+
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1.2rem" }}>
+                <div>
+                  <label style={{ display: "block", fontFamily: "var(--_font-accent)", fontSize: "1.1rem", textTransform: "uppercase", color: "var(--t-medium)", marginBottom: "0.6rem", fontWeight: 700 }}>
+                    Valor Previsto *
+                  </label>
+                  <input
+                    type="number"
+                    step="0.01"
+                    required
+                    value={editExpenseEstimated}
+                    onChange={(e) => setEditExpenseEstimated(e.target.value)}
+                    style={{ width: "100%", height: "4.5rem", padding: "0 1.5rem", backgroundColor: "var(--base)", border: "1px solid var(--st-medium)", color: "var(--t-bright)", fontFamily: "var(--_font-accent)", fontSize: "1.4rem", outline: "none" }}
+                  />
+                </div>
+
+                <div>
+                  <label style={{ display: "block", fontFamily: "var(--_font-accent)", fontSize: "1.1rem", textTransform: "uppercase", color: "var(--t-medium)", marginBottom: "0.6rem", fontWeight: 700 }}>
+                    Vencimento *
+                  </label>
+                  <input
+                    type="date"
+                    required
+                    value={editExpenseDueDate}
+                    onChange={(e) => setEditExpenseDueDate(e.target.value)}
+                    style={{ width: "100%", height: "4.5rem", padding: "0 1.5rem", backgroundColor: "var(--base)", border: "1px solid var(--st-medium)", color: "var(--t-bright)", fontFamily: "var(--_font-accent)", fontSize: "1.4rem", outline: "none" }}
+                  />
+                </div>
+              </div>
+
+              <div style={{ padding: "1.5rem", backgroundColor: "var(--base)", border: "1px solid var(--st-medium)", borderRadius: "0.4rem" }}>
+                <label style={{ display: "flex", alignItems: "center", gap: "1rem", cursor: "pointer", fontFamily: "var(--_font-accent)", fontSize: "1.3rem", color: "var(--t-bright)", fontWeight: 600 }}>
+                  <input
+                    type="checkbox"
+                    checked={editExpenseIsPaid}
+                    onChange={(e) => setEditExpenseIsPaid(e.target.checked)}
+                    style={{ width: "1.8rem", height: "1.8rem", accentColor: "var(--accent)" }}
+                  />
+                  Despesa já Liquidada / Paga
+                </label>
+
+                {editExpenseIsPaid && (
+                  <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1.2rem", marginTop: "1.5rem" }}>
+                    <div>
+                      <label style={{ display: "block", fontFamily: "var(--_font-accent)", fontSize: "1.1rem", textTransform: "uppercase", color: "var(--t-medium)", marginBottom: "0.6rem", fontWeight: 700 }}>
+                        Valor Efetivo Pago
+                      </label>
+                      <input
+                        type="number"
+                        step="0.01"
+                        value={editExpenseActual}
+                        onChange={(e) => setEditExpenseActual(e.target.value)}
+                        placeholder="R$ 0,00"
+                        style={{ width: "100%", height: "4.2rem", padding: "0 1.2rem", backgroundColor: "var(--base-tint)", border: "1px solid var(--st-medium)", color: "var(--t-bright)", fontFamily: "var(--_font-accent)", fontSize: "1.3rem", outline: "none" }}
+                      />
+                    </div>
+                    <div>
+                      <label style={{ display: "block", fontFamily: "var(--_font-accent)", fontSize: "1.1rem", textTransform: "uppercase", color: "var(--t-medium)", marginBottom: "0.6rem", fontWeight: 700 }}>
+                        Data da Baixa
+                      </label>
+                      <input
+                        type="date"
+                        value={editExpensePaymentDate}
+                        onChange={(e) => setEditExpensePaymentDate(e.target.value)}
+                        style={{ width: "100%", height: "4.2rem", padding: "0 1.2rem", backgroundColor: "var(--base-tint)", border: "1px solid var(--st-medium)", color: "var(--t-bright)", fontFamily: "var(--_font-accent)", fontSize: "1.3rem", outline: "none" }}
+                      />
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              <div>
+                <label style={{ display: "block", fontFamily: "var(--_font-accent)", fontSize: "1.1rem", textTransform: "uppercase", color: "var(--t-medium)", marginBottom: "0.6rem", fontWeight: 700 }}>
+                  Substituir Comprovante (Opcional)
+                </label>
+                {editingExpense.receiptUrl && (
+                  <div style={{ marginBottom: "0.8rem", fontSize: "1.2rem", color: "#819ffe" }}>
+                    Comprovante atual cadastrado. Selecione um novo arquivo abaixo caso deseje substituí-lo.
+                  </div>
+                )}
+                <input
+                  type="file"
+                  accept=".pdf,image/png,image/jpeg,image/webp"
+                  onChange={(e) => setEditExpenseReceiptFile(e.target.files?.[0] || null)}
+                  style={{
+                    width: "100%",
+                    padding: "1rem",
+                    backgroundColor: "var(--base)",
+                    border: "1px solid var(--st-medium)",
+                    color: "var(--t-bright)",
+                    fontFamily: "var(--_font-accent)",
+                    fontSize: "1.2rem",
+                  }}
+                />
+              </div>
+
+              <div>
+                <label style={{ display: "block", fontFamily: "var(--_font-accent)", fontSize: "1.1rem", textTransform: "uppercase", color: "var(--t-medium)", marginBottom: "0.6rem", fontWeight: 700 }}>
+                  Observações / Notas
+                </label>
+                <textarea
+                  rows={2}
+                  value={editExpenseNotes}
+                  onChange={(e) => setEditExpenseNotes(e.target.value)}
+                  style={{ width: "100%", padding: "1.2rem", backgroundColor: "var(--base)", border: "1px solid var(--st-medium)", color: "var(--t-bright)", fontFamily: "var(--_font-accent)", fontSize: "1.3rem", outline: "none", resize: "vertical" }}
+                />
+              </div>
+
+              <div style={{ display: "flex", justifyContent: "flex-end", gap: "1.5rem", marginTop: "1rem" }}>
+                <button
+                  type="button"
+                  onClick={() => setEditingExpense(null)}
+                  disabled={isSavingEditExpense}
+                  style={{ padding: "1rem 2rem", background: "none", border: "none", fontFamily: "var(--_font-accent)", fontSize: "1.3rem", color: "var(--t-medium)", cursor: "pointer" }}
+                >
+                  Cancelar
+                </button>
+                <button
+                  type="submit"
+                  disabled={isSavingEditExpense}
+                  className="btn btn-default-icon btn-default-accent"
+                  style={{ height: "4.6rem", padding: "0.4rem 1.8rem", fontSize: "1.3rem" }}
+                >
+                  <span className="btn-caption">{isSavingEditExpense ? "Salvando..." : "Salvar Alterações"}</span>
                   <i className="btn-icon" style={{ width: "3.4rem", height: "3.4rem" }}>✓</i>
                 </button>
               </div>

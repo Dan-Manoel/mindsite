@@ -7,6 +7,8 @@ import { ContractType, UserRole } from "@prisma/client";
 import { revalidatePath } from "next/cache";
 import { Resend } from "resend";
 import { renderWelcomeEmailHtml } from "@/lib/mail/welcomeTemplate";
+import { renderNewProjectNotificationEmailHtml } from "@/lib/mail/newProjectTemplate";
+import { parseLocalDate } from "@/lib/utils";
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
@@ -107,7 +109,7 @@ export async function createClientWithProjectsAction(data: ClientDTO) {
                 data: {
                   installmentNumber: i + 1,
                   amount: inst.amount,
-                  scheduledDate: new Date(inst.scheduledDate),
+                  scheduledDate: parseLocalDate(inst.scheduledDate),
                   description: inst.description || `Parcela ${i + 1}`,
                   contractId: setupContract.id,
                 },
@@ -135,7 +137,7 @@ export async function createClientWithProjectsAction(data: ClientDTO) {
                 title: `Sustentação Mensal — ${planTitle} (${proj.name})`,
                 contractType: ContractType.SUSTAINABILITY,
                 totalAmount: planPrice,
-                startDate: proj.sustainabilityStartDate ? new Date(proj.sustainabilityStartDate) : new Date(),
+                startDate: proj.sustainabilityStartDate ? parseLocalDate(proj.sustainabilityStartDate) : new Date(),
                 userId: userId,
                 projectId: createdProject.id,
                 autentiqueDocId: data.autentiqueDocId?.trim() || null,
@@ -220,6 +222,7 @@ export async function getClientsListAction(query?: string) {
               { email: { contains: query, mode: "insensitive" } },
               { document: { contains: query, mode: "insensitive" } },
               { projects: { some: { name: { contains: query, mode: "insensitive" } } } },
+              { invoices: { some: { invoiceNumber: { contains: query, mode: "insensitive" } } } },
             ],
           }
         : {}),
@@ -229,13 +232,29 @@ export async function getClientsListAction(query?: string) {
         include: {
           contracts: {
             include: {
-              installments: { orderBy: { scheduledDate: "asc" } },
+              installments: {
+                include: {
+                  invoiceItem: {
+                    include: {
+                      invoice: {
+                        select: { invoiceNumber: true },
+                      },
+                    },
+                  },
+                },
+                orderBy: { scheduledDate: "asc" },
+              },
             },
           },
         },
       },
       invoices: {
-        where: { status: { in: ["PENDING", "OVERDUE"] } },
+        select: {
+          id: true,
+          invoiceNumber: true,
+          status: true,
+          totalAmount: true,
+        },
       },
     },
     orderBy: { createdAt: "desc" },
@@ -271,10 +290,17 @@ export async function getClientsListAction(query?: string) {
           scheduledDate: ins.scheduledDate.toISOString(),
           status: ins.status,
           description: ins.description,
+          invoiceNumber: ins.invoiceItem?.invoice?.invoiceNumber || null,
         })),
       })),
     })),
-    pendingInvoicesCount: c.invoices.length,
+    invoices: c.invoices.map((inv) => ({
+      id: inv.id,
+      invoiceNumber: inv.invoiceNumber,
+      status: inv.status,
+      totalAmount: Number(inv.totalAmount),
+    })),
+    pendingInvoicesCount: c.invoices.filter((inv) => inv.status === "PENDING" || inv.status === "OVERDUE").length,
   }));
 }
 
@@ -295,10 +321,36 @@ export async function getClientByIdAction(clientId: string) {
           contracts: {
             include: {
               installments: {
+                include: {
+                  invoiceItem: {
+                    include: {
+                      invoice: {
+                        select: {
+                          id: true,
+                          invoiceNumber: true,
+                          status: true,
+                        },
+                      },
+                    },
+                  },
+                },
                 orderBy: { scheduledDate: "asc" },
               },
             },
           },
+        },
+      },
+      invoices: {
+        orderBy: { dueDate: "desc" },
+        select: {
+          id: true,
+          invoiceNumber: true,
+          dueDate: true,
+          totalAmount: true,
+          status: true,
+          paidAt: true,
+          receiptUrl: true,
+          gatewayInvoiceUrl: true,
         },
       },
     },
@@ -336,8 +388,20 @@ export async function getClientByIdAction(clientId: string) {
           scheduledDate: ins.scheduledDate.toISOString(),
           status: ins.status,
           description: ins.description,
+          invoiceNumber: ins.invoiceItem?.invoice?.invoiceNumber || null,
+          invoiceStatus: ins.invoiceItem?.invoice?.status || null,
         })),
       })),
+    })),
+    invoices: (c.invoices || []).map((inv) => ({
+      id: inv.id,
+      invoiceNumber: inv.invoiceNumber,
+      dueDate: inv.dueDate.toISOString(),
+      totalAmount: Number(inv.totalAmount),
+      status: inv.status,
+      paidAt: inv.paidAt?.toISOString() || null,
+      receiptUrl: inv.receiptUrl,
+      gatewayInvoiceUrl: inv.gatewayInvoiceUrl,
     })),
   };
 }
@@ -422,7 +486,7 @@ export async function addProjectToClientAction(clientId: string, proj: ProjectIn
               data: {
                 installmentNumber: i + 1,
                 amount: inst.amount,
-                scheduledDate: new Date(inst.scheduledDate),
+                scheduledDate: parseLocalDate(inst.scheduledDate),
                 description: inst.description || `Parcela ${i + 1}`,
                 contractId: setupContract.id,
               },
@@ -450,7 +514,7 @@ export async function addProjectToClientAction(clientId: string, proj: ProjectIn
               title: `Sustentação Mensal — ${planTitle} (${proj.name})`,
               contractType: ContractType.SUSTAINABILITY,
               totalAmount: planPrice,
-              startDate: proj.sustainabilityStartDate ? new Date(proj.sustainabilityStartDate) : new Date(),
+              startDate: proj.sustainabilityStartDate ? parseLocalDate(proj.sustainabilityStartDate) : new Date(),
               userId: clientId,
               projectId: createdProject.id,
             },
@@ -459,6 +523,49 @@ export async function addProjectToClientAction(clientId: string, proj: ProjectIn
       },
       { timeout: 15000 }
     );
+
+    // Disparo oficial da notificação comercial por e-mail para o cliente
+    try {
+      const clientUser = await prisma.user.findUnique({
+        where: { id: clientId },
+        select: { fullName: true, companyName: true, email: true, secondaryEmail: true },
+      });
+
+      if (clientUser?.email) {
+        const recipients = [clientUser.email, clientUser.secondaryEmail].filter(Boolean) as string[];
+        let sustAmount = 100;
+        if (proj.sustainabilityPlan === "DEVELOPMENT") sustAmount = 300;
+        else if (proj.sustainabilityPlan === "ADVANCED") sustAmount = 700;
+        else if (proj.sustainabilityPlan === "CUSTOM") sustAmount = Number(proj.customPlanAmount) || 0;
+
+        const emailHtml = renderNewProjectNotificationEmailHtml({
+          clientName: clientUser.fullName || clientUser.companyName || "Cliente",
+          projectName: proj.name,
+          domain: proj.domain,
+          description: proj.description,
+          setupAmount: proj.setupAmount,
+          installments: proj.installments.map((inst, idx) => ({
+            installmentNumber: idx + 1,
+            scheduledDate: inst.scheduledDate,
+            amount: Number(inst.amount) || 0,
+            description: inst.description || `Parcela 0${idx + 1}`,
+          })),
+          sustainabilityPlan: proj.sustainabilityPlan,
+          sustainabilityAmount: sustAmount,
+          sustainabilityStartDate: proj.sustainabilityStartDate,
+          portalUrl: "https://mindsite.com.br/portal",
+        });
+
+        await resend.emails.send({
+          from: "MindSite <no-reply@mindsite.com.br>",
+          to: recipients,
+          subject: `Novo Projeto Registrado na sua Conta: ${proj.name} — MindSite`,
+          html: emailHtml,
+        });
+      }
+    } catch (mailErr: unknown) {
+      console.error("[Email New Project] Falha ao disparar e-mail de novo projeto:", mailErr);
+    }
 
     revalidatePath(`/admin/clients/${clientId}/edit`);
     revalidatePath("/admin/clients");
@@ -534,6 +641,7 @@ export async function settleInstallmentManuallyAction(installmentId: string) {
       }
     });
 
+    revalidatePath("/admin");
     revalidatePath("/admin/dashboard");
     revalidatePath("/admin/clients");
     revalidatePath("/portal/dashboard");
@@ -585,7 +693,7 @@ export async function addInstallmentToContractAction(
         data: {
           installmentNumber: nextNumber,
           amount: data.amount,
-          scheduledDate: new Date(data.scheduledDate),
+          scheduledDate: parseLocalDate(data.scheduledDate),
           description: data.description?.trim() || `Parcela ${nextNumber}`,
           status: "SCHEDULED",
           contractId,

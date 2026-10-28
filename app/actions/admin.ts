@@ -21,6 +21,9 @@ import {
   UserRole,
 } from "@prisma/client";
 import { settleInstallmentManuallyAction as settleAction } from "@/app/actions/adminClients";
+import { parseLocalDate } from "@/lib/utils";
+import { calculateRevenueAnalytics } from "./finance";
+
 
 // Validador de autorização de administrador
 export async function assertAdmin() {
@@ -61,8 +64,22 @@ export async function getAdminDashboardData() {
           contracts: {
             include: {
               installments: {
+                include: {
+                  invoiceItem: {
+                    include: {
+                      invoice: {
+                        select: {
+                          id: true,
+                          invoiceNumber: true,
+                          status: true,
+                        },
+                      },
+                    },
+                  },
+                },
                 orderBy: { scheduledDate: "asc" },
               },
+
             },
           },
         },
@@ -113,6 +130,8 @@ export async function getAdminDashboardData() {
       amount: number;
       scheduledDate: string;
       projectName: string;
+      invoiceNumber?: string | null;
+      invoiceStatus?: string | null;
     }> = [];
 
     // Checa faturas vencidas do cliente
@@ -169,7 +188,7 @@ export async function getAdminDashboardData() {
             if (inst.status !== InstallmentStatus.PAID && inst.status !== InstallmentStatus.CANCELLED) {
               setupPending += instAmount;
 
-              if (inst.status === InstallmentStatus.SCHEDULED) {
+              if (inst.status === InstallmentStatus.SCHEDULED || inst.status === InstallmentStatus.BILLED) {
                 pendingInstallments.push({
                   id: inst.id,
                   installmentNumber: inst.installmentNumber,
@@ -177,6 +196,8 @@ export async function getAdminDashboardData() {
                   amount: instAmount,
                   scheduledDate: inst.scheduledDate.toISOString(),
                   projectName: proj.name,
+                  invoiceNumber: inst.invoiceItem?.invoice?.invoiceNumber || null,
+                  invoiceStatus: inst.invoiceItem?.invoice?.status || null,
                 });
               }
 
@@ -227,7 +248,24 @@ export async function getAdminDashboardData() {
           status: c.status,
           totalAmount: Number(c.totalAmount),
           paidAmount: Number(c.paidAmount),
+          installments: c.installments.map((inst) => ({
+            id: inst.id,
+            installmentNumber: inst.installmentNumber,
+            amount: Number(inst.amount),
+            scheduledDate: inst.scheduledDate.toISOString(),
+            status: inst.status,
+            description: inst.description,
+            invoiceNumber: inst.invoiceItem?.invoice?.invoiceNumber || null,
+            invoiceStatus: inst.invoiceItem?.invoice?.status || null,
+          })),
         })),
+      })),
+      invoices: client.invoices.map((inv) => ({
+        id: inv.id,
+        invoiceNumber: inv.invoiceNumber,
+        status: inv.status,
+        totalAmount: Number(inv.totalAmount),
+        dueDate: inv.dueDate.toISOString(),
       })),
       sustainabilityPlan: sustainabilityPlanLabel,
       sustainabilityDetails: sustainabilityContract,
@@ -240,6 +278,7 @@ export async function getAdminDashboardData() {
       ticketsCount: client.tickets.length,
       invoicesCount: client.invoices.length,
     };
+
   });
 
   projected.total = projected.d30 + projected.d60 + projected.d90 + projected.d120;
@@ -392,6 +431,8 @@ export async function getAdminDashboardData() {
     })),
   }));
 
+  const revenueAnalytics = await calculateRevenueAnalytics();
+
   return {
     finance: {
       mrrTotal,
@@ -400,6 +441,9 @@ export async function getAdminDashboardData() {
       projection12Months,
       total12MonthsProjected,
       expensesComparison,
+      realizedRevenue12Months: revenueAnalytics.monthlyStats,
+      total12MonthsRealized: revenueAnalytics.totalRealized,
+      averageMonthlyRealized: revenueAnalytics.averageMonthlyRealized,
       clientBalances,
       monthlyExpenses: {
         estimated: estimatedExpenses,
@@ -796,7 +840,7 @@ export async function createInvoiceWithItemsAction(input: CreateInvoiceInput) {
 
   try {
     const linkedInstIds = input.items.map((it) => it.installmentId).filter(Boolean) as string[];
-    let invoiceDueDate = new Date(input.dueDate);
+    let invoiceDueDate = parseLocalDate(input.dueDate);
     if (linkedInstIds.length > 0) {
       const linkedInst = await prisma.contractInstallment.findMany({
         where: { id: { in: linkedInstIds } },

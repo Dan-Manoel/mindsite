@@ -43,8 +43,24 @@ export default function ClientsListPage() {
       )
     );
 
-    return nameMatch || companyMatch || emailMatch || docMatch || projectMatch;
+    const cleanQuery = query.replace(/[#[\]]/g, "").trim();
+    const invoiceMatch =
+      (c.invoices || []).some((inv) =>
+        inv.invoiceNumber.toLowerCase().includes(query) ||
+        inv.invoiceNumber.toLowerCase().includes(cleanQuery)
+      ) ||
+      (c.projects || []).some((p) =>
+        (p.contracts || []).some((cont) =>
+          (cont.installments || []).some((inst) =>
+            inst.invoiceNumber?.toLowerCase().includes(query) ||
+            inst.invoiceNumber?.toLowerCase().includes(cleanQuery)
+          )
+        )
+      );
+
+    return nameMatch || companyMatch || emailMatch || docMatch || projectMatch || invoiceMatch;
   });
+
 
   return (
     <main
@@ -149,7 +165,7 @@ export default function ClientsListPage() {
               type="text"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              placeholder="Filtrar por Nome, Empresa, Projeto ou Plano de Sustentação..."
+              placeholder="Filtrar por Nome, Empresa, Fatura (#INV-XXXXXX), Projeto ou E-mail..."
               style={{
                 width: "100%",
                 height: "4.8rem",
@@ -226,7 +242,7 @@ export default function ClientsListPage() {
                 <th style={{ padding: "1.5rem" }}>Cliente / Empresa</th>
                 <th style={{ padding: "1.5rem" }}>E-mails (Login / Backup)</th>
                 <th style={{ padding: "1.5rem" }}>Documento</th>
-                <th style={{ padding: "1.5rem" }}>Projetos & Contratos</th>
+                <th style={{ padding: "1.5rem" }}>Projetos & Faturas</th>
                 <th style={{ padding: "1.5rem", textAlign: "right" }}>Ações</th>
               </tr>
             </thead>
@@ -263,22 +279,45 @@ export default function ClientsListPage() {
                       {c.document || "-"}
                     </td>
                     <td style={{ padding: "1.5rem" }}>
-                      <div style={{ display: "flex", flexWrap: "wrap", gap: "0.5rem" }}>
-                        {(c.projects || []).map((p) => (
-                          <span
-                            key={p.id}
-                            style={{
-                              padding: "0.2rem 0.6rem",
-                              fontSize: "1rem",
-                              border: "1px solid var(--st-medium)",
-                              borderRadius: "0.2rem",
-                              backgroundColor: "var(--base)",
-                              color: "var(--t-bright)",
-                            }}
-                          >
-                            {p.name}
-                          </span>
-                        ))}
+                      <div style={{ display: "flex", flexDirection: "column", gap: "0.6rem" }}>
+                        <div style={{ display: "flex", flexWrap: "wrap", gap: "0.5rem" }}>
+                          {(c.projects || []).map((p) => (
+                            <span
+                              key={p.id}
+                              style={{
+                                padding: "0.2rem 0.6rem",
+                                fontSize: "1rem",
+                                border: "1px solid var(--st-medium)",
+                                borderRadius: "0.2rem",
+                                backgroundColor: "var(--base)",
+                                color: "var(--t-bright)",
+                              }}
+                            >
+                              {p.name}
+                            </span>
+                          ))}
+                        </div>
+                        {c.invoices && c.invoices.length > 0 && (
+                          <div style={{ display: "flex", flexWrap: "wrap", gap: "0.4rem" }}>
+                            {c.invoices.slice(0, 4).map((inv) => (
+                              <span
+                                key={inv.id}
+                                style={{
+                                  fontFamily: "monospace",
+                                  fontSize: "0.95rem",
+                                  fontWeight: 700,
+                                  padding: "0.1rem 0.5rem",
+                                  borderRadius: "0.2rem",
+                                  backgroundColor: inv.status === "PAID" ? "rgba(16, 185, 129, 0.1)" : "rgba(0, 43, 186, 0.08)",
+                                  color: inv.status === "PAID" ? "#10b981" : "var(--accent)",
+                                  border: `1px solid ${inv.status === "PAID" ? "rgba(16, 185, 129, 0.3)" : "rgba(0, 43, 186, 0.25)"}`,
+                                }}
+                              >
+                                [ #{inv.invoiceNumber} ]
+                              </span>
+                            ))}
+                          </div>
+                        )}
                       </div>
                     </td>
                     <td style={{ padding: "1.5rem", textAlign: "right" }}>

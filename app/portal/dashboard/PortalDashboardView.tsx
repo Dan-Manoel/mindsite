@@ -1951,7 +1951,7 @@ export default function PortalDashboardView({ data, isFirstLogin }: PortalProps)
                   }}
                 >
                   {data.activeInvoice.invoiceNumber} — Vencimento:{" "}
-                  {new Date(data.activeInvoice.dueDate).toLocaleDateString("pt-BR")}
+                  {new Date(data.activeInvoice.dueDate).toLocaleDateString("pt-BR", { timeZone: "America/Sao_Paulo" })}
                 </h3>
 
                 <div
@@ -2251,7 +2251,7 @@ export default function PortalDashboardView({ data, isFirstLogin }: PortalProps)
                               {inst.projectName}
                             </td>
                             <td style={{ padding: "1.2rem 1rem", color: "var(--t-medium)" }}>
-                              {new Date(inst.scheduledDate).toLocaleDateString("pt-BR")}
+                              {new Date(inst.scheduledDate).toLocaleDateString("pt-BR", { timeZone: "America/Sao_Paulo" })}
                             </td>
                             <td
                               style={{
@@ -2364,7 +2364,7 @@ export default function PortalDashboardView({ data, isFirstLogin }: PortalProps)
                           {inv.invoiceNumber}
                         </td>
                         <td style={{ padding: "1.2rem 1rem", color: "var(--t-medium)" }}>
-                          {new Date(inv.dueDate).toLocaleDateString("pt-BR")}
+                          {new Date(inv.dueDate).toLocaleDateString("pt-BR", { timeZone: "America/Sao_Paulo" })}
                         </td>
                         <td
                           style={{

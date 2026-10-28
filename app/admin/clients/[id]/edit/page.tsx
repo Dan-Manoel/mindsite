@@ -30,6 +30,19 @@ interface ContractInstallmentItem {
   scheduledDate: string | Date;
   amount: number | string;
   status: string;
+  invoiceNumber?: string | null;
+  invoiceStatus?: string | null;
+}
+
+interface ClientInvoiceItem {
+  id: string;
+  invoiceNumber: string;
+  dueDate: string;
+  totalAmount: number;
+  status: string;
+  paidAt?: string | null;
+  receiptUrl?: string | null;
+  gatewayInvoiceUrl?: string | null;
 }
 
 interface ContractItem {
@@ -56,6 +69,7 @@ interface ProjectItem {
   const [address, setAddress] = useState("");
   const [autentiqueDocId, setAutentiqueDocId] = useState("");
   const [projects, setProjects] = useState<ProjectItem[]>([]);
+  const [clientInvoices, setClientInvoices] = useState<ClientInvoiceItem[]>([]);
 
   // Modais
   const [isNewProjectModalOpen, setIsNewProjectModalOpen] = useState(false);
@@ -100,6 +114,7 @@ interface ProjectItem {
       setAddress(client.address || "");
       setAutentiqueDocId(client.autentiqueDocId || "");
       setProjects((client.projects as unknown as ProjectItem[]) || []);
+      setClientInvoices((client.invoices as unknown as ClientInvoiceItem[]) || []);
     }
   }, [resolvedParams.id]);
 
@@ -676,6 +691,7 @@ interface ProjectItem {
                               <thead>
                                 <tr style={{ borderBottom: "1px solid var(--st-medium)", color: "var(--t-muted)", fontSize: "1rem", textTransform: "uppercase" }}>
                                   <th style={{ padding: "0.8rem", textAlign: "left" }}>Parcela</th>
+                                  <th style={{ padding: "0.8rem", textAlign: "left" }}>Fatura / Identificador</th>
                                   <th style={{ padding: "0.8rem", textAlign: "left" }}>Vencimento</th>
                                   <th style={{ padding: "0.8rem", textAlign: "right" }}>Valor</th>
                                   <th style={{ padding: "0.8rem", textAlign: "center" }}>Status</th>
@@ -685,11 +701,41 @@ interface ProjectItem {
                               <tbody>
                                 {c.installments?.map((inst) => {
                                   const isPaid = inst.status === "PAID";
-                                  const dateStr = new Date(inst.scheduledDate).toLocaleDateString("pt-BR");
+                                  const dateStr = new Date(inst.scheduledDate).toLocaleDateString("pt-BR", { timeZone: "America/Sao_Paulo" });
                                   return (
                                     <tr key={inst.id} style={{ borderBottom: "1px solid var(--st-medium)" }}>
                                       <td style={{ padding: "1rem 0.8rem", color: "var(--t-bright)" }}>
                                         #{inst.installmentNumber} - {inst.description || "Parcela"}
+                                      </td>
+                                      <td style={{ padding: "1rem 0.8rem" }}>
+                                        {inst.invoiceNumber ? (
+                                          <span style={{
+                                            fontFamily: "var(--_font-mono, monospace)",
+                                            fontSize: "1.05rem",
+                                            fontWeight: 700,
+                                            color: "var(--accent)",
+                                            backgroundColor: "rgba(0, 43, 186, 0.08)",
+                                            border: "1px solid rgba(0, 43, 186, 0.25)",
+                                            padding: "0.2rem 0.6rem",
+                                            borderRadius: "0.2rem",
+                                            display: "inline-block",
+                                          }}>
+                                            [ #{inst.invoiceNumber} ]
+                                          </span>
+                                        ) : (
+                                          <span style={{
+                                            fontFamily: "var(--_font-mono, monospace)",
+                                            fontSize: "0.95rem",
+                                            color: "var(--t-muted)",
+                                            backgroundColor: "rgba(255, 255, 255, 0.05)",
+                                            border: "1px solid var(--st-medium)",
+                                            padding: "0.2rem 0.6rem",
+                                            borderRadius: "0.2rem",
+                                            display: "inline-block",
+                                          }}>
+                                            #AGENDADO
+                                          </span>
+                                        )}
                                       </td>
                                       <td style={{ padding: "1rem 0.8rem", color: "var(--t-medium)" }}>
                                         {dateStr}
@@ -748,6 +794,123 @@ interface ProjectItem {
                     ))}
                   </div>
                 ))}
+              </div>
+            )}
+          </div>
+
+          {/* Seção 3: Histórico de Faturas Emitidas */}
+          <div style={{ backgroundColor: "var(--base-tint)", border: "1px solid var(--st-medium)", padding: "3rem", borderRadius: "0.4rem" }}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "2rem" }}>
+              <div>
+                <h3 style={{ fontSize: "1.8rem", fontWeight: 700, color: "var(--t-bright)", margin: "0 0 0.5rem 0" }}>
+                  Faturas Emitidas (#INV-XXXXXX)
+                </h3>
+                <p style={{ fontSize: "1.2rem", color: "var(--t-muted)", margin: 0 }}>
+                  Faturas consolidadas geradas no ecossistema e transmitidas para liquidação via InfinitePay.
+                </p>
+              </div>
+            </div>
+
+            {clientInvoices.length === 0 ? (
+              <p style={{ color: "var(--t-muted)", fontSize: "1.2rem", margin: 0, fontStyle: "italic" }}>
+                Nenhuma fatura oficial emitida até o momento para este cliente.
+              </p>
+            ) : (
+              <div style={{ overflowX: "auto" }}>
+                <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "1.2rem", fontFamily: "var(--_font-accent)" }}>
+                  <thead>
+                    <tr style={{ borderBottom: "1px solid var(--st-medium)", color: "var(--t-muted)", fontSize: "1rem", textTransform: "uppercase" }}>
+                      <th style={{ padding: "0.8rem", textAlign: "left" }}>Fatura Oficial</th>
+                      <th style={{ padding: "0.8rem", textAlign: "left" }}>Vencimento</th>
+                      <th style={{ padding: "0.8rem", textAlign: "right" }}>Valor Consolidado</th>
+                      <th style={{ padding: "0.8rem", textAlign: "center" }}>Status</th>
+                      <th style={{ padding: "0.8rem", textAlign: "right" }}>Ações</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {clientInvoices.map((inv) => {
+                      const isPaid = inv.status === "PAID";
+                      const isOverdue = inv.status === "OVERDUE";
+                      return (
+                        <tr key={inv.id} style={{ borderBottom: "1px solid var(--st-medium)" }}>
+                          <td style={{ padding: "1rem 0.8rem" }}>
+                            <span style={{
+                              fontFamily: "var(--_font-mono, monospace)",
+                              fontSize: "1.15rem",
+                              fontWeight: 700,
+                              color: "var(--accent)",
+                              backgroundColor: "rgba(0, 43, 186, 0.08)",
+                              border: "1px solid rgba(0, 43, 186, 0.25)",
+                              padding: "0.2rem 0.7rem",
+                              borderRadius: "0.2rem",
+                              display: "inline-block",
+                            }}>
+                              [ #{inv.invoiceNumber} ]
+                            </span>
+                          </td>
+                          <td style={{ padding: "1rem 0.8rem", color: "var(--t-medium)" }}>
+                            {new Date(inv.dueDate).toLocaleDateString("pt-BR", { timeZone: "America/Sao_Paulo" })}
+                          </td>
+                          <td style={{ padding: "1rem 0.8rem", textAlign: "right", color: "var(--t-bright)", fontWeight: 700 }}>
+                            R$ {Number(inv.totalAmount).toFixed(2).replace(".", ",")}
+                          </td>
+                          <td style={{ padding: "1rem 0.8rem", textAlign: "center" }}>
+                            <span style={{
+                              padding: "0.2rem 0.6rem",
+                              fontSize: "0.95rem",
+                              borderRadius: "0.2rem",
+                              backgroundColor: isPaid ? "rgba(16, 185, 129, 0.1)" : isOverdue ? "rgba(239, 68, 68, 0.1)" : "rgba(245, 158, 11, 0.1)",
+                              color: isPaid ? "#10b981" : isOverdue ? "#ef4444" : "#f59e0b",
+                              border: `1px solid ${isPaid ? "rgba(16, 185, 129, 0.3)" : isOverdue ? "rgba(239, 68, 68, 0.3)" : "rgba(245, 158, 11, 0.3)"}`,
+                            }}>
+                              {isPaid ? "PAGO" : isOverdue ? "VENCIDO" : "PENDENTE"}
+                            </span>
+                          </td>
+                          <td style={{ padding: "1rem 0.8rem", textAlign: "right" }}>
+                            <div style={{ display: "inline-flex", gap: "0.8rem" }}>
+                              {inv.receiptUrl && (
+                                <a
+                                  href={inv.receiptUrl}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  style={{
+                                    padding: "0.4rem 0.8rem",
+                                    fontSize: "1rem",
+                                    color: "#10b981",
+                                    border: "1px solid rgba(16, 185, 129, 0.3)",
+                                    borderRadius: "0.2rem",
+                                    textDecoration: "none",
+                                    fontWeight: 600,
+                                  }}
+                                >
+                                  Comprovante
+                                </a>
+                              )}
+                              {inv.gatewayInvoiceUrl && !isPaid && (
+                                <a
+                                  href={inv.gatewayInvoiceUrl}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  style={{
+                                    padding: "0.4rem 0.8rem",
+                                    fontSize: "1rem",
+                                    backgroundColor: "var(--accent)",
+                                    color: "#ffffff",
+                                    borderRadius: "0.2rem",
+                                    textDecoration: "none",
+                                    fontWeight: 600,
+                                  }}
+                                >
+                                  Checkout InfinitePay
+                                </a>
+                              )}
+                            </div>
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
               </div>
             )}
           </div>
