@@ -71,6 +71,23 @@ export function renderLeadEmailHtml(data: LeadEmailPayload): string {
       .code-font {
         font-family: 'JetBrains Mono', SFMono-Regular, Consolas, Monaco, monospace;
       }
+      @media only screen and (max-width: 480px) {
+        .header-table td {
+          display: block !important;
+          width: 100% !important;
+          text-align: center !important;
+        }
+        .header-badge-cell {
+          padding-top: 16px !important;
+          text-align: center !important;
+        }
+        .header-logo-cell {
+          text-align: center !important;
+        }
+        .header-logo-cell img {
+          margin: 0 auto !important;
+        }
+      }
       @media only screen and (max-width: 600px) {
         .email-card {
           width: 100% !important;
@@ -94,26 +111,6 @@ export function renderLeadEmailHtml(data: LeadEmailPayload): string {
   </head>
   <body style="background-color: #0c0d10; margin: 0; padding: 36px 12px; font-family: 'Manrope', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; -webkit-font-smoothing: antialiased;">
     <table align="center" border="0" cellpadding="0" cellspacing="0" width="100%" style="max-width: 620px; margin: 0 auto;">
-      <!-- Top Brand bar -->
-      <tr>
-        <td style="padding: 0 0 16px 4px;">
-          <table border="0" cellpadding="0" cellspacing="0" width="100%">
-            <tr>
-              <td>
-                <span class="code-font" style="font-family: 'JetBrains Mono', Consolas, monospace; font-size: 11px; font-weight: 700; letter-spacing: 2px; color: #819ffe; text-transform: uppercase;">
-                  • MindSite Lead System •
-                </span>
-              </td>
-              <td align="right">
-                <span class="code-font" style="font-family: 'JetBrains Mono', Consolas, monospace; font-size: 11px; color: #6b7280;">
-                  Vitrine Web
-                </span>
-              </td>
-            </tr>
-          </table>
-        </td>
-      </tr>
-
       <!-- Main Card -->
       <tr>
         <td class="email-card" style="background-color: #14161b; border: 1px solid #282b33; border-radius: 8px; overflow: hidden; box-shadow: 0 8px 30px rgba(0, 0, 0, 0.4);">
@@ -123,10 +120,30 @@ export function renderLeadEmailHtml(data: LeadEmailPayload): string {
               <td style="background-color: #002bba; height: 3px; font-size: 1px; line-height: 1px;">&nbsp;</td>
             </tr>
             <tr>
-              <td style="padding: 32px 32px 24px 32px; background: linear-gradient(180deg, #181a22 0%, #14161b 100%); border-bottom: 1px solid #242730;">
-                <span class="code-font" style="display: inline-block; background-color: rgba(0, 43, 186, 0.2); border: 1px solid rgba(129, 159, 254, 0.4); color: #819ffe; padding: 4px 10px; border-radius: 4px; font-size: 11px; font-weight: 600; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 12px;">
-                  Novo Contato Comercial
-                </span>
+              <td style="padding: 28px 32px 24px 32px; background: linear-gradient(180deg, #181a22 0%, #14161b 100%); border-bottom: 1px solid #242730;">
+                <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%" class="header-table" style="margin-bottom: 24px;">
+                  <tr>
+                    <td class="header-logo-cell" align="left" valign="middle">
+                      <a href="https://mindsite.com.br" target="_blank" style="text-decoration: none; display: inline-block;">
+                        <img 
+                          src="https://mindsite.com.br/img/logo-email.png" 
+                          alt="MindSite" 
+                          width="72" 
+                          height="72" 
+                          style="display: block; width: 72px; height: 72px; max-width: 72px; border: 0; outline: none;" 
+                        />
+                      </a>
+                    </td>
+                    <td class="header-badge-cell" align="right" valign="middle">
+                      <span style="display: inline-block; font-family: 'JetBrains Mono', monospace, sans-serif; font-size: 11px; font-weight: 700; color: #819ffe; background-color: rgba(0, 43, 186, 0.2); border: 1px solid rgba(129, 159, 254, 0.4); padding: 6px 12px; border-radius: 4px; text-transform: uppercase; letter-spacing: 0.05em; white-space: nowrap;">
+                        NOVO CONTATO COMERCIAL
+                      </span>
+                      <div style="font-family: 'JetBrains Mono', monospace, sans-serif; font-size: 11px; color: #6b7280; margin-top: 6px; letter-spacing: 0.02em;">
+                        VITRINE WEB
+                      </div>
+                    </td>
+                  </tr>
+                </table>
                 <h1 style="color: #ffffff; font-size: 24px; font-weight: 700; margin: 0 0 6px 0; letter-spacing: -0.5px; line-height: 1.3;">
                   ${safeName}
                 </h1>

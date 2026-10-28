@@ -15,7 +15,7 @@ export function renderTicketNotificationEmailHtml(params: TicketNotificationEmai
   const portalUrl = params.actionUrl || "https://mindsite.com.br/portal/chamados";
   const isAwaiting = params.type === "AGUARDANDO_CLIENTE";
 
-  const badgeText = isAwaiting ? "[ RESOLUÇÃO PENDENTE DE ACEITE ]" : "[ NOVA RESPOSTA TÉCNICA ]";
+  const badgeText = isAwaiting ? "HOMOLOGAÇÃO" : "NOVA RESPOSTA TÉCNICA";
   const badgeColor = isAwaiting ? "#f59e0b" : "#819ffe";
   const badgeBg = isAwaiting ? "rgba(245, 158, 11, 0.12)" : "rgba(129, 159, 254, 0.12)";
   const badgeBorder = isAwaiting ? "rgba(245, 158, 11, 0.3)" : "rgba(129, 159, 254, 0.3)";
@@ -36,6 +36,25 @@ export function renderTicketNotificationEmailHtml(params: TicketNotificationEmai
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>${isAwaiting ? "Homologação de Chamado" : "Nova Resposta no Chamado"} — MindSite</title>
+  <style>
+    @media only screen and (max-width: 480px) {
+      .header-table td {
+        display: block !important;
+        width: 100% !important;
+        text-align: center !important;
+      }
+      .header-badge-cell {
+        padding-top: 16px !important;
+        text-align: center !important;
+      }
+      .header-logo-cell {
+        text-align: center !important;
+      }
+      .header-logo-cell img {
+        margin: 0 auto !important;
+      }
+    }
+  </style>
 </head>
 <body style="margin: 0; padding: 40px 16px; background-color: #0a0a0c; font-family: 'Manrope', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; -webkit-font-smoothing: antialiased; color: #eeeae8;">
   <table align="center" border="0" cellpadding="0" cellspacing="0" width="100%" style="max-width: 620px; margin: 0 auto; background-color: #111114; border: 1px solid #1f1f24; border-radius: 8px; overflow: hidden; box-shadow: 0 8px 32px rgba(0, 0, 0, 0.45);">
@@ -43,19 +62,25 @@ export function renderTicketNotificationEmailHtml(params: TicketNotificationEmai
     <!-- Topo / Header Institucional Dark -->
     <tr>
       <td style="padding: 28px 32px; background-color: #0d0d10; border-bottom: 1px solid #1f1f24;">
-        <table width="100%" border="0" cellpadding="0" cellspacing="0">
+        <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%" class="header-table" style="margin-bottom: 0;">
           <tr>
-            <td align="left" valign="middle">
+            <td class="header-logo-cell" align="left" valign="middle">
               <a href="https://mindsite.com.br" target="_blank" style="text-decoration: none; display: inline-block;">
-                <img src="https://mindsite.com.br/img/logo.webp" alt="MindSite" width="130" style="display: block; border: 0; outline: none; text-decoration: none; max-width: 130px; height: auto;" />
+                <img 
+                  src="https://mindsite.com.br/img/logo-email.png" 
+                  alt="MindSite" 
+                  width="72" 
+                  height="72" 
+                  style="display: block; width: 72px; height: 72px; max-width: 72px; border: 0; outline: none;" 
+                />
               </a>
             </td>
-            <td align="right" valign="middle">
-              <span style="display: inline-block; padding: 5px 12px; background-color: ${badgeBg}; border: 1px solid ${badgeBorder}; border-radius: 4px; font-family: 'JetBrains Mono', Consolas, Monaco, monospace; font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: ${badgeColor}; font-weight: 700;">
+            <td class="header-badge-cell" align="right" valign="middle">
+              <span style="display: inline-block; font-family: 'JetBrains Mono', monospace, sans-serif; font-size: 11px; font-weight: 700; color: ${badgeColor}; background-color: ${badgeBg}; border: 1px solid ${badgeBorder}; padding: 6px 12px; border-radius: 4px; text-transform: uppercase; letter-spacing: 0.05em; white-space: nowrap;">
                 ${badgeText}
               </span>
-              <div style="font-family: 'JetBrains Mono', Consolas, monospace; font-size: 11px; color: #8f9098; margin-top: 5px; font-weight: 600;">
-                CHAMADO #${params.ticketNumber}
+              <div style="font-family: 'JetBrains Mono', monospace, sans-serif; font-size: 11px; color: #8f9098; margin-top: 6px; letter-spacing: 0.02em;">
+                REF #${params.ticketNumber}
               </div>
             </td>
           </tr>
@@ -99,9 +124,8 @@ export function renderTicketNotificationEmailHtml(params: TicketNotificationEmai
           </tr>
         </table>
 
-        ${
-          isAwaiting
-            ? `
+        ${isAwaiting
+      ? `
         <!-- Box Informativo de Prazo 72h SLA -->
         <table width="100%" border="0" cellpadding="0" cellspacing="0" style="background-color: rgba(245, 158, 11, 0.08); border: 1px solid rgba(245, 158, 11, 0.25); border-radius: 6px; margin-bottom: 24px;">
           <tr>
@@ -116,8 +140,8 @@ export function renderTicketNotificationEmailHtml(params: TicketNotificationEmai
           </tr>
         </table>
         `
-            : ""
-        }
+      : ""
+    }
 
         <!-- CTA Principal -->
         <table width="100%" border="0" cellpadding="0" cellspacing="0">
@@ -167,10 +191,9 @@ export async function sendTicketNotificationEmail(params: {
 
   const subject =
     params.subject ||
-    `[Chamado #${params.ticketNumber}] ${params.ticketTitle} — ${
-      params.type === "AGUARDANDO_CLIENTE"
-        ? "Resolução Pendente de Aceite"
-        : "Nova Resposta da Equipe Técnica"
+    `[Chamado #${params.ticketNumber}] ${params.ticketTitle} — ${params.type === "AGUARDANDO_CLIENTE"
+      ? "Resolução Pendente de Aceite"
+      : "Nova Resposta da Equipe Técnica"
     }`;
 
   const html = renderTicketNotificationEmailHtml(params);

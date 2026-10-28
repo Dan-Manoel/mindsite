@@ -40,7 +40,7 @@ function getStageMetadata(
   switch (stage) {
     case "UPCOMING_5D":
       return {
-        badgeText: "[ LEMBRETE DE VENCIMENTO ]",
+        badgeText: "LEMBRETE DE VENCIMENTO",
         badgeColor: "#002bba",
         badgeBg: "rgba(0, 43, 186, 0.08)",
         badgeBorder: "rgba(0, 43, 186, 0.25)",
@@ -51,7 +51,7 @@ function getStageMetadata(
       };
     case "DUE_TODAY":
       return {
-        badgeText: "[ VENCIMENTO HOJE ]",
+        badgeText: "VENCIMENTO HOJE",
         badgeColor: "#d97706",
         badgeBg: "rgba(217, 119, 6, 0.10)",
         badgeBorder: "rgba(217, 119, 6, 0.30)",
@@ -62,7 +62,7 @@ function getStageMetadata(
       };
     case "OVERDUE_1D":
       return {
-        badgeText: "[ FATURA VENCIDA ]",
+        badgeText: "FATURA VENCIDA",
         badgeColor: "#dc2626",
         badgeBg: "rgba(220, 38, 38, 0.10)",
         badgeBorder: "rgba(220, 38, 38, 0.30)",
@@ -73,7 +73,7 @@ function getStageMetadata(
       };
     case "OVERDUE_3D":
       return {
-        badgeText: "[ AVISO DE SUSPENSÃO ]",
+        badgeText: "AVISO DE SUSPENSÃO",
         badgeColor: "#991b1b",
         badgeBg: "rgba(153, 27, 27, 0.12)",
         badgeBorder: "rgba(153, 27, 27, 0.35)",
@@ -103,8 +103,8 @@ export function renderInvoiceReminderEmailHtml(params: InvoiceReminderProps): st
 
   const itemsHtml = params.items && params.items.length > 0
     ? params.items
-        .map(
-          (item) => `
+      .map(
+        (item) => `
       <tr>
         <td style="padding: 14px 16px; border-bottom: 1px solid #e5e5e5; font-family: 'Manrope', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; font-size: 13px; line-height: 1.5; color: #1f2937;">
           ${item.description}
@@ -113,8 +113,8 @@ export function renderInvoiceReminderEmailHtml(params: InvoiceReminderProps): st
           R$ ${item.amount.toFixed(2).replace(".", ",")}
         </td>
       </tr>`
-        )
-        .join("")
+      )
+      .join("")
     : `
       <tr>
         <td style="padding: 14px 16px; border-bottom: 1px solid #e5e5e5; font-family: 'Manrope', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; font-size: 13px; line-height: 1.5; color: #1f2937;">
@@ -133,6 +133,25 @@ export function renderInvoiceReminderEmailHtml(params: InvoiceReminderProps): st
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>${meta.heading} — MindSite</title>
+  <style>
+    @media only screen and (max-width: 480px) {
+      .header-table td {
+        display: block !important;
+        width: 100% !important;
+        text-align: center !important;
+      }
+      .header-badge-cell {
+        padding-top: 16px !important;
+        text-align: center !important;
+      }
+      .header-logo-cell {
+        text-align: center !important;
+      }
+      .header-logo-cell img {
+        margin: 0 auto !important;
+      }
+    }
+  </style>
 </head>
 <body style="margin: 0; padding: 40px 16px; background-color: #f9f7f7; font-family: 'Manrope', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; -webkit-font-smoothing: antialiased; color: #0f0f0f;">
   <table align="center" border="0" cellpadding="0" cellspacing="0" width="100%" style="max-width: 620px; margin: 0 auto; background-color: #ffffff; border: 1px solid #e5e5e5; border-radius: 8px; box-shadow: 0 4px 24px rgba(0, 0, 0, 0.05); overflow: hidden;">
@@ -140,18 +159,24 @@ export function renderInvoiceReminderEmailHtml(params: InvoiceReminderProps): st
     <!-- Topo com Logo MindSite e Tag do Estágio -->
     <tr>
       <td style="padding: 24px 32px; background-color: #ffffff; border-bottom: 1px solid #e5e5e5;">
-        <table width="100%" border="0" cellpadding="0" cellspacing="0">
+        <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%" class="header-table" style="margin-bottom: 0;">
           <tr>
-            <td align="left" valign="middle">
-              <a href="https://mindsite.com.br" target="_blank" rel="noopener noreferrer" style="text-decoration: none; display: inline-block;">
-                <img src="https://mindsite.com.br/img/logo.webp" alt="MindSite" width="130" style="display: block; border: 0; outline: none; text-decoration: none; max-width: 130px; height: auto;" />
+            <td class="header-logo-cell" align="left" valign="middle">
+              <a href="https://mindsite.com.br" target="_blank" style="text-decoration: none; display: inline-block;">
+                <img 
+                  src="https://mindsite.com.br/img/logo-email.png" 
+                  alt="MindSite" 
+                  width="72" 
+                  height="72" 
+                  style="display: block; width: 72px; height: 72px; max-width: 72px; border: 0; outline: none;" 
+                />
               </a>
             </td>
-            <td align="right" valign="middle">
-              <span style="display: inline-block; padding: 5px 12px; background-color: ${meta.badgeBg}; border: 1px solid ${meta.badgeBorder}; border-radius: 4px; font-family: 'JetBrains Mono', Consolas, Monaco, monospace; font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: ${meta.badgeColor}; font-weight: 700;">
+            <td class="header-badge-cell" align="right" valign="middle">
+              <span style="display: inline-block; font-family: 'JetBrains Mono', monospace, sans-serif; font-size: 11px; font-weight: 700; color: ${meta.badgeColor}; background-color: ${meta.badgeBg}; border: 1px solid ${meta.badgeBorder}; padding: 6px 12px; border-radius: 4px; text-transform: uppercase; letter-spacing: 0.05em; white-space: nowrap;">
                 ${meta.badgeText}
               </span>
-              <div style="font-family: 'JetBrains Mono', Consolas, monospace; font-size: 11px; color: #6b7280; margin-top: 5px; font-weight: 600;">
+              <div style="font-family: 'JetBrains Mono', monospace, sans-serif; font-size: 11px; color: #6b7280; margin-top: 6px; letter-spacing: 0.02em;">
                 REF #${params.invoiceNumber}
               </div>
             </td>
@@ -229,9 +254,8 @@ export function renderInvoiceReminderEmailHtml(params: InvoiceReminderProps): st
         </table>
 
         <!-- Código Pix Copia e Cola em Bloco Mono Destacado caso exista -->
-        ${
-          params.pixCopyPaste
-            ? `
+        ${params.pixCopyPaste
+      ? `
         <table width="100%" border="0" cellpadding="0" cellspacing="0" style="background-color: #f9f7f7; border: 1px dashed #d1d5db; border-radius: 6px; margin-bottom: 24px;">
           <tr>
             <td style="padding: 16px;">
@@ -244,8 +268,8 @@ export function renderInvoiceReminderEmailHtml(params: InvoiceReminderProps): st
             </td>
           </tr>
         </table>`
-            : ""
-        }
+      : ""
+    }
 
         <!-- Seção de Links Úteis no Rodapé -->
         <table width="100%" border="0" cellpadding="0" cellspacing="0" style="border-top: 1px solid #e5e5e5; padding-top: 20px; margin-top: 8px;">

@@ -40,8 +40,11 @@ export async function assertAdmin() {
   const isDanilo = user.email === "contato@mindsite.com.br";
 
   if (!isDanilo && role !== "ADMIN") {
-    // Verifica no banco de dados também
-    const dbUser = await prisma.user.findUnique({ where: { id: user.id } });
+    // Verifica no banco de dados também com projeção enxuta
+    const dbUser = await prisma.user.findUnique({
+      where: { id: user.id },
+      select: { role: true },
+    });
     if (!dbUser || dbUser.role !== "ADMIN") {
       throw new Error("Acesso não autorizado. Área restrita a administradores.");
     }
@@ -55,47 +58,174 @@ export async function getAdminDashboardData() {
 
   const now = new Date();
 
-  // 1. Clientes com contratos, parcelas, projetos e faturas
-  const clients = await prisma.user.findMany({
-    where: { role: UserRole.CLIENT },
-    include: {
-      projects: {
-        include: {
-          contracts: {
-            include: {
-              installments: {
-                include: {
-                  invoiceItem: {
-                    include: {
-                      invoice: {
-                        select: {
-                          id: true,
-                          invoiceNumber: true,
-                          status: true,
+  // Busca concorrente (zero waterfall) de clientes, despesas, tickets, faturas e analytics de receita
+  const [
+    clients,
+    expenses,
+    allExpenseMetrics,
+    tickets,
+    allTicketMetrics,
+    allInvoices,
+    revenueAnalytics,
+  ] = await Promise.all([
+    prisma.user.findMany({
+      where: { role: UserRole.CLIENT },
+      orderBy: { createdAt: "desc" },
+      select: {
+        id: true,
+        fullName: true,
+        email: true,
+        phone: true,
+        companyName: true,
+        document: true,
+        _count: {
+          select: {
+            tickets: true,
+            invoices: true,
+          },
+        },
+        projects: {
+          select: {
+            id: true,
+            name: true,
+            domain: true,
+            isActive: true,
+            contracts: {
+              select: {
+                id: true,
+                title: true,
+                contractType: true,
+                status: true,
+                totalAmount: true,
+                paidAmount: true,
+                installments: {
+                  orderBy: { scheduledDate: "asc" },
+                  take: 20,
+                  select: {
+                    id: true,
+                    installmentNumber: true,
+                    amount: true,
+                    scheduledDate: true,
+                    status: true,
+                    description: true,
+                    invoiceItem: {
+                      select: {
+                        invoice: {
+                          select: {
+                            id: true,
+                            invoiceNumber: true,
+                            status: true,
+                          },
                         },
                       },
                     },
                   },
                 },
-                orderBy: { scheduledDate: "asc" },
               },
-
             },
           },
         },
-      },
-      invoices: {
-        include: {
-          items: true,
+        invoices: {
+          orderBy: { dueDate: "desc" },
+          take: 10,
+          select: {
+            id: true,
+            invoiceNumber: true,
+            status: true,
+            totalAmount: true,
+            dueDate: true,
+          },
         },
-        orderBy: { dueDate: "desc" },
       },
-      tickets: {
-        orderBy: { createdAt: "desc" },
+    }),
+    prisma.companyExpense.findMany({
+      orderBy: { dueDate: "asc" },
+      take: 20,
+      select: {
+        id: true,
+        name: true,
+        category: true,
+        frequency: true,
+        currency: true,
+        estimatedAmount: true,
+        actualAmountPaid: true,
+        exchangeRateUsed: true,
+        dueDate: true,
+        paymentDate: true,
+        isPaid: true,
+        receiptUrl: true,
+        notes: true,
       },
-    },
-    orderBy: { createdAt: "desc" },
-  });
+    }),
+    prisma.companyExpense.findMany({
+      select: {
+        estimatedAmount: true,
+        actualAmountPaid: true,
+        dueDate: true,
+        isPaid: true,
+      },
+    }),
+    prisma.ticket.findMany({
+      orderBy: { createdAt: "desc" },
+      take: 20,
+      select: {
+        id: true,
+        ticketNumber: true,
+        title: true,
+        description: true,
+        category: true,
+        status: true,
+        slaHours: true,
+        slaDueAt: true,
+        createdAt: true,
+        user: {
+          select: {
+            fullName: true,
+            email: true,
+          },
+        },
+        project: {
+          select: {
+            name: true,
+            domain: true,
+          },
+        },
+        attachments: {
+          select: {
+            id: true,
+            fileName: true,
+            fileUrl: true,
+          },
+        },
+        comments: {
+          orderBy: { createdAt: "asc" },
+          select: {
+            id: true,
+            message: true,
+            authorName: true,
+            isAdmin: true,
+            attachments: true,
+            createdAt: true,
+          },
+        },
+      },
+    }),
+    prisma.ticket.findMany({
+      select: {
+        status: true,
+        slaDueAt: true,
+      },
+    }),
+    prisma.invoice.findMany({
+      select: {
+        id: true,
+        dueDate: true,
+        totalAmount: true,
+        status: true,
+      },
+    }),
+    calculateRevenueAnalytics(),
+  ]);
 
   let mrrTotal = 0;
   let activeSustainabilityCount = 0;
@@ -136,7 +266,9 @@ export async function getAdminDashboardData() {
 
     // Checa faturas vencidas do cliente
     client.invoices.forEach((inv) => {
-      const isOverdue = inv.status === InvoiceStatus.OVERDUE || (inv.status === InvoiceStatus.PENDING && new Date(inv.dueDate) < now);
+      const isOverdue =
+        inv.status === InvoiceStatus.OVERDUE ||
+        (inv.status === InvoiceStatus.PENDING && new Date(inv.dueDate) < now);
       if (isOverdue) {
         hasOverdueInvoice = true;
       }
@@ -275,30 +407,18 @@ export async function getAdminDashboardData() {
       setupDue: setupPending,
       status: statusText,
       activeContractsCount: client.projects.reduce((acc, p) => acc + p.contracts.length, 0),
-      ticketsCount: client.tickets.length,
-      invoicesCount: client.invoices.length,
+      ticketsCount: client._count.tickets,
+      invoicesCount: client._count.invoices,
     };
-
   });
 
   projected.total = projected.d30 + projected.d60 + projected.d90 + projected.d120;
 
-  // 2. Despesas, Tickets e Faturas
-  const expenses = await prisma.companyExpense.findMany({ orderBy: { dueDate: "asc" } });
-  const tickets = await prisma.ticket.findMany({
-    include: {
-      user: true,
-      project: true,
-      attachments: true,
-      comments: {
-        orderBy: { createdAt: "asc" },
-      },
-    },
-    orderBy: { createdAt: "desc" },
-  });
-
-  const estimatedExpenses = expenses.reduce((acc, curr) => acc + Number(curr.estimatedAmount), 0);
-  const paidExpenses = expenses
+  const estimatedExpenses = allExpenseMetrics.reduce(
+    (acc, curr) => acc + Number(curr.estimatedAmount),
+    0
+  );
+  const paidExpenses = allExpenseMetrics
     .filter((e) => e.isPaid)
     .reduce((acc, curr) => acc + Number(curr.actualAmountPaid || curr.estimatedAmount), 0);
 
@@ -372,7 +492,7 @@ export async function getAdminDashboardData() {
     const monthKey = `${shortMonthNames[targetDate.getMonth()]}/${targetDate.getFullYear().toString().slice(-2)}`;
     const monthLabel = `${fullMonthNames[targetDate.getMonth()]} ${targetDate.getFullYear()}`;
 
-    const monthExpenses = expenses.filter((e) => {
+    const monthExpenses = allExpenseMetrics.filter((e) => {
       const d = new Date(e.dueDate);
       return d >= targetDate && d < nextMonthDate;
     });
@@ -391,15 +511,6 @@ export async function getAdminDashboardData() {
   }
 
   // 5. Métricas Operacionais Adicionais (Faturas em Atraso consolidado, Distribuição de Assinantes, Resumo de Chamados)
-  const allInvoices = await prisma.invoice.findMany({
-    select: {
-      id: true,
-      dueDate: true,
-      totalAmount: true,
-      status: true,
-    },
-  });
-
   const overdueInvoices = allInvoices.filter(
     (inv) => inv.status === InvoiceStatus.OVERDUE || (inv.status === InvoiceStatus.PENDING && new Date(inv.dueDate) < now)
   );
@@ -407,14 +518,14 @@ export async function getAdminDashboardData() {
   const overdueInvoicesTotal = overdueInvoices.reduce((sum, inv) => sum + Number(inv.totalAmount), 0);
 
   const ticketSummary = {
-    open: tickets.filter((t) => t.status === "OPEN").length,
-    inProgress: tickets.filter((t) => t.status === "IN_PROGRESS").length,
-    waitingClient: tickets.filter((t) => t.status === "WAITING_CLIENT").length,
-    resolved: tickets.filter((t) => t.status === "RESOLVED").length,
-    overdue: tickets.filter(
+    open: allTicketMetrics.filter((t) => t.status === "OPEN").length,
+    inProgress: allTicketMetrics.filter((t) => t.status === "IN_PROGRESS").length,
+    waitingClient: allTicketMetrics.filter((t) => t.status === "WAITING_CLIENT").length,
+    resolved: allTicketMetrics.filter((t) => t.status === "RESOLVED").length,
+    overdue: allTicketMetrics.filter(
       (t) => t.status !== "RESOLVED" && t.status !== "CANCELLED" && new Date(t.slaDueAt) < now
     ).length,
-    total: tickets.length,
+    total: allTicketMetrics.length,
   };
 
   // 6. Opções de clientes para o Combobox de abertura de chamado
@@ -430,8 +541,6 @@ export async function getAdminDashboardData() {
       domain: p.domain,
     })),
   }));
-
-  const revenueAnalytics = await calculateRevenueAnalytics();
 
   return {
     finance: {
@@ -460,22 +569,39 @@ export async function getAdminDashboardData() {
     },
     clientOptions,
     expenses: expenses.map((e) => ({
-      ...e,
+      id: e.id,
+      name: e.name,
+      category: e.category,
+      frequency: e.frequency,
+      currency: e.currency,
       estimatedAmount: Number(e.estimatedAmount),
       actualAmountPaid: e.actualAmountPaid ? Number(e.actualAmountPaid) : null,
       exchangeRateUsed: e.exchangeRateUsed ? Number(e.exchangeRateUsed) : null,
       dueDate: e.dueDate.toISOString(),
       paymentDate: e.paymentDate ? e.paymentDate.toISOString() : null,
+      isPaid: e.isPaid,
+      receiptUrl: e.receiptUrl,
+      notes: e.notes,
     })),
     tickets: tickets.map((t) => ({
-      ...t,
+      id: t.id,
+      ticketNumber: t.ticketNumber,
+      title: t.title,
+      description: t.description,
+      category: t.category,
+      status: t.status,
+      slaHours: t.slaHours,
       slaDueAt: t.slaDueAt.toISOString(),
       createdAt: t.createdAt.toISOString(),
       isOverdue: t.status !== "RESOLVED" && t.status !== "CANCELLED" && new Date(t.slaDueAt) < now,
       client: { name: t.user.fullName || t.user.email, email: t.user.email },
       project: { name: t.project.name, domain: t.project.domain },
       attachmentsCount: t.attachments.length,
-      attachments: t.attachments,
+      attachments: t.attachments.map((a) => ({
+        id: a.id,
+        fileName: a.fileName,
+        fileUrl: a.fileUrl,
+      })),
       comments: (t.comments || []).map((c) => ({
         id: c.id,
         message: c.message,
@@ -486,12 +612,10 @@ export async function getAdminDashboardData() {
       })),
     })),
     stats: {
-      openTickets: tickets.filter((t) => t.status === "OPEN").length,
-      inProgressTickets: tickets.filter((t) => t.status === "IN_PROGRESS").length,
-      overdueTickets: tickets.filter(
-        (t) => t.status !== "RESOLVED" && t.status !== "CANCELLED" && new Date(t.slaDueAt) < now
-      ).length,
-      resolvedTickets: tickets.filter((t) => t.status === "RESOLVED").length,
+      openTickets: ticketSummary.open,
+      inProgressTickets: ticketSummary.inProgress,
+      overdueTickets: ticketSummary.overdue,
+      resolvedTickets: ticketSummary.resolved,
     },
   };
 }
@@ -505,6 +629,7 @@ export async function reclassifyTicketAction(
 
   const ticket = await prisma.ticket.findUnique({
     where: { id: ticketId },
+    select: { id: true, createdAt: true },
   });
 
   if (!ticket) {
@@ -570,7 +695,17 @@ export async function updateTicketStatusAction(
   const updatedTicket = await prisma.ticket.update({
     where: { id: ticketId },
     data: dataToUpdate,
-    include: { user: true },
+    select: {
+      ticketNumber: true,
+      title: true,
+      user: {
+        select: {
+          email: true,
+          fullName: true,
+          companyName: true,
+        },
+      },
+    },
   });
 
   if (newStatus === "WAITING_CLIENT" && updatedTicket.user.email) {
@@ -747,8 +882,15 @@ export async function createTicketForClientAction(data: {
 
   const client = await prisma.user.findUnique({
     where: { id: data.clientId },
-    include: {
-      projects: { where: { id: data.projectId } },
+    select: {
+      id: true,
+      email: true,
+      fullName: true,
+      companyName: true,
+      projects: {
+        where: { id: data.projectId },
+        select: { id: true, name: true },
+      },
     },
   });
 
@@ -872,24 +1014,32 @@ export async function createInvoiceWithItemsAction(input: CreateInvoiceInput) {
             })),
           },
         },
-        include: {
-          items: true,
+        select: {
+          id: true,
+          invoiceNumber: true,
+          items: {
+            select: {
+              id: true,
+            },
+          },
         },
       });
 
-      // Se houver vínculos com parcelas de contrato agendadas, atualiza status para BILLED e vincula invoiceItemId
-      for (let idx = 0; idx < input.items.length; idx++) {
-        const item = input.items[idx];
-        if (item.installmentId && createdInvoice.items[idx]) {
-          await tx.contractInstallment.update({
-            where: { id: item.installmentId },
-            data: {
-              status: "BILLED",
-              invoiceItemId: createdInvoice.items[idx].id,
-            },
-          });
-        }
-      }
+      // Se houver vínculos com parcelas de contrato agendadas, atualiza status para BILLED e vincula invoiceItemId em paralelo
+      await Promise.all(
+        input.items.map((item, idx) => {
+          if (item.installmentId && createdInvoice.items[idx]) {
+            return tx.contractInstallment.update({
+              where: { id: item.installmentId },
+              data: {
+                status: "BILLED",
+                invoiceItemId: createdInvoice.items[idx].id,
+              },
+            });
+          }
+          return Promise.resolve();
+        })
+      );
 
       return createdInvoice;
     });
@@ -940,6 +1090,12 @@ export async function issueImmediateInvoiceAction(data: {
 
   const client = await prisma.user.findUnique({
     where: { id: data.userId },
+    select: {
+      id: true,
+      fullName: true,
+      email: true,
+      phone: true,
+    },
   });
 
   if (!client) {
@@ -1017,22 +1173,31 @@ export async function issueImmediateInvoiceAction(data: {
         })),
       },
     },
-    include: { items: true },
+    select: {
+      id: true,
+      items: {
+        select: {
+          id: true,
+        },
+      },
+    },
   });
 
-  // Vincula as parcelas agendadas aos respectivos invoice items
-  for (let idx = 0; idx < items.length; idx++) {
-    const it = items[idx];
-    if (it.installmentId && invoice.items[idx]) {
-      await prisma.contractInstallment.update({
-        where: { id: it.installmentId },
-        data: {
-          status: "BILLED",
-          invoiceItemId: invoice.items[idx].id,
-        },
-      });
-    }
-  }
+  // Vincula as parcelas agendadas aos respectivos invoice items em paralelo
+  await Promise.all(
+    items.map((it, idx) => {
+      if (it.installmentId && invoice.items[idx]) {
+        return prisma.contractInstallment.update({
+          where: { id: it.installmentId },
+          data: {
+            status: "BILLED",
+            invoiceItemId: invoice.items[idx].id,
+          },
+        });
+      }
+      return Promise.resolve();
+    })
+  );
 
   // 3. Dispara e-mail profissional via Resend usando o template estilizado
   try {
@@ -1092,23 +1257,30 @@ export async function addTicketCommentAction(ticketId: string, message: string) 
     : user.user_metadata?.full_name || user.email || "Cliente";
 
   try {
-    const comment = await prisma.ticketComment.create({
-      data: {
-        ticketId,
-        message: message.trim(),
-        authorName,
-        isAdmin,
-      },
-    });
-
-    // Atualiza status do chamado
-    await prisma.ticket.update({
-      where: { id: ticketId },
-      data: {
-        updatedAt: new Date(),
-        ...(isAdmin ? { status: TicketStatus.IN_PROGRESS } : { status: TicketStatus.OPEN }),
-      },
-    });
+    const [comment] = await Promise.all([
+      prisma.ticketComment.create({
+        data: {
+          ticketId,
+          message: message.trim(),
+          authorName,
+          isAdmin,
+        },
+        select: {
+          id: true,
+          message: true,
+          authorName: true,
+          isAdmin: true,
+        },
+      }),
+      prisma.ticket.update({
+        where: { id: ticketId },
+        data: {
+          updatedAt: new Date(),
+          ...(isAdmin ? { status: TicketStatus.IN_PROGRESS } : { status: TicketStatus.OPEN }),
+        },
+        select: { id: true },
+      }),
+    ]);
 
     revalidatePath("/admin/dashboard");
     revalidatePath("/portal/dashboard");

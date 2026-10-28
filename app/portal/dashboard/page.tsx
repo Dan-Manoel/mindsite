@@ -1,6 +1,5 @@
 import { redirect } from "next/navigation";
 import { getClientDashboardData } from "@/app/actions/portal";
-import { createClient } from "@/lib/supabase/server";
 import PortalDashboardView from "./PortalDashboardView";
 import { Metadata } from "next";
 
@@ -10,16 +9,8 @@ export const metadata: Metadata = {
 };
 
 export default async function ClientDashboardPage() {
-  let isFirstLogin = false;
   let data;
   try {
-    const supabase = await createClient();
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
-
-    isFirstLogin = !!user?.user_metadata?.first_login;
-
     data = await getClientDashboardData();
   } catch (error: unknown) {
     const message = error instanceof Error ? error.message : "Erro desconhecido";
@@ -27,5 +18,5 @@ export default async function ClientDashboardPage() {
     redirect("/login");
   }
 
-  return <PortalDashboardView data={data} isFirstLogin={isFirstLogin} />;
+  return <PortalDashboardView data={data} isFirstLogin={data.isFirstLogin} />;
 }

@@ -21,7 +21,10 @@ async function assertAdminUser() {
   const isDanilo = user.email === "contato@mindsite.com.br";
 
   if (!isDanilo && role !== "ADMIN") {
-    const dbUser = await prisma.user.findUnique({ where: { id: user.id } });
+    const dbUser = await prisma.user.findUnique({
+      where: { id: user.id },
+      select: { role: true },
+    });
     if (!dbUser || dbUser.role !== "ADMIN") {
       throw new Error("Acesso não autorizado.");
     }
@@ -94,68 +97,65 @@ export async function calculateRevenueAnalytics(): Promise<{
   // Data de corte inicial para a consulta no banco
   const startWindowDate = new Date(Date.UTC(monthsList[0].year, monthsList[0].month - 1, 1));
 
-  // 1. Faturas com status PAID e paidAt preenchido
-  const paidInvoices = await prisma.invoice.findMany({
-    where: {
-      status: "PAID",
-      paidAt: {
-        not: null,
-        gte: startWindowDate,
-      },
-    },
-    select: {
-      id: true,
-      invoiceNumber: true,
-      totalAmount: true,
-      paidAt: true,
-      dueDate: true,
-    },
-  });
-
-  // 2. Parcelas avulsas de contrato com status PAID sem invoice vinculada
-  const paidInstallments = await prisma.contractInstallment.findMany({
-    where: {
-      status: "PAID",
-      invoiceItemId: null,
-      OR: [
-        { updatedAt: { gte: startWindowDate } },
-        { scheduledDate: { gte: startWindowDate } },
-      ],
-    },
-    select: {
-      id: true,
-      amount: true,
-      scheduledDate: true,
-      updatedAt: true,
-    },
-  });
-
-  // 3. Faturas projetadas (vencimento na janela temporal)
-  const projectedInvoices = await prisma.invoice.findMany({
-    where: {
-      status: { notIn: ["CANCELLED", "DRAFT"] },
-      dueDate: { gte: startWindowDate },
-    },
-    select: {
-      id: true,
-      totalAmount: true,
-      dueDate: true,
-    },
-  });
-
-  // 4. Parcelas projetadas (sem invoice vinculada)
-  const projectedInstallments = await prisma.contractInstallment.findMany({
-    where: {
-      status: { not: "CANCELLED" },
-      invoiceItemId: null,
-      scheduledDate: { gte: startWindowDate },
-    },
-    select: {
-      id: true,
-      amount: true,
-      scheduledDate: true,
-    },
-  });
+  // Busca concorrente de faturas e parcelas (realizadas e projetadas) em uma única viagem de rede
+  const [paidInvoices, paidInstallments, projectedInvoices, projectedInstallments] =
+    await Promise.all([
+      prisma.invoice.findMany({
+        where: {
+          status: "PAID",
+          paidAt: {
+            not: null,
+            gte: startWindowDate,
+          },
+        },
+        select: {
+          id: true,
+          invoiceNumber: true,
+          totalAmount: true,
+          paidAt: true,
+          dueDate: true,
+        },
+      }),
+      prisma.contractInstallment.findMany({
+        where: {
+          status: "PAID",
+          invoiceItemId: null,
+          OR: [
+            { updatedAt: { gte: startWindowDate } },
+            { scheduledDate: { gte: startWindowDate } },
+          ],
+        },
+        select: {
+          id: true,
+          amount: true,
+          scheduledDate: true,
+          updatedAt: true,
+        },
+      }),
+      prisma.invoice.findMany({
+        where: {
+          status: { notIn: ["CANCELLED", "DRAFT"] },
+          dueDate: { gte: startWindowDate },
+        },
+        select: {
+          id: true,
+          totalAmount: true,
+          dueDate: true,
+        },
+      }),
+      prisma.contractInstallment.findMany({
+        where: {
+          status: { not: "CANCELLED" },
+          invoiceItemId: null,
+          scheduledDate: { gte: startWindowDate },
+        },
+        select: {
+          id: true,
+          amount: true,
+          scheduledDate: true,
+        },
+      }),
+    ]);
 
   // Agrupamento temporal pelos 12 meses
   const monthlyStats: MonthlyRealizedRevenue[] = monthsList.map((slot) => {

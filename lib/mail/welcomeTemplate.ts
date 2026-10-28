@@ -15,38 +15,65 @@ export function renderWelcomeEmailHtml(params: WelcomeEmailProps): string {
       (benefit) => `
       <tr>
         <td style="padding: 6px 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; font-size: 13px; line-height: 1.5; color: #a1a1aa;">
-          <span style="color: #002bba; font-family: 'JetBrains Mono', monospace; font-weight: 700; margin-right: 8px;">[✓]</span>
+          <span style="color: #002bba; font-family: 'JetBrains Mono', monospace; font-weight: 700; margin-right: 8px;">✓</span>
           ${benefit}
         </td>
       </tr>`
     )
     .join("");
 
-  return `
-<!DOCTYPE html>
+  return `<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Acesso à sua Infraestrutura — MindSite</title>
+  <style>
+    @media only screen and (max-width: 480px) {
+      .header-table td {
+        display: block !important;
+        width: 100% !important;
+        text-align: center !important;
+      }
+      .header-badge-cell {
+        padding-top: 16px !important;
+        text-align: center !important;
+      }
+      .header-logo-cell {
+        text-align: center !important;
+      }
+      .header-logo-cell img {
+        margin: 0 auto !important;
+      }
+    }
+  </style>
 </head>
 <body style="margin: 0; padding: 48px 16px; background-color: #0a0a0c; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; -webkit-font-smoothing: antialiased;">
   <table align="center" border="0" cellpadding="0" cellspacing="0" width="100%" style="max-width: 600px; margin: 0 auto; background-color: #111114; border: 1px solid #222227; border-radius: 2px;">
     
-    <!-- Topbar / Tagline -->
+    <!-- Topbar / Header Responsivo -->
     <tr>
       <td style="padding: 24px 32px; border-bottom: 1px solid #1f1f24;">
-        <table width="100%" border="0" cellpadding="0" cellspacing="0">
+        <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%" class="header-table" style="margin-bottom: 0;">
           <tr>
-            <td align="left">
-              <span style="font-family: 'JetBrains Mono', monospace, Consolas; font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: #002bba; font-weight: 700;">
-                [ AMBIENTE ATIVADO ]
-              </span>
+            <td class="header-logo-cell" align="left" valign="middle">
+              <a href="https://mindsite.com.br" target="_blank" style="text-decoration: none; display: inline-block;">
+                <img 
+                  src="https://mindsite.com.br/img/logo-email.png" 
+                  alt="MindSite" 
+                  width="72" 
+                  height="72" 
+                  style="display: block; width: 72px; height: 72px; max-width: 72px; border: 0; outline: none;" 
+                />
+              </a>
             </td>
-            <td align="right">
-              <span style="font-family: 'JetBrains Mono', monospace, Consolas; font-size: 11px; letter-spacing: 0.05em; color: #71717a;">
-                MINDSITE // SAAS
+            <td class="header-badge-cell" align="right" valign="middle">
+              <span style="display: inline-block; font-family: 'JetBrains Mono', monospace, sans-serif; font-size: 11px; font-weight: 700; color: #819ffe; background-color: rgba(0, 43, 186, 0.2); border: 1px solid rgba(129, 159, 254, 0.35); padding: 6px 12px; border-radius: 4px; text-transform: uppercase; letter-spacing: 0.05em; white-space: nowrap;">
+                AMBIENTE ATIVADO
               </span>
+              <div style="font-family: 'JetBrains Mono', monospace, sans-serif; font-size: 11px; color: #71717a; margin-top: 6px; letter-spacing: 0.02em;">
+                MINDSITE // SAAS
+              </div>
             </td>
           </tr>
         </table>
@@ -113,7 +140,7 @@ export function renderWelcomeEmailHtml(params: WelcomeEmailProps): string {
           <tr>
             <td>
               <span style="display: block; font-family: 'JetBrains Mono', monospace, Consolas; font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; color: #e4e4e7; font-weight: 700; margin-bottom: 12px;">
-                PLANO CONTRATADO: <span style="color: #002bba;">[ ${params.planName} ]</span>
+                PLANO CONTRATADO: <span style="color: #002bba;">${params.planName}</span>
               </span>
               <table width="100%" border="0" cellpadding="0" cellspacing="0">
                 ${benefitsList}

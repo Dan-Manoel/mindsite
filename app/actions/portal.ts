@@ -19,145 +19,214 @@ export async function getClientDashboardData() {
     throw new Error("Não autenticado.");
   }
 
-  // 1. Busca dados do usuário, projetos vinculados e contratos
-  let client = await prisma.user.findUnique({
-    where: { id: user.id },
-    include: {
-      projects: {
-        where: { isActive: true },
-        include: {
-          contracts: {
-            where: { status: "ACTIVE" },
-            include: {
-              installments: {
-                orderBy: { scheduledDate: "asc" },
-              },
-            },
+  const isFirstLogin = !!user.user_metadata?.first_login;
+
+  const userSelect = {
+    id: true,
+    fullName: true,
+    email: true,
+    secondaryEmail: true,
+    phone: true,
+    document: true,
+    address: true,
+    avatarUrl: true,
+    companyName: true,
+    autentiqueDocId: true,
+  } as const;
+
+  const projectSelect = {
+    id: true,
+    name: true,
+    domain: true,
+    description: true,
+    contracts: {
+      where: { status: "ACTIVE" as const },
+      select: {
+        id: true,
+        contractType: true,
+        status: true,
+        totalAmount: true,
+        autentiqueDocId: true,
+        installments: {
+          orderBy: { scheduledDate: "asc" as const },
+          take: 20,
+          select: {
+            id: true,
+            installmentNumber: true,
+            amount: true,
+            scheduledDate: true,
+            status: true,
+            description: true,
+            invoiceItemId: true,
           },
-        },
-      },
-      tickets: {
-        orderBy: { createdAt: "desc" },
-        include: {
-          attachments: true,
-          project: true,
-          comments: {
-            orderBy: { createdAt: "asc" },
-          },
-        },
-      },
-      invoices: {
-        orderBy: { dueDate: "desc" },
-        include: {
-          items: true,
         },
       },
     },
-  });
+  } as const;
+
+  const ticketSelect = {
+    id: true,
+    ticketNumber: true,
+    title: true,
+    description: true,
+    category: true,
+    status: true,
+    slaHours: true,
+    slaDueAt: true,
+    slaPausedAt: true,
+    reopenReason: true,
+    createdAt: true,
+    project: {
+      select: {
+        name: true,
+      },
+    },
+    attachments: {
+      select: {
+        id: true,
+        fileName: true,
+        fileUrl: true,
+      },
+    },
+    comments: {
+      orderBy: { createdAt: "asc" as const },
+      select: {
+        id: true,
+        message: true,
+        authorName: true,
+        isAdmin: true,
+        attachments: true,
+        createdAt: true,
+      },
+    },
+  } as const;
+
+  const invoiceSelect = {
+    id: true,
+    invoiceNumber: true,
+    dueDate: true,
+    totalAmount: true,
+    status: true,
+    paidAt: true,
+    receiptUrl: true,
+    gatewayInvoiceUrl: true,
+    pixCopyPaste: true,
+    pixQrCode: true,
+    items: {
+      select: {
+        id: true,
+        description: true,
+        amount: true,
+      },
+    },
+  } as const;
+
+  // 1. Busca concorrente (sem waterfall) de usuário, projetos, chamados, métricas de SLA e faturas
+  const [initialClientRecord, initialProjects, tickets, allTicketMetrics, initialInvoices] =
+    await Promise.all([
+      prisma.user.findUnique({
+        where: { id: user.id },
+        select: userSelect,
+      }),
+      prisma.project.findMany({
+        where: { userId: user.id, isActive: true },
+        select: projectSelect,
+      }),
+      prisma.ticket.findMany({
+        where: { userId: user.id },
+        orderBy: { createdAt: "desc" },
+        take: 20,
+        select: ticketSelect,
+      }),
+      prisma.ticket.findMany({
+        where: { userId: user.id },
+        select: {
+          status: true,
+          slaDueAt: true,
+          createdAt: true,
+        },
+      }),
+      prisma.invoice.findMany({
+        where: { userId: user.id },
+        orderBy: { dueDate: "desc" },
+        take: 20,
+        select: invoiceSelect,
+      }),
+    ]);
+
+  let clientRecord = initialClientRecord;
+  let projects = initialProjects;
+  let invoices = initialInvoices;
 
   // Garante inicialização no banco caso seja primeiro login
-  if (!client) {
-    await prisma.user.create({
+  if (!clientRecord) {
+    clientRecord = await prisma.user.create({
       data: {
         id: user.id,
         email: user.email!,
         fullName: user.user_metadata?.full_name || user.email?.split("@")[0] || "Cliente",
         role: "CLIENT",
       },
+      select: userSelect,
     });
+  }
 
-    client = await prisma.user.findUnique({
-      where: { id: user.id },
-      include: {
-        projects: {
-          where: { isActive: true },
-          include: {
-            contracts: {
-              where: { status: "ACTIVE" },
-              include: {
-                installments: {
-                  orderBy: { scheduledDate: "asc" },
-                },
+  // Se o cliente ainda não possuir projeto, cria um inicial e fatura de demonstração em paralelo
+  if (projects.length === 0) {
+    const [newProject, pendingInv] = await Promise.all([
+      prisma.project.create({
+        data: {
+          name: clientRecord.companyName || `${clientRecord.fullName || "Cliente"} - Website`,
+          slug: `projeto-${clientRecord.id.substring(0, 8)}`,
+          domain: "meudominio.com.br",
+          stagingUrl: "https://staging.mindsite.com.br",
+          description: "Projeto principal de presença digital e sustentação contínua.",
+          userId: clientRecord.id,
+          contracts: {
+            create: {
+              title: "Sustentação Development",
+              contractType: "SUSTAINABILITY",
+              status: "ACTIVE",
+              totalAmount: 300.0,
+              paidAmount: 0.0,
+              userId: clientRecord.id,
+            },
+          },
+        },
+        select: projectSelect,
+      }),
+      prisma.invoice.create({
+        data: {
+          invoiceNumber: `INV-${new Date().getFullYear()}-${Math.floor(1000 + Math.random() * 9000)}`,
+          dueDate: new Date(Date.now() + 5 * 24 * 60 * 60 * 1000),
+          totalAmount: 300.0,
+          status: "PENDING",
+          pixCopyPaste:
+            "00020126580014br.gov.bcb.pix0136contato@mindsite.com.br5204000053039865406300.005802BR5916Mindsite Agencia6009Sao Paulo62070503***6304E8A2",
+          userId: clientRecord.id,
+          items: {
+            create: [
+              {
+                description: "Sustentação Mensal Development",
+                amount: 300.0,
               },
-            },
+            ],
           },
         },
-        tickets: {
-          orderBy: { createdAt: "desc" },
-          include: {
-            attachments: true,
-            project: true,
-            comments: {
-              orderBy: { createdAt: "asc" },
-            },
-          },
-        },
-        invoices: {
-          orderBy: { dueDate: "desc" },
-          include: {
-            items: true,
-          },
-        },
-      },
-    });
+        select: invoiceSelect,
+      }),
+    ]);
+
+    projects = [newProject];
+    invoices = [pendingInv];
   }
 
-  if (!client) {
-    throw new Error("Cliente não localizado no banco de dados.");
-  }
-
-  // Se o cliente ainda não possuir projeto, cria um inicial para permitir abertura imediata de chamados
-  if (client.projects.length === 0) {
-    const newProject = await prisma.project.create({
-      data: {
-        name: client.companyName || `${client.fullName || "Cliente"} - Website`,
-        slug: `projeto-${client.id.substring(0, 8)}`,
-        domain: "meudominio.com.br",
-        stagingUrl: "https://staging.mindsite.com.br",
-        description: "Projeto principal de presença digital e sustentação contínua.",
-        userId: client.id,
-        contracts: {
-          create: {
-            title: "Sustentação Development",
-            contractType: "SUSTAINABILITY",
-            status: "ACTIVE",
-            totalAmount: 300.0,
-            paidAmount: 0.0,
-            userId: client.id,
-          },
-        },
-      },
-      include: {
-        contracts: {
-          include: { installments: true },
-        },
-      },
-    });
-
-    // Cria fatura de demonstração pendente
-    const pendingInv = await prisma.invoice.create({
-      data: {
-        invoiceNumber: `INV-${new Date().getFullYear()}-${Math.floor(1000 + Math.random() * 9000)}`,
-        dueDate: new Date(Date.now() + 5 * 24 * 60 * 60 * 1000),
-        totalAmount: 300.0,
-        status: "PENDING",
-        pixCopyPaste: "00020126580014br.gov.bcb.pix0136contato@mindsite.com.br5204000053039865406300.005802BR5916Mindsite Agencia6009Sao Paulo62070503***6304E8A2",
-        userId: client.id,
-        items: {
-          create: [
-            {
-              description: "Sustentação Mensal Development",
-              amount: 300.0,
-            },
-          ],
-        },
-      },
-      include: { items: true },
-    });
-
-    client.projects = [newProject as unknown as (typeof client.projects)[number]];
-    client.invoices = [pendingInv as unknown as (typeof client.invoices)[number]];
-  }
+  const client = {
+    ...clientRecord,
+    projects,
+    tickets,
+    invoices,
+  };
 
   const now = new Date();
 
@@ -214,11 +283,11 @@ export async function getClientDashboardData() {
   const hasAnyTransactions = client.invoices.length > 0 || allInstallments.length > 0;
   const allPaid = hasAnyTransactions && !hasUnsettledPastOrCurrent && !isOverdue;
 
-  // 2. Estatísticas de Chamados
-  const openTickets = client.tickets.filter((t) => t.status === "OPEN" || t.status === "IN_PROGRESS").length;
-  const waitingTickets = client.tickets.filter((t) => t.status === "WAITING_CLIENT").length;
-  const resolvedTickets = client.tickets.filter((t) => t.status === "RESOLVED").length;
-  const overdueTickets = client.tickets.filter(
+  // 2. Estatísticas de Chamados (baseadas na projeção enxuta allTicketMetrics)
+  const openTickets = allTicketMetrics.filter((t) => t.status === "OPEN" || t.status === "IN_PROGRESS").length;
+  const waitingTickets = allTicketMetrics.filter((t) => t.status === "WAITING_CLIENT").length;
+  const resolvedTickets = allTicketMetrics.filter((t) => t.status === "RESOLVED").length;
+  const overdueTickets = allTicketMetrics.filter(
     (t) => t.status !== "RESOLVED" && t.status !== "CANCELLED" && new Date(t.slaDueAt) < now
   ).length;
 
@@ -265,7 +334,7 @@ export async function getClientDashboardData() {
   }
 
   const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
-  const ticketsConsumedThisMonth = client.tickets.filter(
+  const ticketsConsumedThisMonth = allTicketMetrics.filter(
     (t) => new Date(t.createdAt) >= startOfMonth
   ).length;
 
@@ -307,6 +376,7 @@ export async function getClientDashboardData() {
   }
 
   return {
+    isFirstLogin,
     client: {
       id: client.id,
       fullName: client.fullName,
@@ -445,7 +515,7 @@ export async function addTicketCommentAction(ticketId: string, comment: string) 
 
   const ticket = await prisma.ticket.findUnique({
     where: { id: ticketId },
-    include: { user: true },
+    select: { id: true, status: true },
   });
 
   if (!ticket) {
@@ -457,22 +527,23 @@ export async function addTicketCommentAction(ticketId: string, comment: string) 
     ? "Danilo (MindSite)"
     : user.user_metadata?.full_name || user.email?.split("@")[0] || "Cliente";
 
-  await prisma.ticketComment.create({
-    data: {
-      ticketId,
-      message: comment.trim(),
-      authorName,
-      isAdmin,
-    },
-  });
-
-  await prisma.ticket.update({
-    where: { id: ticketId },
-    data: {
-      updatedAt: new Date(),
-      status: ticket.status === "WAITING_CLIENT" ? "OPEN" : ticket.status,
-    },
-  });
+  await Promise.all([
+    prisma.ticketComment.create({
+      data: {
+        ticketId,
+        message: comment.trim(),
+        authorName,
+        isAdmin,
+      },
+    }),
+    prisma.ticket.update({
+      where: { id: ticketId },
+      data: {
+        updatedAt: new Date(),
+        status: ticket.status === "WAITING_CLIENT" ? "OPEN" : ticket.status,
+      },
+    }),
+  ]);
 
   revalidatePath("/portal/dashboard");
   revalidatePath("/admin/dashboard");
@@ -563,8 +634,13 @@ export async function getAttachmentSignedUrlAction(attachmentIdOrUrl: string) {
       where: {
         OR: [{ id: attachmentIdOrUrl }, { fileUrl: attachmentIdOrUrl }],
       },
-      include: {
-        ticket: true,
+      select: {
+        fileUrl: true,
+        ticket: {
+          select: {
+            userId: true,
+          },
+        },
       },
     });
 
@@ -695,14 +771,34 @@ export async function generateConsolidatedPaymentAction(payload: {
 
   const client = await prisma.user.findUnique({
     where: { id: user.id },
-    include: {
-      invoices: { where: { status: "PENDING" } },
+    select: {
+      id: true,
+      fullName: true,
+      email: true,
+      phone: true,
+      invoices: {
+        where: { status: "PENDING" },
+        take: 10,
+        select: {
+          id: true,
+          invoiceNumber: true,
+          totalAmount: true,
+          dueDate: true,
+        },
+      },
       projects: {
-        include: {
+        select: {
+          name: true,
           contracts: {
-            include: {
+            select: {
               installments: {
                 where: { id: { in: payload.selectedInstallmentIds }, status: "SCHEDULED" },
+                select: {
+                  id: true,
+                  amount: true,
+                  scheduledDate: true,
+                  description: true,
+                },
               },
             },
           },
@@ -805,24 +901,31 @@ export async function generateConsolidatedPaymentAction(payload: {
         })),
       },
     },
-    include: {
-      items: true,
+    select: {
+      id: true,
+      items: {
+        select: {
+          id: true,
+        },
+      },
     },
   });
 
-  // Vincula as parcelas à nova fatura e ao item correspondente com status BILLED
-  for (let i = 0; i < itemsToBill.length; i++) {
-    const item = itemsToBill[i];
-    if (item.installmentId && createdInvoice.items[i]) {
-      await prisma.contractInstallment.update({
-        where: { id: item.installmentId },
-        data: {
-          status: "BILLED",
-          invoiceItemId: createdInvoice.items[i].id,
-        },
-      });
-    }
-  }
+  // Vincula as parcelas à nova fatura e ao item correspondente com status BILLED em paralelo
+  await Promise.all(
+    itemsToBill.map((item, i) => {
+      if (item.installmentId && createdInvoice.items[i]) {
+        return prisma.contractInstallment.update({
+          where: { id: item.installmentId },
+          data: {
+            status: "BILLED",
+            invoiceItemId: createdInvoice.items[i].id,
+          },
+        });
+      }
+      return Promise.resolve();
+    })
+  );
 
   revalidatePath("/portal/dashboard");
   revalidatePath("/admin/dashboard");
@@ -942,6 +1045,17 @@ export async function getClientProfileData() {
 
   const client = await prisma.user.findUnique({
     where: { id: user.id },
+    select: {
+      id: true,
+      fullName: true,
+      email: true,
+      secondaryEmail: true,
+      phone: true,
+      address: true,
+      document: true,
+      avatarUrl: true,
+      companyName: true,
+    },
   });
 
   if (!client) {

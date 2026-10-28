@@ -34,6 +34,25 @@ export function renderInvoiceEmailHtml(params: InvoiceEmailProps): string {
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Fatura Emitida — MindSite</title>
+  <style>
+    @media only screen and (max-width: 480px) {
+      .header-table td {
+        display: block !important;
+        width: 100% !important;
+        text-align: center !important;
+      }
+      .header-badge-cell {
+        padding-top: 16px !important;
+        text-align: center !important;
+      }
+      .header-logo-cell {
+        text-align: center !important;
+      }
+      .header-logo-cell img {
+        margin: 0 auto !important;
+      }
+    }
+  </style>
 </head>
 <body style="margin: 0; padding: 40px 16px; background-color: #eeeae8; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; -webkit-font-smoothing: antialiased; color: #0f0f0f;">
   <table align="center" border="0" cellpadding="0" cellspacing="0" width="100%" style="max-width: 620px; margin: 0 auto; background-color: #ffffff; border: 1px solid #e2dedc; border-radius: 6px; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06); overflow: hidden;">
@@ -41,18 +60,24 @@ export function renderInvoiceEmailHtml(params: InvoiceEmailProps): string {
     <!-- Header Institucional com Fundo Claro e Alto Contraste -->
     <tr>
       <td style="padding: 24px 32px; background-color: #f9f7f7; border-bottom: 2px solid #eeeae8;">
-        <table width="100%" border="0" cellpadding="0" cellspacing="0">
+        <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%" class="header-table" style="margin-bottom: 0;">
           <tr>
-            <td align="left" valign="middle">
+            <td class="header-logo-cell" align="left" valign="middle">
               <a href="https://mindsite.com.br" target="_blank" style="text-decoration: none; display: inline-block;">
-                <img src="https://mindsite.com.br/img/logo.webp" alt="MindSite" width="130" style="display: block; border: 0; outline: none; text-decoration: none; max-width: 130px; height: auto;" />
+                <img 
+                  src="https://mindsite.com.br/img/logo-email.png" 
+                  alt="MindSite" 
+                  width="72" 
+                  height="72" 
+                  style="display: block; width: 72px; height: 72px; max-width: 72px; border: 0; outline: none;" 
+                />
               </a>
             </td>
-            <td align="right" valign="middle">
-              <span style="display: inline-block; padding: 5px 12px; background-color: rgba(0, 43, 186, 0.08); border: 1px solid rgba(0, 43, 186, 0.25); border-radius: 4px; font-family: 'JetBrains Mono', Consolas, Monaco, monospace; font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: #002bba; font-weight: 700;">
-                [ COBRANÇA EMITIDA ]
+            <td class="header-badge-cell" align="right" valign="middle">
+              <span style="display: inline-block; font-family: 'JetBrains Mono', monospace, sans-serif; font-size: 11px; font-weight: 700; color: #002bba; background-color: rgba(0, 43, 186, 0.08); border: 1px solid rgba(0, 43, 186, 0.25); padding: 6px 12px; border-radius: 4px; text-transform: uppercase; letter-spacing: 0.05em; white-space: nowrap;">
+                FATURA EMITIDA
               </span>
-              <div style="font-family: 'JetBrains Mono', Consolas, monospace; font-size: 11px; color: #6b7280; margin-top: 5px; font-weight: 600;">
+              <div style="font-family: 'JetBrains Mono', monospace, sans-serif; font-size: 11px; color: #6b7280; margin-top: 6px; letter-spacing: 0.02em;">
                 REF #${params.invoiceNumber}
               </div>
             </td>
@@ -65,7 +90,7 @@ export function renderInvoiceEmailHtml(params: InvoiceEmailProps): string {
     <tr>
       <td style="padding: 36px 32px 24px 32px; background-color: #ffffff;">
         <h1 style="margin: 0 0 14px 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; font-size: 24px; line-height: 1.25; font-weight: 800; letter-spacing: -0.02em; color: #0f0f0f;">
-          Fafura MindSite
+          Fatura MindSite
         </h1>
         <p style="margin: 0; font-size: 15px; line-height: 1.6; color: #4b5563;">
           Olá, <strong style="color: #0f0f0f;">${params.clientName}</strong>. Emitimos uma fatura referente a serviços de desenvolvimento, manutenção e ou infraestrutura digital. Confira abaixo a discriminação detalhada dos serviços e efetue a liquidação direta via Pix ou Cartão de Crédito.
@@ -130,9 +155,8 @@ export function renderInvoiceEmailHtml(params: InvoiceEmailProps): string {
         </table>
 
         <!-- Bloco Pix Copia e Cola (quando disponível) -->
-        ${
-          params.pixCopyPaste
-            ? `
+        ${params.pixCopyPaste
+      ? `
         <table width="100%" border="0" cellpadding="0" cellspacing="0" style="background-color: #f9f7f7; border: 1px dashed #d1d5db; border-radius: 4px; margin-bottom: 24px;">
           <tr>
             <td style="padding: 16px;">
@@ -145,8 +169,8 @@ export function renderInvoiceEmailHtml(params: InvoiceEmailProps): string {
             </td>
           </tr>
         </table>`
-            : ""
-        }
+      : ""
+    }
 
         <!-- Seção de Links Úteis e Portal do Cliente -->
         <table width="100%" border="0" cellpadding="0" cellspacing="0" style="border-top: 1px solid #eeeae8; padding-top: 24px; margin-top: 8px;">

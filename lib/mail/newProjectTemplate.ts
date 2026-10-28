@@ -27,10 +27,10 @@ export function renderNewProjectNotificationEmailHtml(params: NewProjectEmailPro
   const installmentsHtml =
     params.installments && params.installments.length > 0
       ? params.installments
-          .map((inst) => {
-            const dateStr = formatLocalDate(inst.scheduledDate);
-            const desc = inst.description || `Parcela 0${inst.installmentNumber}`;
-            return `
+        .map((inst) => {
+          const dateStr = formatLocalDate(inst.scheduledDate);
+          const desc = inst.description || `Parcela 0${inst.installmentNumber}`;
+          return `
             <tr>
               <td style="padding: 12px 16px; border-bottom: 1px solid #e5e5e5; font-family: 'Manrope', -apple-system, BlinkMacSystemFont, sans-serif; font-size: 13px; color: #1f2937;">
                 <strong>#${inst.installmentNumber}</strong> — ${desc}
@@ -42,8 +42,8 @@ export function renderNewProjectNotificationEmailHtml(params: NewProjectEmailPro
                 R$ ${Number(inst.amount).toFixed(2).replace(".", ",")}
               </td>
             </tr>`;
-          })
-          .join("")
+        })
+        .join("")
       : `
         <tr>
           <td colspan="3" style="padding: 14px 16px; text-align: center; color: #6b7280; font-size: 13px;">
@@ -63,12 +63,12 @@ export function renderNewProjectNotificationEmailHtml(params: NewProjectEmailPro
     params.sustainabilityAmount && params.sustainabilityAmount > 0
       ? `R$ ${Number(params.sustainabilityAmount).toFixed(2).replace(".", ",")}/mês`
       : params.sustainabilityPlan === "DEVELOPMENT"
-      ? "R$ 300,00/mês"
-      : params.sustainabilityPlan === "ADVANCED"
-      ? "R$ 700,00/mês"
-      : params.sustainabilityPlan === "ESSENTIAL"
-      ? "R$ 100,00/mês"
-      : "Incluso / Sob Demanda";
+        ? "R$ 300,00/mês"
+        : params.sustainabilityPlan === "ADVANCED"
+          ? "R$ 700,00/mês"
+          : params.sustainabilityPlan === "ESSENTIAL"
+            ? "R$ 100,00/mês"
+            : "Incluso / Sob Demanda";
 
   const sustStartDateFormatted = params.sustainabilityStartDate
     ? formatLocalDate(params.sustainabilityStartDate)
@@ -80,6 +80,25 @@ export function renderNewProjectNotificationEmailHtml(params: NewProjectEmailPro
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Novo Projeto Cadastrado — MindSite</title>
+  <style>
+    @media only screen and (max-width: 480px) {
+      .header-table td {
+        display: block !important;
+        width: 100% !important;
+        text-align: center !important;
+      }
+      .header-badge-cell {
+        padding-top: 16px !important;
+        text-align: center !important;
+      }
+      .header-logo-cell {
+        text-align: center !important;
+      }
+      .header-logo-cell img {
+        margin: 0 auto !important;
+      }
+    }
+  </style>
 </head>
 <body style="margin: 0; padding: 40px 16px; background-color: #eeeae8; font-family: 'Manrope', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; -webkit-font-smoothing: antialiased; color: #0f0f0f;">
   <table align="center" border="0" cellpadding="0" cellspacing="0" width="100%" style="max-width: 620px; margin: 0 auto; background-color: #ffffff; border: 1px solid #e5e5e5; border-radius: 6px; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06); overflow: hidden;">
@@ -87,16 +106,22 @@ export function renderNewProjectNotificationEmailHtml(params: NewProjectEmailPro
     <!-- Header Institucional com Fundo Claro e Badge -->
     <tr>
       <td style="padding: 24px 32px; background-color: #f9f7f7; border-bottom: 2px solid #e5e5e5;">
-        <table width="100%" border="0" cellpadding="0" cellspacing="0">
+        <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%" class="header-table" style="margin-bottom: 0;">
           <tr>
-            <td align="left" valign="middle">
+            <td class="header-logo-cell" align="left" valign="middle">
               <a href="https://mindsite.com.br" target="_blank" style="text-decoration: none; display: inline-block;">
-                <img src="https://mindsite.com.br/img/logo.webp" alt="MindSite" width="130" style="display: block; border: 0; outline: none; text-decoration: none; max-width: 130px; height: auto;" />
+                <img 
+                  src="https://mindsite.com.br/img/logo-email.png" 
+                  alt="MindSite" 
+                  width="72" 
+                  height="72" 
+                  style="display: block; width: 72px; height: 72px; max-width: 72px; border: 0; outline: none;" 
+                />
               </a>
             </td>
-            <td align="right" valign="middle">
-              <span style="display: inline-block; padding: 5px 12px; background-color: rgba(0, 43, 186, 0.08); border: 1px solid rgba(0, 43, 186, 0.25); border-radius: 4px; font-family: 'JetBrains Mono', Consolas, Monaco, monospace; font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: #002bba; font-weight: 700;">
-                [ NOVO PROJETO CADASTRADO ]
+            <td class="header-badge-cell" align="right" valign="middle">
+              <span style="display: inline-block; font-family: 'JetBrains Mono', monospace, sans-serif; font-size: 11px; font-weight: 700; color: #002bba; background-color: rgba(0, 43, 186, 0.08); border: 1px solid rgba(0, 43, 186, 0.25); padding: 6px 12px; border-radius: 4px; text-transform: uppercase; letter-spacing: 0.05em; white-space: nowrap;">
+                NOVO PROJETO CADASTRADO
               </span>
             </td>
           </tr>
@@ -128,20 +153,18 @@ export function renderNewProjectNotificationEmailHtml(params: NewProjectEmailPro
               <div style="font-family: 'Manrope', sans-serif; font-size: 18px; font-weight: 800; color: #0f0f0f; margin-bottom: 4px;">
                 ${params.projectName}
               </div>
-              ${
-                params.domain
-                  ? `<div style="font-family: 'JetBrains Mono', Consolas, monospace; font-size: 12px; color: #6b7280; margin-bottom: 12px;">
+              ${params.domain
+      ? `<div style="font-family: 'JetBrains Mono', Consolas, monospace; font-size: 12px; color: #6b7280; margin-bottom: 12px;">
                       Domínio Oficial: <a href="https://${params.domain.replace(/^https?:\/\//, "")}" target="_blank" style="color: #002bba; text-decoration: none; font-weight: 600;">${params.domain}</a>
                     </div>`
-                  : ""
-              }
-              ${
-                params.description
-                  ? `<div style="font-size: 13px; line-height: 1.5; color: #4b5563; border-top: 1px solid #e5e5e5; padding-top: 12px; margin-top: 8px;">
+      : ""
+    }
+              ${params.description
+      ? `<div style="font-size: 13px; line-height: 1.5; color: #4b5563; border-top: 1px solid #e5e5e5; padding-top: 12px; margin-top: 8px;">
                       <strong style="color: #0f0f0f;">Escopo & Entregas:</strong> ${params.description}
                     </div>`
-                  : ""
-              }
+      : ""
+    }
             </td>
           </tr>
         </table>
