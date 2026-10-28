@@ -7,9 +7,15 @@ import { TicketCategory } from "@prisma/client";
 import {
   createTicketAction,
   generateConsolidatedPaymentAction,
-  addTicketCommentAction,
   completeFirstLoginAction,
+  uploadTicketAttachmentAction,
 } from "@/app/actions/portal";
+import {
+  addTicketReplyAction,
+  acceptTicketResolutionAction,
+  reopenTicketAction,
+  getAttachmentSignedUrlAction,
+} from "@/app/actions/tickets";
 import { createClient } from "@/lib/supabase/client";
 import { signOut } from "@/app/actions/auth";
 
@@ -62,6 +68,28 @@ function SLACountdownBadge({
         }}
       >
         ✓ SLA Cumprido
+      </span>
+    );
+  }
+
+  if (status === "WAITING_CLIENT") {
+    return (
+      <span
+        style={{
+          padding: "0.4rem 1.2rem",
+          fontSize: "1.1rem",
+          fontFamily: "var(--_font-accent)",
+          fontWeight: 600,
+          borderRadius: "0.2rem",
+          backgroundColor: "rgba(161, 161, 170, 0.12)",
+          color: "var(--t-medium)",
+          border: "1px solid var(--st-medium)",
+          display: "inline-flex",
+          alignItems: "center",
+          gap: "0.6rem",
+        }}
+      >
+        ⏸️ SLA Pausado
       </span>
     );
   }
@@ -175,6 +203,8 @@ interface PortalProps {
       status: string;
       slaHours: number;
       slaDueAt: string;
+      slaPausedAt?: string | null;
+      reopenReason?: string | null;
       createdAt: string;
       isOverdue: boolean;
       projectName: string;
@@ -184,6 +214,7 @@ interface PortalProps {
         message: string;
         authorName: string;
         isAdmin: boolean;
+        attachments?: string[];
         createdAt: string;
       }>;
     }>;
@@ -248,14 +279,24 @@ export default function PortalDashboardView({ data, isFirstLogin }: PortalProps)
   const [description, setDescription] = useState("");
   const [category, setCategory] = useState<TicketCategory>("BASIC");
   const [uploading, setUploading] = useState(false);
-  const [uploadedFiles, setUploadedFiles] = useState<
-    Array<{ fileName: string; fileUrl: string; fileSize?: number; mimeType?: string }>
-  >([]);
+  const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
+  const [openingAttachmentId, setOpeningAttachmentId] = useState<string | null>(null);
   const [feedback, setFeedback] = useState<string | null>(null);
 
   // Estados de Thread de Comentários por Ticket
   const [expandedTicketId, setExpandedTicketId] = useState<string | null>(null);
   const [commentInputs, setCommentInputs] = useState<{ [ticketId: string]: string }>({});
+  const [commentFiles, setCommentFiles] = useState<{ [ticketId: string]: File[] }>({});
+  const [sendingCommentId, setSendingCommentId] = useState<string | null>(null);
+
+  // Estados de Homologação e Reabertura de Chamado
+  const [reopeningTicket, setReopeningTicket] = useState<{ id: string; ticketNumber: number; title: string } | null>(null);
+  const [reopenReasonText, setReopenReasonText] = useState("");
+  const [reopenFiles, setReopenFiles] = useState<File[]>([]);
+  const [isReopening, setIsReopening] = useState(false);
+  const [acceptingTicket, setAcceptingTicket] = useState<{ id: string; ticketNumber: number; title: string } | null>(null);
+  const [acceptFeedbackText, setAcceptFeedbackText] = useState("");
+  const [isAcceptingResolution, setIsAcceptingResolution] = useState(false);
 
   // Estados de Pagamento e Adiantamento
   const [selectedInstallments, setSelectedInstallments] = useState<string[]>([]);
@@ -292,99 +333,195 @@ export default function PortalDashboardView({ data, isFirstLogin }: PortalProps)
     }
   };
 
-  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (!e.target.files || e.target.files.length === 0) return;
-    setUploading(true);
-    const supabase = createClient();
-    const files = Array.from(e.target.files);
-
+  // Abertura segura de anexo com Signed URL temporária (60 minutos)
+  const handleOpenAttachment = async (attachmentIdOrUrl: string, fileName?: string) => {
+    setOpeningAttachmentId(attachmentIdOrUrl);
     try {
-      for (const file of files) {
-        const fileExt = file.name.split(".").pop();
-        const fileName = `${Date.now()}-${Math.random().toString(36).substring(7)}.${fileExt}`;
-        const filePath = `${data.client.id}/${fileName}`;
-
-        const { data: uploadData, error } = await supabase.storage
-          .from("ticket-attachments")
-          .upload(filePath, file);
-
-        if (error) {
-          console.error("Erro no upload do anexo:", error);
-          alert(
-            `Aviso de Armazenamento: Não foi possível enviar o anexo "${file.name}" para o bucket 'ticket-attachments' (${error.message}). Verifique as permissões de Storage no Supabase.`
-          );
-          continue;
-        }
-
-        if (uploadData) {
-          const { data: publicUrlData } = supabase.storage
-            .from("ticket-attachments")
-            .getPublicUrl(filePath);
-
-          setUploadedFiles((prev) => [
-            ...prev,
-            {
-              fileName: file.name,
-              fileUrl: publicUrlData.publicUrl,
-              fileSize: file.size,
-              mimeType: file.type,
-            },
-          ]);
-        }
+      const res = await getAttachmentSignedUrlAction(attachmentIdOrUrl);
+      if (res.success && res.signedUrl) {
+        window.open(res.signedUrl, "_blank", "noopener,noreferrer");
+      } else {
+        alert(res.error || `Não foi possível carregar o anexo ${fileName ? `"${fileName}"` : ""}.`);
       }
     } catch (err: unknown) {
-      const message = err instanceof Error ? err.message : "Erro desconhecido";
-      alert(`Falha de conexão com o Supabase Storage: ${message}`);
+      const msg = err instanceof Error ? err.message : "Erro ao carregar anexo.";
+      alert(msg);
     } finally {
-      setUploading(false);
+      setOpeningAttachmentId(null);
     }
   };
 
-  const handleCreateTicket = (e: React.FormEvent) => {
+  // Fechamento e limpeza do modal de chamado (limpa formulário e arquivos selecionados)
+  const handleCloseTicketModal = () => {
+    setIsModalOpen(false);
+    setTitle("");
+    setDescription("");
+    setSelectedFiles([]);
+  };
+
+  // Submissão com Adiamento de Upload (Deferred Upload): o upload só ocorre ao clicar em "Salvar"
+  const handleCreateTicket = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!data.client.activeProject) {
       alert("Nenhum projeto ativo associado à sua conta.");
       return;
     }
 
-    startTransition(async () => {
-      const res = await createTicketAction({
-        title,
-        description,
-        category,
-        projectId: data.client.activeProject!.id,
-        attachments: uploadedFiles,
+    if (!title.trim() || !description.trim()) {
+      alert("Por favor, preencha o título e a descrição da demanda.");
+      return;
+    }
+
+    setUploading(true);
+
+    try {
+      const uploadedAttachments: Array<{
+        fileName: string;
+        fileUrl: string;
+        fileSize?: number;
+        mimeType?: string;
+      }> = [];
+
+      // Upload sequencial seguro de cada arquivo selecionado
+      for (const file of selectedFiles) {
+        const formData = new FormData();
+        formData.append("file", file);
+        const upRes = await uploadTicketAttachmentAction(formData);
+        if (upRes.success && upRes.fileUrl) {
+          uploadedAttachments.push({
+            fileName: upRes.fileName,
+            fileUrl: upRes.fileUrl,
+            fileSize: upRes.fileSize,
+            mimeType: upRes.mimeType,
+          });
+        } else {
+          console.error("Falha ao subir anexo:", upRes.error);
+        }
+      }
+
+      startTransition(async () => {
+        const res = await createTicketAction({
+          title: title.trim(),
+          description: description.trim(),
+          category,
+          projectId: data.client.activeProject!.id,
+          attachments: uploadedAttachments,
+        });
+
+        if (res.success) {
+          setIsModalOpen(false);
+          setTitle("");
+          setDescription("");
+          setSelectedFiles([]);
+          setFeedback("Chamado aberto com sucesso!");
+          setTimeout(() => setFeedback(null), 4000);
+          router.refresh();
+        } else {
+          alert(res.error || "Falha ao abrir chamado.");
+        }
+      });
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : "Erro ao enviar anexos.";
+      alert(message);
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  const handleAddComment = async (ticketId: string) => {
+    const text = commentInputs[ticketId]?.trim() || "";
+    const files = commentFiles[ticketId] || [];
+    if (!text && files.length === 0) return;
+
+    setSendingCommentId(ticketId);
+    try {
+      const formData = new FormData();
+      formData.append("ticketId", ticketId);
+      formData.append("message", text);
+      for (const file of files) {
+        formData.append("files", file);
+      }
+
+      const res = await addTicketReplyAction(formData);
+      if (res.success) {
+        setCommentInputs((prev) => ({ ...prev, [ticketId]: "" }));
+        setCommentFiles((prev) => ({ ...prev, [ticketId]: [] }));
+        setFeedback("Mensagem e anexo(s) enviados com sucesso!");
+        setTimeout(() => setFeedback(null), 4000);
+        router.refresh();
+      } else {
+        alert(res.error || "Erro ao adicionar resposta.");
+      }
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : "Erro ao enviar resposta.";
+      alert(msg);
+    } finally {
+      setSendingCommentId(null);
+    }
+  };
+
+  const handleConfirmAcceptance = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!acceptingTicket) return;
+
+    setIsAcceptingResolution(true);
+    try {
+      const res = await acceptTicketResolutionAction({
+        ticketId: acceptingTicket.id,
+        feedback: acceptFeedbackText.trim() || undefined,
       });
 
       if (res.success) {
-        setIsModalOpen(false);
-        setTitle("");
-        setDescription("");
-        setUploadedFiles([]);
-        setFeedback("Chamado aberto com sucesso!");
-        setTimeout(() => setFeedback(null), 4000);
+        setFeedback(`Resolução do chamado #${acceptingTicket.ticketNumber} homologada com sucesso! Obrigado pela parceria.`);
+        setAcceptingTicket(null);
+        setAcceptFeedbackText("");
+        setTimeout(() => setFeedback(null), 5000);
         router.refresh();
       } else {
-        alert(res.error || "Falha ao abrir chamado.");
+        alert(res.error || "Erro ao homologar resolução.");
       }
-    });
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : "Erro ao homologar chamado.";
+      alert(msg);
+    } finally {
+      setIsAcceptingResolution(false);
+    }
   };
 
-  const handleAddComment = (ticketId: string) => {
-    const text = commentInputs[ticketId]?.trim();
-    if (!text) return;
+  const handleConfirmReopen = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!reopeningTicket) return;
+    if (reopenReasonText.trim().length < 10) {
+      alert("A justificativa de reabertura deve conter no mínimo 10 caracteres detalhando a não conformidade.");
+      return;
+    }
 
-    startTransition(async () => {
-      const res = await addTicketCommentAction(ticketId, text);
+    setIsReopening(true);
+    try {
+      const formData = new FormData();
+      formData.append("ticketId", reopeningTicket.id);
+      formData.append("reason", reopenReasonText.trim());
+      for (const file of reopenFiles) {
+        formData.append("files", file);
+      }
+
+      const res = await reopenTicketAction(formData);
       if (res.success) {
-        setCommentInputs((prev) => ({ ...prev, [ticketId]: "" }));
-        setFeedback("Comentário adicionado com sucesso!");
-        setTimeout(() => setFeedback(null), 4000);
+        setFeedback(`Chamado #${reopeningTicket.ticketNumber} reaberto com sucesso. O prazo de SLA foi restabelecido.`);
+        setReopeningTicket(null);
+        setReopenReasonText("");
+        setReopenFiles([]);
+        setTimeout(() => setFeedback(null), 5000);
         router.refresh();
       } else {
-        alert(res.error || "Erro ao adicionar comentário.");
+        alert(res.error || "Erro ao reabrir chamado.");
       }
-    });
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : "Erro ao processar reabertura.";
+      alert(msg);
+    } finally {
+      setIsReopening(false);
+    }
   };
 
   const handleRequestAddon = (addonName: string, basePrice: string) => {
@@ -462,7 +599,8 @@ export default function PortalDashboardView({ data, isFirstLogin }: PortalProps)
             }}
           >
             <div>
-              <span
+              <Link
+                href="/portal/dashboard"
                 className="tag tag-s tag-medium"
                 style={{
                   color: "var(--accent)",
@@ -470,10 +608,12 @@ export default function PortalDashboardView({ data, isFirstLogin }: PortalProps)
                   display: "inline-block",
                   marginBottom: "0.8rem",
                   fontFamily: "var(--_font-accent)",
+                  textDecoration: "none",
+                  fontWeight: 700,
                 }}
               >
-                Área do Cliente — {data.client.companyName || data.client.fullName || data.client.email}
-              </span>
+                Dashboard
+              </Link>
               <h1
                 style={{
                   fontSize: "clamp(2.6rem, 3.5vw, 4.2rem)",
@@ -755,7 +895,7 @@ export default function PortalDashboardView({ data, isFirstLogin }: PortalProps)
                       borderRadius: "0.2rem",
                     }}
                   >
-                    Termo de adesão em confecção pelo setor jurídico
+                    Contrato em preparação. Avisaremos quando estiver pronto!
                   </span>
                 )}
               </div>
@@ -1126,17 +1266,15 @@ export default function PortalDashboardView({ data, isFirstLogin }: PortalProps)
                         transition: "border-color 0.2s ease",
                       }}
                     >
-                      {/* Header do Card com clique para expandir */}
+                      {/* Header do Card (sem expansão acidental ao clicar) */}
                       <div
-                        onClick={() => setExpandedTicketId(isExpanded ? null : t.id)}
                         style={{
                           display: "flex",
                           flexWrap: "wrap",
                           justifyContent: "space-between",
-                          alignItems: "center",
+                          alignItems: "flex-start",
                           gap: "1.5rem",
                           marginBottom: "1.2rem",
-                          cursor: "pointer",
                         }}
                       >
                         <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", gap: "1rem" }}>
@@ -1189,7 +1327,7 @@ export default function PortalDashboardView({ data, isFirstLogin }: PortalProps)
                           >
                             {t.status === "OPEN" && "Aberto"}
                             {t.status === "IN_PROGRESS" && "Em Andamento"}
-                            {t.status === "WAITING_CLIENT" && "Aguardando Validação"}
+                            {t.status === "WAITING_CLIENT" && "AGUARDANDO SEU ACEITE"}
                             {t.status === "RESOLVED" && "Concluído"}
                             {t.status === "CANCELLED" && "Cancelado"}
                           </span>
@@ -1213,7 +1351,7 @@ export default function PortalDashboardView({ data, isFirstLogin }: PortalProps)
                           </span>
                         </div>
 
-                        {/* SLA Regressivo e Prazo Final */}
+                        {/* Coluna Direita: SLA Regressivo e Prazo Final */}
                         <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", gap: "1.2rem" }}>
                           <SLACountdownBadge slaDueAt={t.slaDueAt} status={t.status} isOverdue={t.isOverdue} />
                           <span style={{ fontFamily: "var(--_font-accent)", fontSize: "1.2rem", color: "var(--t-muted)" }}>
@@ -1227,11 +1365,103 @@ export default function PortalDashboardView({ data, isFirstLogin }: PortalProps)
                               {slaDate.toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" })}
                             </strong>
                           </span>
-                          <span style={{ fontSize: "1.4rem", color: "var(--t-muted)" }}>
-                            {isExpanded ? "▲" : "▼"}
-                          </span>
                         </div>
                       </div>
+
+                      {/* Barra de Homologação (Quando Status = WAITING_CLIENT / AGUARDANDO_CLIENTE) */}
+                      {t.status === "WAITING_CLIENT" && (
+                        <div
+                          style={{
+                            margin: "1.5rem 0",
+                            padding: "1.8rem 2rem",
+                            backgroundColor: "rgba(245, 158, 11, 0.08)",
+                            border: "1px solid rgba(245, 158, 11, 0.35)",
+                            borderRadius: "0.4rem",
+                            display: "flex",
+                            flexWrap: "wrap",
+                            alignItems: "center",
+                            justifyContent: "space-between",
+                            gap: "1.5rem",
+                          }}
+                        >
+                          <div style={{ display: "flex", alignItems: "center", gap: "1.2rem", flex: "1 1 320px" }}>
+                            <span style={{ fontSize: "2.4rem" }}>⏳</span>
+                            <div>
+                              <strong
+                                style={{
+                                  display: "block",
+                                  fontSize: "1.3rem",
+                                  color: "#f59e0b",
+                                  fontFamily: "var(--_font-accent)",
+                                  textTransform: "uppercase",
+                                  marginBottom: "0.3rem",
+                                }}
+                              >
+                                Validação de Entrega Solicitada
+                              </strong>
+                              <p
+                                style={{
+                                  margin: 0,
+                                  fontSize: "1.3rem",
+                                  color: "var(--t-bright)",
+                                  fontFamily: "var(--_font-default)",
+                                  lineHeight: 1.5,
+                                }}
+                              >
+                                A equipe concluiu o atendimento. Por favor, valide a solução. Caso não haja manifestação, o chamado será finalizado automaticamente em 72h.
+                              </p>
+                            </div>
+                          </div>
+
+                          <div style={{ display: "flex", flexWrap: "wrap", gap: "1rem", alignItems: "center" }}>
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setAcceptingTicket({ id: t.id, ticketNumber: t.ticketNumber, title: t.title });
+                                setAcceptFeedbackText("");
+                              }}
+                              className="btn btn-default-icon"
+                              style={{
+                                height: "3.8rem",
+                                padding: "0 2rem",
+                                fontSize: "1.2rem",
+                                fontFamily: "var(--_font-accent)",
+                                backgroundColor: "#10b981",
+                                borderColor: "#10b981",
+                                color: "#ffffff",
+                                fontWeight: 700,
+                                cursor: "pointer",
+                                borderRadius: "0.2rem",
+                              }}
+                            >
+                              ✓ Aceitar Resolução
+                            </button>
+
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setReopeningTicket({ id: t.id, ticketNumber: t.ticketNumber, title: t.title });
+                                setReopenReasonText("");
+                                setReopenFiles([]);
+                              }}
+                              className="btn btn-default-icon btn-default-outline"
+                              style={{
+                                height: "3.8rem",
+                                padding: "0 1.8rem",
+                                fontSize: "1.2rem",
+                                fontFamily: "var(--_font-accent)",
+                                borderColor: "#ef4444",
+                                color: "#ef4444",
+                                fontWeight: 700,
+                                cursor: "pointer",
+                                borderRadius: "0.2rem",
+                              }}
+                            >
+                              ↺ Recusar / Reabrir Chamado
+                            </button>
+                          </div>
+                        </div>
+                      )}
 
                       {/* Descrição e Timeline de Comentários */}
                       <p
@@ -1247,36 +1477,87 @@ export default function PortalDashboardView({ data, isFirstLogin }: PortalProps)
                         {t.description}
                       </p>
 
-                      {/* Anexos */}
-                      {t.attachments && t.attachments.length > 0 && (
-                        <div style={{ marginTop: "1.5rem", display: "flex", flexWrap: "wrap", gap: "1rem" }}>
-                          {t.attachments.map((att) => (
-                            <a
-                              key={att.id}
-                              href={att.fileUrl}
-                              download={att.fileName}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="btn btn-line-icon btn-line-icon-small btn-line-default"
-                              style={{
-                                fontSize: "1.1rem",
-                                fontFamily: "var(--_font-accent)",
-                                padding: "0.4rem 1rem",
-                                backgroundColor: "var(--base)",
-                                border: "1px solid var(--st-medium)",
-                                color: "var(--t-bright)",
-                                textDecoration: "none",
-                                borderRadius: "0.2rem",
-                                display: "inline-flex",
-                                alignItems: "center",
-                                gap: "0.6rem",
-                              }}
-                            >
-                              📥 {att.fileName}
-                            </a>
-                          ))}
+                      {/* Barra Inferior: Anexos à esquerda e Botão de Ação à direita (alinhado embaixo e azul) */}
+                      <div
+                        style={{
+                          marginTop: "1.6rem",
+                          display: "flex",
+                          flexWrap: "wrap",
+                          alignItems: "center",
+                          justifyContent: "space-between",
+                          gap: "1.2rem",
+                        }}
+                      >
+                        {/* Anexos com Acesso Seguro via Signed URL */}
+                        <div style={{ display: "flex", flexWrap: "wrap", gap: "1rem", alignItems: "center" }}>
+                          {t.attachments && t.attachments.length > 0 &&
+                            t.attachments.map((att) => {
+                              const isOpening = openingAttachmentId === att.id;
+                              return (
+                                <button
+                                  key={att.id}
+                                  type="button"
+                                  onClick={() => handleOpenAttachment(att.id, att.fileName)}
+                                  disabled={isOpening}
+                                  className="btn btn-line-icon btn-line-icon-small btn-line-default"
+                                  style={{
+                                    fontSize: "1.1rem",
+                                    fontFamily: "var(--_font-accent)",
+                                    padding: "0.4rem 1rem",
+                                    backgroundColor: "var(--base)",
+                                    border: "1px solid var(--st-medium)",
+                                    color: "var(--t-bright)",
+                                    cursor: "pointer",
+                                    borderRadius: "0.2rem",
+                                    display: "inline-flex",
+                                    alignItems: "center",
+                                    gap: "0.6rem",
+                                    opacity: isOpening ? 0.6 : 1,
+                                  }}
+                                >
+                                  📥 {isOpening ? "Gerando link seguro..." : att.fileName}
+                                </button>
+                              );
+                            })}
                         </div>
-                      )}
+
+                        {/* Botão Enviar nova mensagem alinhado embaixo e em azul */}
+                        <div style={{ marginLeft: "auto" }}>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              const willExpand = !isExpanded;
+                              setExpandedTicketId(willExpand ? t.id : null);
+                              if (willExpand) {
+                                setTimeout(() => {
+                                  document.getElementById(`ticket-comment-input-${t.id}`)?.focus();
+                                }, 120);
+                              }
+                            }}
+                            className="btn btn-default-icon"
+                            style={{
+                              height: "3.4rem",
+                              padding: "0.4rem 1.8rem",
+                              fontSize: "1.2rem",
+                              fontFamily: "var(--_font-accent)",
+                              fontWeight: 700,
+                              borderColor: "#002bba",
+                              backgroundColor: "#002bba",
+                              color: "#ffffff",
+                              cursor: "pointer",
+                              display: "inline-flex",
+                              alignItems: "center",
+                              gap: "0.6rem",
+                              borderRadius: "0.2rem",
+                              boxShadow: "0 2px 10px rgba(0, 43, 186, 0.28)",
+                              transition: "all 0.2s ease",
+                            }}
+                          >
+                            <span>{isExpanded ? "Ocultar mensagens" : "Enviar nova Mensagem"}</span>
+                            <span style={{ fontSize: "1rem" }}>{isExpanded ? "▲" : "▼"}</span>
+                          </button>
+                        </div>
+                      </div>
 
                       {/* Thread Expandida: Timeline e Envio de Novo Comentário */}
                       {isExpanded && (
@@ -1323,6 +1604,43 @@ export default function PortalDashboardView({ data, isFirstLogin }: PortalProps)
                                   <p style={{ fontSize: "1.3rem", color: "var(--t-medium)", margin: 0, whiteSpace: "pre-line", fontFamily: "var(--_font-default)" }}>
                                     {comm.message}
                                   </p>
+
+                                  {/* Anexos do Comentário */}
+                                  {comm.attachments && comm.attachments.length > 0 && (
+                                    <div style={{ marginTop: "0.8rem", display: "flex", flexWrap: "wrap", gap: "0.8rem" }}>
+                                      {comm.attachments.map((attPath, attIdx) => {
+                                        const cleanFileName =
+                                          attPath.split("/").pop()?.split("_").slice(2).join("_") ||
+                                          attPath.split("/").pop() ||
+                                          `Anexo_${attIdx + 1}`;
+                                        const isOpeningThis = openingAttachmentId === attPath;
+                                        return (
+                                          <button
+                                            key={attIdx}
+                                            type="button"
+                                            onClick={() => handleOpenAttachment(attPath, cleanFileName)}
+                                            disabled={isOpeningThis}
+                                            style={{
+                                              fontSize: "1.1rem",
+                                              fontFamily: "var(--_font-accent)",
+                                              padding: "0.3rem 0.9rem",
+                                              backgroundColor: "var(--base-tint)",
+                                              border: "1px solid var(--st-medium)",
+                                              borderRadius: "0.2rem",
+                                              color: "var(--t-bright)",
+                                              cursor: "pointer",
+                                              display: "inline-flex",
+                                              alignItems: "center",
+                                              gap: "0.6rem",
+                                              opacity: isOpeningThis ? 0.6 : 1,
+                                            }}
+                                          >
+                                            📎 {isOpeningThis ? "Abrindo..." : cleanFileName} ↗
+                                          </button>
+                                        );
+                                      })}
+                                    </div>
+                                  )}
                                 </div>
                               ))}
                             </div>
@@ -1342,6 +1660,7 @@ export default function PortalDashboardView({ data, isFirstLogin }: PortalProps)
                           </label>
                           <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
                             <textarea
+                              id={`ticket-comment-input-${t.id}`}
                               rows={3}
                               value={commentInputs[t.id] || ""}
                               onChange={(e) =>
@@ -1360,22 +1679,106 @@ export default function PortalDashboardView({ data, isFirstLogin }: PortalProps)
                                 outline: "none",
                               }}
                             />
-                            <div style={{ display: "flex", justifyContent: "flex-end" }}>
+
+                            {/* Seletor Estilizado de Anexos (Múltiplos arquivos) */}
+                            <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", justifyContent: "space-between", gap: "1rem" }}>
+                              <label
+                                style={{
+                                  display: "inline-flex",
+                                  alignItems: "center",
+                                  gap: "0.6rem",
+                                  cursor: "pointer",
+                                  fontFamily: "var(--_font-accent)",
+                                  fontSize: "1.2rem",
+                                  color: "var(--accent)",
+                                  padding: "0.6rem 1.4rem",
+                                  border: "1px dashed var(--st-medium)",
+                                  borderRadius: "0.2rem",
+                                  backgroundColor: "var(--base-tint)",
+                                  transition: "border-color 0.2s ease",
+                                }}
+                              >
+                                <span>📎 Anexar arquivos (PNG, JPG, PDF, WEBP)</span>
+                                <input
+                                  type="file"
+                                  multiple
+                                  style={{ display: "none" }}
+                                  disabled={sendingCommentId === t.id}
+                                  onChange={(e) => {
+                                    if (!e.target.files) return;
+                                    const newFiles = Array.from(e.target.files);
+                                    setCommentFiles((prev) => ({
+                                      ...prev,
+                                      [t.id]: [...(prev[t.id] || []), ...newFiles],
+                                    }));
+                                  }}
+                                />
+                              </label>
+
                               <button
                                 type="button"
-                                disabled={isPending || !commentInputs[t.id]?.trim()}
+                                disabled={
+                                  sendingCommentId === t.id ||
+                                  (!commentInputs[t.id]?.trim() && (!commentFiles[t.id] || commentFiles[t.id].length === 0))
+                                }
                                 onClick={() => handleAddComment(t.id)}
                                 className="btn btn-default-icon btn-default-accent"
                                 style={{
                                   height: "4rem",
-                                  padding: "0 1.8rem",
+                                  padding: "0 2.2rem",
                                   fontSize: "1.2rem",
                                   fontFamily: "var(--_font-accent)",
                                 }}
                               >
-                                Enviar Mensagem ➔
+                                {sendingCommentId === t.id ? "ENVIANDO..." : "ENVIAR MENSAGEM →"}
                               </button>
                             </div>
+
+                            {/* Chips de arquivos selecionados para a resposta (Deferred upload) */}
+                            {commentFiles[t.id] && commentFiles[t.id].length > 0 && (
+                              <div style={{ display: "flex", flexWrap: "wrap", gap: "0.8rem", marginTop: "0.4rem" }}>
+                                {commentFiles[t.id].map((f, fIdx) => (
+                                  <span
+                                    key={fIdx}
+                                    style={{
+                                      fontSize: "1.1rem",
+                                      fontFamily: "var(--_font-accent)",
+                                      backgroundColor: "var(--base)",
+                                      border: "1px solid var(--st-medium)",
+                                      padding: "0.3rem 0.8rem",
+                                      borderRadius: "0.2rem",
+                                      color: "var(--t-bright)",
+                                      display: "inline-flex",
+                                      alignItems: "center",
+                                      gap: "0.6rem",
+                                    }}
+                                  >
+                                    📎 {f.name} ({(f.size / 1024).toFixed(0)} KB)
+                                    <button
+                                      type="button"
+                                      onClick={() =>
+                                        setCommentFiles((prev) => ({
+                                          ...prev,
+                                          [t.id]: prev[t.id].filter((_, idx) => idx !== fIdx),
+                                        }))
+                                      }
+                                      style={{
+                                        background: "none",
+                                        border: "none",
+                                        color: "var(--t-muted)",
+                                        cursor: "pointer",
+                                        fontSize: "1.2rem",
+                                        lineHeight: 1,
+                                        padding: "0 0.2rem",
+                                      }}
+                                      title="Remover anexo"
+                                    >
+                                      ✕
+                                    </button>
+                                  </span>
+                                ))}
+                              </div>
+                            )}
                           </div>
                         </div>
                       )}
@@ -2124,7 +2527,7 @@ export default function PortalDashboardView({ data, isFirstLogin }: PortalProps)
                   onClick={() => {
                     setTitle("Criação de Conta de E-mail Corporativo");
                     setDescription(
-                      `Solicito a criação de uma nova caixa de e-mail corporativo:\n\n- Nome Completo do Colaborador:\n- Prefixo desejado: _______@${data.client.activeProject?.domain || "meudominio.com.br"}\n- E-mail pessoal para envio da senha provisória:`
+                      `Solicito a criação de uma nova caixa de e-mail corporativo:\n\n- Nome Completo da pessoa:\n- Prefixo desejado: _______@${data.client.activeProject?.domain || "meudominio.com.br"}\n- E-mail pessoal para envio da senha provisória:\n- Ou anexe uma lista em formato excel .XLSX ou .CSV com a coluna "Nome" e "domínio":`
                     );
                     setCategory("BASIC");
                     setIsModalOpen(true);
@@ -2431,8 +2834,12 @@ export default function PortalDashboardView({ data, isFirstLogin }: PortalProps)
                 <input
                   type="file"
                   multiple
-                  onChange={handleFileUpload}
-                  disabled={uploading}
+                  onChange={(e) => {
+                    if (!e.target.files) return;
+                    const incoming = Array.from(e.target.files);
+                    setSelectedFiles((prev) => [...prev, ...incoming]);
+                  }}
+                  disabled={uploading || isPending}
                   style={{
                     width: "100%",
                     fontSize: "1.2rem",
@@ -2452,9 +2859,9 @@ export default function PortalDashboardView({ data, isFirstLogin }: PortalProps)
                     Fazendo upload no bucket seguro...
                   </span>
                 )}
-                {uploadedFiles.length > 0 && (
+                {selectedFiles.length > 0 && (
                   <div style={{ marginTop: "1rem", display: "flex", flexWrap: "wrap", gap: "0.8rem" }}>
-                    {uploadedFiles.map((f, i) => (
+                    {selectedFiles.map((f, i) => (
                       <span
                         key={i}
                         style={{
@@ -2462,12 +2869,32 @@ export default function PortalDashboardView({ data, isFirstLogin }: PortalProps)
                           fontFamily: "var(--_font-accent)",
                           backgroundColor: "var(--base)",
                           border: "1px solid var(--st-medium)",
-                          padding: "0.2rem 0.8rem",
+                          padding: "0.3rem 0.8rem",
                           borderRadius: "0.2rem",
                           color: "var(--t-bright)",
+                          display: "inline-flex",
+                          alignItems: "center",
+                          gap: "0.6rem",
                         }}
                       >
-                        ✓ {f.fileName}
+                        📎 {f.name} ({(f.size / 1024).toFixed(0)} KB)
+                        <button
+                          type="button"
+                          onClick={() => setSelectedFiles((prev) => prev.filter((_, idx) => idx !== i))}
+                          disabled={uploading || isPending}
+                          style={{
+                            background: "none",
+                            border: "none",
+                            color: "var(--t-muted)",
+                            cursor: "pointer",
+                            padding: "0 0.2rem",
+                            fontSize: "1.2rem",
+                            lineHeight: 1,
+                          }}
+                          title="Remover anexo"
+                        >
+                          ✕
+                        </button>
                       </span>
                     ))}
                   </div>
@@ -2477,7 +2904,8 @@ export default function PortalDashboardView({ data, isFirstLogin }: PortalProps)
               <div style={{ display: "flex", justifyContent: "flex-end", gap: "1.5rem", marginTop: "1rem" }}>
                 <button
                   type="button"
-                  onClick={() => setIsModalOpen(false)}
+                  onClick={handleCloseTicketModal}
+                  disabled={uploading || isPending}
                   style={{
                     padding: "0.8rem 1.6rem",
                     background: "none",
@@ -2494,9 +2922,362 @@ export default function PortalDashboardView({ data, isFirstLogin }: PortalProps)
                   type="submit"
                   disabled={isPending || uploading}
                   className="btn btn-default-icon btn-default-accent"
-                  style={{ height: "4.4rem", padding: "0 2rem", fontSize: "1.3rem" }}
+                  style={{ height: "4.4rem", padding: "0 2.4rem", fontSize: "1.3rem" }}
                 >
-                  {isPending ? "Criando Chamado..." : "Confirmar e Registrar SLA"}
+                  {uploading ? "Enviando Anexos..." : isPending ? "Salvando..." : "Salvar"}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* ==================================================== */}
+      {/* MODAL: REABERTURA DE CHAMADO (JUSTIFICATIVA E ANEXOS) */}
+      {/* ==================================================== */}
+      {reopeningTicket && (
+        <div
+          style={{
+            position: "fixed",
+            inset: 0,
+            zIndex: 10000,
+            backgroundColor: "rgba(0,0,0,0.85)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            padding: "2rem",
+          }}
+        >
+          <div
+            style={{
+              backgroundColor: "var(--base-tint)",
+              border: "1px solid var(--st-medium)",
+              maxWidth: "600px",
+              width: "100%",
+              padding: "3.5rem",
+              borderRadius: "0.4rem",
+              maxHeight: "90vh",
+              overflowY: "auto",
+            }}
+          >
+            <div style={{ marginBottom: "1.5rem" }}>
+              <span
+                style={{
+                  fontFamily: "var(--_font-accent)",
+                  fontSize: "1.1rem",
+                  textTransform: "uppercase",
+                  color: "#ef4444",
+                  fontWeight: 700,
+                  display: "block",
+                  marginBottom: "0.4rem",
+                }}
+              >
+                ↺ Chamado #{reopeningTicket.ticketNumber}
+              </span>
+              <h3
+                style={{
+                  fontSize: "2rem",
+                  fontFamily: "var(--_font-default)",
+                  fontWeight: 700,
+                  color: "var(--t-bright)",
+                  margin: "0 0 0.8rem 0",
+                }}
+              >
+                Reabrir Chamado Técnico
+              </h3>
+              <p style={{ fontSize: "1.3rem", color: "var(--t-medium)", margin: 0, lineHeight: 1.5 }}>
+                Por favor, informe detalhadamente o motivo pelo qual a demanda não foi atendida e anexe novas evidências se necessário.
+              </p>
+            </div>
+
+            <form
+              onSubmit={handleConfirmReopen}
+              style={{ display: "flex", flexDirection: "column", gap: "1.8rem" }}
+            >
+              <div>
+                <label
+                  style={{
+                    display: "block",
+                    fontFamily: "var(--_font-accent)",
+                    fontSize: "1.1rem",
+                    textTransform: "uppercase",
+                    color: "var(--t-medium)",
+                    marginBottom: "0.6rem",
+                  }}
+                >
+                  Motivo da Não Conformidade ou Reabertura * (mínimo 10 caracteres)
+                </label>
+                <textarea
+                  required
+                  rows={4}
+                  value={reopenReasonText}
+                  onChange={(e) => setReopenReasonText(e.target.value)}
+                  placeholder="Descreva detalhadamente o motivo da não conformidade ou reabertura..."
+                  style={{
+                    width: "100%",
+                    padding: "1.2rem",
+                    backgroundColor: "var(--base)",
+                    border: "1px solid var(--st-medium)",
+                    color: "var(--t-bright)",
+                    fontFamily: "var(--_font-default)",
+                    fontSize: "1.3rem",
+                    borderRadius: "0.2rem",
+                    outline: "none",
+                  }}
+                />
+                <span
+                  style={{
+                    display: "block",
+                    fontSize: "1.1rem",
+                    fontFamily: "var(--_font-accent)",
+                    color: reopenReasonText.trim().length < 10 ? "#ef4444" : "#10b981",
+                    marginTop: "0.4rem",
+                  }}
+                >
+                  {reopenReasonText.trim().length}/10 caracteres mínimos
+                </span>
+              </div>
+
+              <div>
+                <label
+                  style={{
+                    display: "block",
+                    fontFamily: "var(--_font-accent)",
+                    fontSize: "1.1rem",
+                    textTransform: "uppercase",
+                    color: "var(--t-medium)",
+                    marginBottom: "0.6rem",
+                  }}
+                >
+                  Anexar Novas Evidências / Prints (Opcional)
+                </label>
+                <input
+                  type="file"
+                  multiple
+                  onChange={(e) => {
+                    if (!e.target.files) return;
+                    const incoming = Array.from(e.target.files);
+                    setReopenFiles((prev) => [...prev, ...incoming]);
+                  }}
+                  disabled={isReopening}
+                  style={{
+                    width: "100%",
+                    fontSize: "1.2rem",
+                    fontFamily: "var(--_font-accent)",
+                    color: "var(--t-medium)",
+                  }}
+                />
+                {reopenFiles.length > 0 && (
+                  <div style={{ marginTop: "1rem", display: "flex", flexWrap: "wrap", gap: "0.8rem" }}>
+                    {reopenFiles.map((f, i) => (
+                      <span
+                        key={i}
+                        style={{
+                          fontSize: "1.1rem",
+                          fontFamily: "var(--_font-accent)",
+                          backgroundColor: "var(--base)",
+                          border: "1px solid var(--st-medium)",
+                          padding: "0.3rem 0.8rem",
+                          borderRadius: "0.2rem",
+                          color: "var(--t-bright)",
+                          display: "inline-flex",
+                          alignItems: "center",
+                          gap: "0.6rem",
+                        }}
+                      >
+                        📎 {f.name} ({(f.size / 1024).toFixed(0)} KB)
+                        <button
+                          type="button"
+                          onClick={() => setReopenFiles((prev) => prev.filter((_, idx) => idx !== i))}
+                          disabled={isReopening}
+                          style={{
+                            background: "none",
+                            border: "none",
+                            color: "var(--t-muted)",
+                            cursor: "pointer",
+                            padding: "0 0.2rem",
+                            fontSize: "1.2rem",
+                            lineHeight: 1,
+                          }}
+                          title="Remover anexo"
+                        >
+                          ✕
+                        </button>
+                      </span>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              <div style={{ display: "flex", justifyContent: "flex-end", gap: "1.5rem", marginTop: "1rem" }}>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setReopeningTicket(null);
+                    setReopenReasonText("");
+                    setReopenFiles([]);
+                  }}
+                  disabled={isReopening}
+                  style={{
+                    padding: "0.8rem 1.6rem",
+                    background: "none",
+                    border: "none",
+                    color: "var(--t-medium)",
+                    cursor: "pointer",
+                    fontFamily: "var(--_font-accent)",
+                    fontSize: "1.2rem",
+                  }}
+                >
+                  Cancelar
+                </button>
+                <button
+                  type="submit"
+                  disabled={isReopening || reopenReasonText.trim().length < 10}
+                  className="btn btn-default-icon btn-default-accent"
+                  style={{ height: "4.4rem", padding: "0 2.4rem", fontSize: "1.3rem" }}
+                >
+                  {isReopening ? "Processando Reabertura..." : "Confirmar Reabertura"}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* ==================================================== */}
+      {/* MODAL: ACCEPT RESOLUTION (HOMOLOGAÇÃO DEFINITIVA)   */}
+      {/* ==================================================== */}
+      {acceptingTicket && (
+        <div
+          style={{
+            position: "fixed",
+            inset: 0,
+            zIndex: 10000,
+            backgroundColor: "rgba(0,0,0,0.85)",
+            backdropFilter: "blur(4px)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            padding: "2rem",
+          }}
+        >
+          <div
+            style={{
+              backgroundColor: "var(--base-tint)",
+              border: "1px solid var(--st-medium)",
+              maxWidth: "540px",
+              width: "100%",
+              padding: "3.5rem",
+              borderRadius: "0.4rem",
+              maxHeight: "90vh",
+              overflowY: "auto",
+            }}
+          >
+            <div style={{ marginBottom: "1.8rem" }}>
+              <span
+                style={{
+                  fontFamily: "var(--_font-accent)",
+                  fontSize: "1.1rem",
+                  textTransform: "uppercase",
+                  color: "#10b981",
+                  fontWeight: 700,
+                  display: "block",
+                  marginBottom: "0.4rem",
+                }}
+              >
+                ✓ Homologação de Entrega // Chamado #{acceptingTicket.ticketNumber}
+              </span>
+              <h3
+                style={{
+                  fontSize: "2.2rem",
+                  fontFamily: "var(--_font-default)",
+                  fontWeight: 700,
+                  color: "var(--t-bright)",
+                  margin: "0 0 1rem 0",
+                }}
+              >
+                Aceitar Resolução
+              </h3>
+              <p
+                style={{
+                  fontSize: "1.4rem",
+                  color: "var(--t-medium)",
+                  lineHeight: 1.6,
+                  margin: 0,
+                }}
+              >
+                Você está aceitando a entrega deste chamado. Agradecemos pela parceria! O chamado será finalizado com sucesso.
+              </p>
+            </div>
+
+            <form onSubmit={handleConfirmAcceptance} style={{ display: "flex", flexDirection: "column", gap: "2rem" }}>
+              <div>
+                <label
+                  style={{
+                    display: "block",
+                    fontFamily: "var(--_font-accent)",
+                    fontSize: "1.1rem",
+                    textTransform: "uppercase",
+                    color: "var(--t-medium)",
+                    marginBottom: "0.6rem",
+                  }}
+                >
+                  Gostaria de deixar uma avaliação ou comentário final? (Opcional)
+                </label>
+                <textarea
+                  rows={3}
+                  value={acceptFeedbackText}
+                  onChange={(e) => setAcceptFeedbackText(e.target.value)}
+                  placeholder="Escreva aqui seu feedback, avaliação ou consideração sobre o atendimento..."
+                  style={{
+                    width: "100%",
+                    padding: "1.2rem",
+                    backgroundColor: "var(--base)",
+                    border: "1px solid var(--st-medium)",
+                    color: "var(--t-bright)",
+                    fontFamily: "var(--_font-default)",
+                    fontSize: "1.3rem",
+                    borderRadius: "0.2rem",
+                    outline: "none",
+                  }}
+                />
+              </div>
+
+              <div style={{ display: "flex", justifyContent: "flex-end", gap: "1.5rem", marginTop: "0.5rem" }}>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setAcceptingTicket(null);
+                    setAcceptFeedbackText("");
+                  }}
+                  disabled={isAcceptingResolution}
+                  style={{
+                    padding: "1rem 2rem",
+                    background: "none",
+                    border: "none",
+                    fontFamily: "var(--_font-accent)",
+                    fontSize: "1.3rem",
+                    color: "var(--t-medium)",
+                    cursor: "pointer",
+                  }}
+                >
+                  Cancelar
+                </button>
+                <button
+                  type="submit"
+                  disabled={isAcceptingResolution}
+                  className="btn btn-default-icon"
+                  style={{
+                    height: "4.4rem",
+                    padding: "0 2.4rem",
+                    fontSize: "1.3rem",
+                    backgroundColor: "#10b981",
+                    borderColor: "#10b981",
+                    color: "#ffffff",
+                    fontWeight: 700,
+                  }}
+                >
+                  {isAcceptingResolution ? "Finalizando..." : "Confirmar Encerramento"}
                 </button>
               </div>
             </form>

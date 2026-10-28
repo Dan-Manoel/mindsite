@@ -39,7 +39,7 @@ export async function POST(req: Request) {
 
     const resend = new Resend(apiKey);
     const recipient = process.env.CONTACT_RECIPIENT_EMAIL || "contato@mindsite.com.br";
-    const fromSender = process.env.CONTACT_EMAIL_FROM || "MindSite - Vitrine <no-reply@mindsite.com.br>";
+    const fromSender = process.env.CONTACT_EMAIL_FROM || "MindSite <no-reply@mindsite.com.br>";
     const companyLabel = company && company.length > 0 ? company : "Sem Empresa";
 
     const html = renderLeadEmailHtml({

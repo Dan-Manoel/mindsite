@@ -24,9 +24,12 @@ import {
   ArrowRight,
   Info,
 } from "lucide-react";
-import { createTicketAction } from "@/app/actions/portal";
+import {
+  createTicketAction,
+  getAttachmentSignedUrlAction,
+  uploadTicketAttachmentAction,
+} from "@/app/actions/portal";
 import { signOut } from "@/app/actions/auth";
-import { createClient as createSupabaseBrowserClient } from "@/lib/supabase/client";
 
 interface PortalDataProps {
   user: {
@@ -108,9 +111,8 @@ export default function ClientPortalView({ initialData }: { initialData: PortalD
   const [description, setDescription] = useState("");
   const [category, setCategory] = useState<TicketCategory>("BASIC");
   const [uploadingFiles, setUploadingFiles] = useState(false);
-  const [attachments, setAttachments] = useState<
-    Array<{ fileName: string; fileUrl: string; fileSize?: number; mimeType?: string }>
-  >([]);
+  const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
+  const [openingAttachmentId, setOpeningAttachmentId] = useState<string | null>(null);
   const [formError, setFormError] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
 
@@ -120,60 +122,34 @@ export default function ClientPortalView({ initialData }: { initialData: PortalD
     setTimeout(() => setCopiedPix(false), 3000);
   };
 
-  // Upload para Supabase Storage
-  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (!e.target.files || e.target.files.length === 0) return;
-
-    setUploadingFiles(true);
-    setFormError(null);
-
-    const supabase = createSupabaseBrowserClient();
-    const files = Array.from(e.target.files);
-    const uploadedList: Array<{ fileName: string; fileUrl: string; fileSize?: number; mimeType?: string }> = [];
-
-    for (const file of files) {
-      try {
-        const fileExt = file.name.split(".").pop();
-        const cleanFileName = `${Date.now()}-${Math.random().toString(36).substring(7)}.${fileExt}`;
-        const filePath = `${data.user.id}/${cleanFileName}`;
-
-        const { data: uploadRes, error } = await supabase.storage
-          .from("ticket-attachments")
-          .upload(filePath, file);
-
-        if (error) {
-          console.warn("Storage upload warning (fallback to direct ref):", error.message);
-          // Fallback seguro caso o bucket ainda não tenha RLS público configurado
-          uploadedList.push({
-            fileName: file.name,
-            fileUrl: URL.createObjectURL(file),
-            fileSize: file.size,
-            mimeType: file.type,
-          });
-        } else {
-          const { data: publicData } = supabase.storage
-            .from("ticket-attachments")
-            .getPublicUrl(uploadRes.path);
-
-          uploadedList.push({
-            fileName: file.name,
-            fileUrl: publicData.publicUrl,
-            fileSize: file.size,
-            mimeType: file.type,
-          });
-        }
-      } catch (err: unknown) {
-        const message = err instanceof Error ? err.message : "Erro desconhecido";
-        console.error("Erro ao subir arquivo:", message);
-      }
-    }
-
-    setAttachments((prev) => [...prev, ...uploadedList]);
-    setUploadingFiles(false);
+  const handleRemoveSelectedFile = (index: number) => {
+    setSelectedFiles((prev) => prev.filter((_, i) => i !== index));
   };
 
-  const handleRemoveAttachment = (index: number) => {
-    setAttachments((prev) => prev.filter((_, i) => i !== index));
+  const handleCloseTicketModal = () => {
+    setIsModalOpen(false);
+    setTitle("");
+    setDescription("");
+    setCategory("BASIC");
+    setSelectedFiles([]);
+    setFormError(null);
+  };
+
+  const handleOpenAttachment = async (attachmentIdOrUrl: string) => {
+    try {
+      setOpeningAttachmentId(attachmentIdOrUrl);
+      const res = await getAttachmentSignedUrlAction(attachmentIdOrUrl);
+      if (!res.success || !res.signedUrl) {
+        alert(res.error || "Não foi possível gerar link seguro para o anexo.");
+        return;
+      }
+      window.open(res.signedUrl, "_blank", "noopener,noreferrer");
+    } catch (err) {
+      console.error("Erro ao abrir anexo:", err);
+      alert("Falha ao abrir anexo.");
+    } finally {
+      setOpeningAttachmentId(null);
+    }
   };
 
   const handleCreateTicket = async (e: React.FormEvent) => {
@@ -186,23 +162,40 @@ export default function ClientPortalView({ initialData }: { initialData: PortalD
     }
 
     startTransition(async () => {
+      const uploadedList: Array<{ fileName: string; fileUrl: string; fileSize?: number; mimeType?: string }> = [];
+
+      if (selectedFiles.length > 0) {
+        setUploadingFiles(true);
+        for (const file of selectedFiles) {
+          const formData = new FormData();
+          formData.append("file", file);
+          const uploadRes = await uploadTicketAttachmentAction(formData);
+          if (uploadRes.success && uploadRes.fileUrl) {
+            uploadedList.push({
+              fileName: uploadRes.fileName,
+              fileUrl: uploadRes.fileUrl,
+              fileSize: uploadRes.fileSize,
+              mimeType: uploadRes.mimeType,
+            });
+          } else {
+            console.warn("Falha no upload do arquivo:", file.name, uploadRes.error);
+          }
+        }
+        setUploadingFiles(false);
+      }
+
       const res = await createTicketAction({
         title,
         description,
         category,
         projectId: data.project?.id,
-        attachments,
+        attachments: uploadedList,
       });
 
       if (!res.success) {
         setFormError(res.error || "Ocorreu um erro ao abrir o chamado.");
       } else {
-        // Sucesso
-        setIsModalOpen(false);
-        setTitle("");
-        setDescription("");
-        setCategory("BASIC");
-        setAttachments([]);
+        handleCloseTicketModal();
         router.refresh();
       }
     });
@@ -536,13 +529,15 @@ export default function ClientPortalView({ initialData }: { initialData: PortalD
                                 ? "bg-yellow-500/10 text-yellow-400 border border-yellow-500/20"
                                 : ticket.status === "RESOLVED"
                                 ? "bg-emerald-500/10 text-emerald-400 border border-emerald-500/20"
+                                : ticket.status === "WAITING_CLIENT"
+                                ? "bg-purple-500/10 text-purple-400 border border-purple-500/20"
                                 : "bg-zinc-500/10 text-zinc-400"
                             }`}
                           >
                             {ticket.status === "OPEN" && "Aberto"}
                             {ticket.status === "IN_PROGRESS" && "Em Atendimento"}
+                            {ticket.status === "WAITING_CLIENT" && "AGUARDANDO SEU ACEITE"}
                             {ticket.status === "RESOLVED" && "Resolvido"}
-                            {ticket.status === "WAITING_CLIENT" && "Aguardando Resposta"}
                             {ticket.status === "CANCELLED" && "Cancelado"}
                           </span>
                         </div>
@@ -556,6 +551,10 @@ export default function ClientPortalView({ initialData }: { initialData: PortalD
                               {ticket.resolvedAt
                                 ? new Date(ticket.resolvedAt).toLocaleDateString("pt-BR")
                                 : "Concluído"}
+                            </span>
+                          ) : ticket.status === "WAITING_CLIENT" ? (
+                            <span className="text-amber-400 font-semibold">
+                              ⏸️ SLA Pausado
                             </span>
                           ) : ticket.isOverdue ? (
                             <span className="text-red-400 font-bold flex items-center gap-1">
@@ -591,17 +590,18 @@ export default function ClientPortalView({ initialData }: { initialData: PortalD
                           </span>
                           <div className="flex flex-wrap gap-2">
                             {ticket.attachments.map((att) => (
-                              <a
+                              <button
                                 key={att.id}
-                                href={att.fileUrl}
-                                target="_blank"
-                                rel="noreferrer"
-                                className="inline-flex items-center gap-1.5 bg-[var(--base)] border border-[var(--st-medium)] hover:border-[var(--accent)] px-2.5 py-1 text-xs font-mono text-[var(--t-bright)] transition-colors rounded-sm"
+                                type="button"
+                                onClick={() => handleOpenAttachment(att.id)}
+                                disabled={openingAttachmentId === att.id}
+                                className="inline-flex items-center gap-1.5 bg-[var(--base)] border border-[var(--st-medium)] hover:border-[var(--accent)] px-2.5 py-1 text-xs font-mono text-[var(--t-bright)] transition-colors rounded-sm cursor-pointer disabled:opacity-50"
                               >
                                 <Paperclip className="w-3 h-3 text-[var(--accent)]" />
                                 <span className="max-w-[150px] truncate">{att.fileName}</span>
                                 <ExternalLink className="w-2.5 h-2.5 text-[var(--t-muted)]" />
-                              </a>
+                                {openingAttachmentId === att.id && <span className="text-[10px] text-[var(--accent)]">...</span>}
+                              </button>
                             ))}
                           </div>
                         </div>
@@ -962,8 +962,12 @@ export default function ClientPortalView({ initialData }: { initialData: PortalD
                     type="file"
                     multiple
                     accept="image/png,image/jpeg,image/webp,video/mp4,application/pdf"
-                    onChange={handleFileUpload}
-                    disabled={uploadingFiles}
+                    onChange={(e) => {
+                      if (!e.target.files) return;
+                      const incoming = Array.from(e.target.files);
+                      setSelectedFiles((prev) => [...prev, ...incoming]);
+                    }}
+                    disabled={uploadingFiles || isPending}
                     className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
                   />
                   <div className="flex flex-col items-center justify-center space-y-1.5">
@@ -977,29 +981,28 @@ export default function ClientPortalView({ initialData }: { initialData: PortalD
                   </div>
                 </div>
 
-                {/* Lista de anexos carregados */}
-                {attachments.length > 0 && (
+                {/* Lista de anexos selecionados */}
+                {selectedFiles.length > 0 && (
                   <div className="mt-3 space-y-1.5">
                     <span className="text-[10px] font-mono uppercase text-[var(--t-muted)] block">
-                      Anexos Prontos ({attachments.length}):
+                      Arquivos Selecionados ({selectedFiles.length}):
                     </span>
-                    {attachments.map((att, idx) => (
+                    {selectedFiles.map((file, idx) => (
                       <div
                         key={idx}
                         className="flex items-center justify-between p-2 bg-[var(--base)] border border-[var(--st-medium)] text-xs font-mono"
                       >
                         <div className="flex items-center gap-2 truncate pr-2">
                           <File className="w-3.5 h-3.5 text-[var(--accent)] shrink-0" />
-                          <span className="truncate text-[var(--t-bright)]">{att.fileName}</span>
-                          {att.fileSize && (
-                            <span className="text-[10px] text-[var(--t-muted)]">
-                              ({(att.fileSize / 1024 / 1024).toFixed(2)} MB)
-                            </span>
-                          )}
+                          <span className="truncate text-[var(--t-bright)]">{file.name}</span>
+                          <span className="text-[10px] text-[var(--t-muted)]">
+                            ({(file.size / 1024 / 1024).toFixed(2)} MB)
+                          </span>
                         </div>
                         <button
                           type="button"
-                          onClick={() => handleRemoveAttachment(idx)}
+                          onClick={() => handleRemoveSelectedFile(idx)}
+                          disabled={uploadingFiles || isPending}
                           className="text-red-400 hover:text-red-300 p-1 cursor-pointer"
                         >
                           <X className="w-3.5 h-3.5" />
@@ -1014,7 +1017,8 @@ export default function ClientPortalView({ initialData }: { initialData: PortalD
               <div className="flex items-center justify-end gap-3 pt-4 border-t border-[var(--st-medium)]">
                 <button
                   type="button"
-                  onClick={() => setIsModalOpen(false)}
+                  onClick={handleCloseTicketModal}
+                  disabled={uploadingFiles || isPending}
                   className="px-4 py-2.5 text-xs font-mono uppercase text-[var(--t-medium)] hover:text-[var(--t-bright)] transition-colors cursor-pointer"
                 >
                   Cancelar
@@ -1024,7 +1028,7 @@ export default function ClientPortalView({ initialData }: { initialData: PortalD
                   disabled={isPending || uploadingFiles}
                   className="bg-[var(--accent)] hover:opacity-90 text-white px-6 py-2.5 text-xs font-mono font-bold uppercase tracking-wider transition-opacity disabled:opacity-50 cursor-pointer shadow-sm"
                 >
-                  {isPending ? "Registrando Chamado..." : "Enviar Chamado ao Time"}
+                  {uploadingFiles ? "Enviando Anexos..." : isPending ? "Salvando..." : "Salvar"}
                 </button>
               </div>
 

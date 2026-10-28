@@ -3,6 +3,7 @@
 import { useState, useEffect, useTransition } from "react";
 import Link from "next/link";
 import { getClientsListAction } from "@/app/actions/adminClients";
+import { signOut } from "@/app/actions/auth";
 
 type ClientListItem = Awaited<ReturnType<typeof getClientsListAction>>[number];
 
@@ -71,12 +72,21 @@ export default function ClientsListPage() {
             }}
           >
             <div>
-              <span
+              <Link
+                href="/admin/dashboard"
                 className="tag tag-s tag-medium"
-                style={{ color: "var(--accent)", display: "inline-block", marginBottom: "0.5rem" }}
+                style={{
+                  color: "var(--accent)",
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: "0.5rem",
+                  marginBottom: "0.5rem",
+                  textDecoration: "none",
+                  fontWeight: 700,
+                }}
               >
-                MindSite Admin
-              </span>
+                ← DASHBOARD // Clientes
+              </Link>
               <h1
                 style={{
                   fontSize: "clamp(2.4rem, 3.5vw, 4rem)",
@@ -89,7 +99,7 @@ export default function ClientsListPage() {
               </h1>
             </div>
 
-            <div style={{ display: "flex", gap: "1.5rem" }}>
+            <div style={{ display: "flex", alignItems: "center", gap: "1.2rem", flexWrap: "wrap" }}>
               <Link
                 href="/admin/clients/new"
                 className="btn btn-default-icon btn-default-accent slide-right"
@@ -115,11 +125,19 @@ export default function ClientsListPage() {
               <Link
                 href="/admin/dashboard"
                 className="btn btn-line-icon btn-line-icon-small btn-line-medium slide-left"
+                style={{ height: "4.4rem", padding: "0 1.6rem", fontSize: "1.3rem" }}
               >
-                <span className="btn-caption" style={{ fontSize: "1.3rem" }}>
-                  Dashboard
-                </span>
+                <span className="btn-caption">Dashboard</span>
               </Link>
+              <form action={signOut}>
+                <button
+                  type="submit"
+                  className="btn btn-line-icon btn-line-icon-small btn-line-medium slide-left"
+                  style={{ height: "4.4rem", padding: "0 1.6rem", fontSize: "1.3rem" }}
+                >
+                  <span className="btn-caption">Sair [→</span>
+                </button>
+              </form>
             </div>
           </div>
         </div>

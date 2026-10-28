@@ -6,6 +6,9 @@ import { revalidatePath } from "next/cache";
 import { Resend } from "resend";
 import { createInfinitePayCheckoutLink } from "@/lib/payment/infinitepay";
 import { renderInvoiceEmailHtml } from "@/lib/mail/invoiceTemplate";
+import { renderTicketNotificationEmailHtml } from "@/lib/mail/ticketCreatedTemplate";
+import { sendTicketNotificationEmail } from "@/lib/mail/ticketNotificationTemplate";
+import { supabaseAdmin } from "@/lib/supabase/admin";
 import {
   Currency,
   ExpenseCategory,
@@ -65,9 +68,13 @@ export async function getAdminDashboardData() {
         },
       },
       invoices: {
-        where: {
-          status: { in: [InvoiceStatus.PENDING, InvoiceStatus.OVERDUE] },
+        include: {
+          items: true,
         },
+        orderBy: { dueDate: "desc" },
+      },
+      tickets: {
+        orderBy: { createdAt: "desc" },
       },
     },
     orderBy: { createdAt: "desc" },
@@ -76,6 +83,14 @@ export async function getAdminDashboardData() {
   let mrrTotal = 0;
   let activeSustainabilityCount = 0;
   const projected = { d30: 0, d60: 0, d90: 0, d120: 0, total: 0 };
+
+  const planDistribution = {
+    essential: 0,
+    development: 0,
+    advanced: 0,
+    custom: 0,
+    total: 0,
+  };
 
   const clientBalances = clients.map((client) => {
     let setupTotal = 0;
@@ -102,7 +117,8 @@ export async function getAdminDashboardData() {
 
     // Checa faturas vencidas do cliente
     client.invoices.forEach((inv) => {
-      if (new Date(inv.dueDate) < now) {
+      const isOverdue = inv.status === InvoiceStatus.OVERDUE || (inv.status === InvoiceStatus.PENDING && new Date(inv.dueDate) < now);
+      if (isOverdue) {
         hasOverdueInvoice = true;
       }
     });
@@ -114,18 +130,24 @@ export async function getAdminDashboardData() {
           const val = Number(contract.totalAmount);
           mrrTotal += val;
           activeSustainabilityCount++;
+          planDistribution.total++;
           let pName = "Personalizado";
           if (val === 100) {
             sustainabilityPlanLabel = "Essential (R$ 100/mês)";
             pName = "Essential";
+            planDistribution.essential++;
           } else if (val === 300) {
             sustainabilityPlanLabel = "Development (R$ 300/mês)";
             pName = "Development";
+            planDistribution.development++;
           } else if (val === 700) {
             sustainabilityPlanLabel = "Advanced (R$ 700/mês)";
             pName = "Advanced";
+            planDistribution.advanced++;
           } else {
             sustainabilityPlanLabel = `Custom (R$ ${val}/mês)`;
+            pName = "Custom";
+            planDistribution.custom++;
           }
 
           sustainabilityContract = {
@@ -189,8 +211,24 @@ export async function getAdminDashboardData() {
       userId: client.id,
       name: client.fullName || "Cliente",
       email: client.email,
+      phone: client.phone || "",
       companyName: client.companyName || client.fullName || "Não informado",
+      document: client.document || "",
       projectName: client.projects[0]?.name || "Nenhum projeto",
+      projects: client.projects.map((p) => ({
+        id: p.id,
+        name: p.name,
+        domain: p.domain,
+        isActive: p.isActive,
+        contracts: p.contracts.map((c) => ({
+          id: c.id,
+          title: c.title,
+          contractType: c.contractType,
+          status: c.status,
+          totalAmount: Number(c.totalAmount),
+          paidAmount: Number(c.paidAmount),
+        })),
+      })),
       sustainabilityPlan: sustainabilityPlanLabel,
       sustainabilityDetails: sustainabilityContract,
       pendingInstallments,
@@ -199,12 +237,14 @@ export async function getAdminDashboardData() {
       setupDue: setupPending,
       status: statusText,
       activeContractsCount: client.projects.reduce((acc, p) => acc + p.contracts.length, 0),
+      ticketsCount: client.tickets.length,
+      invoicesCount: client.invoices.length,
     };
   });
 
   projected.total = projected.d30 + projected.d60 + projected.d90 + projected.d120;
 
-  // Demais consultas (despesas, tickets, estatísticas)
+  // 2. Despesas, Tickets e Faturas
   const expenses = await prisma.companyExpense.findMany({ orderBy: { dueDate: "asc" } });
   const tickets = await prisma.ticket.findMany({
     include: {
@@ -223,17 +263,158 @@ export async function getAdminDashboardData() {
     .filter((e) => e.isPaid)
     .reduce((acc, curr) => acc + Number(curr.actualAmountPaid || curr.estimatedAmount), 0);
 
+  // 3. Projeção de Recebimentos para os Próximos 12 Meses
+  const shortMonthNames = ["Jan", "Fev", "Mar", "Abr", "Mai", "Jun", "Jul", "Ago", "Set", "Out", "Nov", "Dez"];
+  const fullMonthNames = [
+    "Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho",
+    "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"
+  ];
+
+  const allPendingInstallments = clients.flatMap((c) =>
+    c.projects.flatMap((p) =>
+      p.contracts.flatMap((ct) =>
+        ct.installments.filter(
+          (i) => i.status !== InstallmentStatus.PAID && i.status !== InstallmentStatus.CANCELLED
+        )
+      )
+    )
+  );
+
+  const projection12Months: Array<{
+    monthKey: string;
+    monthLabel: string;
+    mrr: number;
+    milestones: number;
+    total: number;
+  }> = [];
+
+  let total12MonthsProjected = 0;
+
+  for (let m = 0; m < 12; m++) {
+    const targetDate = new Date(now.getFullYear(), now.getMonth() + m, 1);
+    const nextMonthDate = new Date(now.getFullYear(), now.getMonth() + m + 1, 1);
+    const monthKey = `${shortMonthNames[targetDate.getMonth()]}/${targetDate.getFullYear().toString().slice(-2)}`;
+    const monthLabel = `${fullMonthNames[targetDate.getMonth()]} ${targetDate.getFullYear()}`;
+
+    // Recorrência mensal fixa (MRR)
+    const mrrForMonth = mrrTotal;
+
+    // Parcelas de projetos agendadas para o mês correspondente
+    const milestonesForMonth = allPendingInstallments
+      .filter((inst) => {
+        const d = new Date(inst.scheduledDate);
+        return d >= targetDate && d < nextMonthDate;
+      })
+      .reduce((sum, inst) => sum + Number(inst.amount), 0);
+
+    const monthTotal = mrrForMonth + milestonesForMonth;
+    total12MonthsProjected += monthTotal;
+
+    projection12Months.push({
+      monthKey,
+      monthLabel,
+      mrr: mrrForMonth,
+      milestones: milestonesForMonth,
+      total: monthTotal,
+    });
+  }
+
+  // 4. Comparativo de Despesas Projetadas vs. Realizadas (12 meses: 4 passados + atual + 7 futuros)
+  const expensesComparison: Array<{
+    monthKey: string;
+    monthLabel: string;
+    projected: number;
+    actual: number;
+  }> = [];
+
+  for (let m = -4; m <= 7; m++) {
+    const targetDate = new Date(now.getFullYear(), now.getMonth() + m, 1);
+    const nextMonthDate = new Date(now.getFullYear(), now.getMonth() + m + 1, 1);
+    const monthKey = `${shortMonthNames[targetDate.getMonth()]}/${targetDate.getFullYear().toString().slice(-2)}`;
+    const monthLabel = `${fullMonthNames[targetDate.getMonth()]} ${targetDate.getFullYear()}`;
+
+    const monthExpenses = expenses.filter((e) => {
+      const d = new Date(e.dueDate);
+      return d >= targetDate && d < nextMonthDate;
+    });
+
+    const projectedAmount = monthExpenses.reduce((sum, e) => sum + Number(e.estimatedAmount), 0);
+    const actualAmount = monthExpenses
+      .filter((e) => e.isPaid)
+      .reduce((sum, e) => sum + Number(e.actualAmountPaid || e.estimatedAmount), 0);
+
+    expensesComparison.push({
+      monthKey,
+      monthLabel,
+      projected: projectedAmount,
+      actual: actualAmount,
+    });
+  }
+
+  // 5. Métricas Operacionais Adicionais (Faturas em Atraso consolidado, Distribuição de Assinantes, Resumo de Chamados)
+  const allInvoices = await prisma.invoice.findMany({
+    select: {
+      id: true,
+      dueDate: true,
+      totalAmount: true,
+      status: true,
+    },
+  });
+
+  const overdueInvoices = allInvoices.filter(
+    (inv) => inv.status === InvoiceStatus.OVERDUE || (inv.status === InvoiceStatus.PENDING && new Date(inv.dueDate) < now)
+  );
+  const overdueInvoicesCount = overdueInvoices.length;
+  const overdueInvoicesTotal = overdueInvoices.reduce((sum, inv) => sum + Number(inv.totalAmount), 0);
+
+  const ticketSummary = {
+    open: tickets.filter((t) => t.status === "OPEN").length,
+    inProgress: tickets.filter((t) => t.status === "IN_PROGRESS").length,
+    waitingClient: tickets.filter((t) => t.status === "WAITING_CLIENT").length,
+    resolved: tickets.filter((t) => t.status === "RESOLVED").length,
+    overdue: tickets.filter(
+      (t) => t.status !== "RESOLVED" && t.status !== "CANCELLED" && new Date(t.slaDueAt) < now
+    ).length,
+    total: tickets.length,
+  };
+
+  // 6. Opções de clientes para o Combobox de abertura de chamado
+  const clientOptions = clients.map((c) => ({
+    id: c.id,
+    name: c.fullName || c.companyName || c.email,
+    companyName: c.companyName || "",
+    email: c.email,
+    document: c.document || "",
+    projects: c.projects.map((p) => ({
+      id: p.id,
+      name: p.name,
+      domain: p.domain,
+    })),
+  }));
+
   return {
     finance: {
       mrrTotal,
       activeSustainabilityCount,
       projected,
+      projection12Months,
+      total12MonthsProjected,
+      expensesComparison,
       clientBalances,
       monthlyExpenses: {
         estimated: estimatedExpenses,
         paid: paidExpenses,
       },
     },
+    operationalMetrics: {
+      overdueInvoices: {
+        count: overdueInvoicesCount,
+        totalAmount: overdueInvoicesTotal,
+      },
+      planDistribution,
+      ticketSummary,
+    },
+    clientOptions,
     expenses: expenses.map((e) => ({
       ...e,
       estimatedAmount: Number(e.estimatedAmount),
@@ -256,6 +437,7 @@ export async function getAdminDashboardData() {
         message: c.message,
         authorName: c.authorName,
         isAdmin: c.isAdmin,
+        attachments: c.attachments || [],
         createdAt: c.createdAt.toISOString(),
       })),
     })),
@@ -315,27 +497,56 @@ export async function reclassifyTicketAction(
   };
 }
 
-// Atualização de status de chamado (OPEN -> IN_PROGRESS -> RESOLVED)
+// Atualização de status de chamado (OPEN -> IN_PROGRESS -> WAITING_CLIENT -> RESOLVED)
 export async function updateTicketStatusAction(
   ticketId: string,
   newStatus: TicketStatus
 ) {
   await assertAdmin();
 
-  const dataToUpdate: { status: TicketStatus; resolvedAt?: Date | null } = { status: newStatus };
+  const dataToUpdate: {
+    status: TicketStatus;
+    resolvedAt?: Date | null;
+    slaPausedAt?: Date | null;
+  } = { status: newStatus };
+
+  const now = new Date();
+
   if (newStatus === "RESOLVED") {
-    dataToUpdate.resolvedAt = new Date();
+    dataToUpdate.resolvedAt = now;
+    dataToUpdate.slaPausedAt = null;
+  } else if (newStatus === "WAITING_CLIENT") {
+    dataToUpdate.resolvedAt = now;
+    dataToUpdate.slaPausedAt = now;
   } else {
     dataToUpdate.resolvedAt = null;
+    dataToUpdate.slaPausedAt = null;
   }
 
-  await prisma.ticket.update({
+  const updatedTicket = await prisma.ticket.update({
     where: { id: ticketId },
     data: dataToUpdate,
+    include: { user: true },
   });
+
+  if (newStatus === "WAITING_CLIENT" && updatedTicket.user.email) {
+    sendTicketNotificationEmail({
+      to: updatedTicket.user.email,
+      clientName: updatedTicket.user.fullName || updatedTicket.user.companyName || "Cliente",
+      ticketNumber: updatedTicket.ticketNumber,
+      ticketTitle: updatedTicket.title,
+      messageSnippet: "A equipe concluiu o atendimento desta demanda e aguarda sua homologação no portal.",
+      actionUrl: "https://mindsite.com.br/portal/chamados",
+      type: "AGUARDANDO_CLIENTE",
+    }).catch((mailErr) => {
+      console.error("Erro ao enviar email de aguardando cliente:", mailErr);
+    });
+  }
 
   revalidatePath("/admin/dashboard");
   revalidatePath("/portal/dashboard");
+  revalidatePath("/admin/chamados");
+  revalidatePath("/portal/chamados");
 
   return { success: true };
 }
@@ -388,14 +599,28 @@ export async function createExpenseAction(input: CreateExpenseInput) {
   }
 }
 
-// Liquidação / Baixa de despesa com cotação cambial efetiva
+// Liquidação / Baixa de despesa com suporte a comprovante de pagamento
 export async function settleExpenseAction(
   expenseId: string,
   actualAmountPaid: number,
-  exchangeRateUsed?: number,
-  paymentDate?: string
+  arg3?: string | number, // paymentDate (string) ou exchangeRateUsed (number)
+  arg4?: string, // receiptUrl ou paymentDate
+  arg5?: string // receiptUrl
 ) {
   await assertAdmin();
+
+  let paymentDate: string | undefined;
+  let exchangeRateUsed: number | undefined;
+  let receiptUrl: string | undefined;
+
+  if (typeof arg3 === "number") {
+    exchangeRateUsed = arg3;
+    paymentDate = typeof arg4 === "string" ? arg4 : undefined;
+    receiptUrl = arg5;
+  } else if (typeof arg3 === "string") {
+    paymentDate = arg3;
+    receiptUrl = arg4;
+  }
 
   try {
     await prisma.companyExpense.update({
@@ -405,15 +630,144 @@ export async function settleExpenseAction(
         actualAmountPaid,
         exchangeRateUsed: exchangeRateUsed || null,
         paymentDate: paymentDate ? new Date(paymentDate) : new Date(),
+        ...(receiptUrl ? { receiptUrl } : {}),
       },
     });
 
     revalidatePath("/admin/dashboard");
+    revalidatePath("/admin");
     return { success: true };
   } catch (err: unknown) {
     const message = err instanceof Error ? err.message : "Erro ao liquidar despesa.";
     return { success: false, error: message };
   }
+}
+
+// Upload de Comprovante de Pagamento de Despesa no Supabase Storage
+export async function uploadExpenseReceiptAction(formData: FormData) {
+  await assertAdmin();
+
+  const file = formData.get("file") as File;
+  if (!file) {
+    return { success: false, error: "Nenhum arquivo enviado." };
+  }
+
+  try {
+    const bytes = await file.arrayBuffer();
+    const buffer = Buffer.from(bytes);
+    const fileExt = file.name.split(".").pop() || "pdf";
+    const fileName = `receipt-${Date.now()}-${Math.random().toString(36).substring(7)}.${fileExt}`;
+
+    try {
+      await supabaseAdmin.storage.createBucket("expense-receipts", { public: true });
+    } catch {
+      // Ignora caso bucket já exista
+    }
+
+    const { error: uploadError } = await supabaseAdmin.storage
+      .from("expense-receipts")
+      .upload(fileName, buffer, {
+        contentType: file.type || "application/octet-stream",
+        upsert: true,
+      });
+
+    if (uploadError) {
+      console.error("Erro upload Supabase storage:", uploadError);
+      return { success: false, error: uploadError.message };
+    }
+
+    const { data: urlData } = supabaseAdmin.storage
+      .from("expense-receipts")
+      .getPublicUrl(fileName);
+
+    return { success: true, publicUrl: urlData.publicUrl };
+  } catch (err: unknown) {
+    const msg = err instanceof Error ? err.message : "Erro no upload do comprovante.";
+    return { success: false, error: msg };
+  }
+}
+
+// Abertura Administrativa de Chamado em nome do Cliente (Triagem via WhatsApp)
+export async function createTicketForClientAction(data: {
+  clientId: string;
+  projectId: string;
+  title: string;
+  category: TicketCategory;
+  description: string;
+}) {
+  await assertAdmin();
+
+  if (!data.clientId || !data.projectId || !data.title?.trim() || !data.description?.trim()) {
+    return { success: false, error: "Preencha todos os campos obrigatórios." };
+  }
+
+  const client = await prisma.user.findUnique({
+    where: { id: data.clientId },
+    include: {
+      projects: { where: { id: data.projectId } },
+    },
+  });
+
+  if (!client) {
+    return { success: false, error: "Cliente não encontrado." };
+  }
+
+  const project = client.projects[0];
+  if (!project) {
+    return { success: false, error: "Projeto selecionado não pertence ao cliente." };
+  }
+
+  let slaHours = 24;
+  if (data.category === TicketCategory.INTERMEDIATE) slaHours = 72;
+  if (data.category === TicketCategory.ADVANCED) slaHours = 168; // 7 dias
+
+  const slaDueAt = new Date(Date.now() + slaHours * 60 * 60 * 1000);
+
+  const ticket = await prisma.ticket.create({
+    data: {
+      title: data.title.trim(),
+      description: data.description.trim(),
+      category: data.category,
+      slaHours,
+      slaDueAt,
+      userId: client.id,
+      projectId: project.id,
+      status: TicketStatus.OPEN,
+    },
+  });
+
+  // Notificar cliente por e-mail com template institucional
+  try {
+    if (process.env.RESEND_API_KEY) {
+      const resend = new Resend(process.env.RESEND_API_KEY);
+      const emailHtml = renderTicketNotificationEmailHtml({
+        clientName: client.fullName || client.companyName || "Cliente",
+        ticketNumber: ticket.ticketNumber,
+        ticketTitle: ticket.title,
+        category: data.category as "BASIC" | "INTERMEDIATE" | "ADVANCED",
+        slaHours,
+        slaDueAt: slaDueAt.toLocaleString("pt-BR"),
+        description: ticket.description,
+        projectName: project.name,
+        portalUrl: "https://mindsite.com.br/portal/dashboard",
+      });
+
+      await resend.emails.send({
+        from: "MindSite Suporte <suporte@mindsite.com.br>",
+        to: client.email,
+        subject: `[Chamado #${ticket.ticketNumber}] ${ticket.title} — MindSite Suporte`,
+        html: emailHtml,
+      });
+    }
+  } catch (err: unknown) {
+    console.error("Erro ao enviar e-mail de notificação de chamado:", err);
+  }
+
+  revalidatePath("/admin/dashboard");
+  revalidatePath("/admin");
+  revalidatePath("/portal/dashboard");
+
+  return { success: true, ticketId: ticket.id, ticketNumber: ticket.ticketNumber };
 }
 
 // Criação atômica de fatura com múltiplos itens discriminados (prisma.$transaction)
@@ -728,3 +1082,10 @@ export async function settleInstallmentManuallyAction(installmentId: string) {
 export async function markInstallmentPaidAction(installmentId: string) {
   return settleAction(installmentId);
 }
+
+// Obter Signed URL temporária de anexo
+export async function getAttachmentSignedUrlAction(attachmentIdOrUrl: string) {
+  const { getAttachmentSignedUrlAction: getUrl } = await import("@/app/actions/portal");
+  return getUrl(attachmentIdOrUrl);
+}
+

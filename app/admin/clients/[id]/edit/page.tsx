@@ -12,6 +12,7 @@ import {
   resetClientPasswordAction,
 } from "@/app/actions/adminClients";
 import { issueImmediateInvoiceAction } from "@/app/actions/admin";
+import { signOut } from "@/app/actions/auth";
 import { isValidDocument, maskDocument } from "@/lib/validators";
 
 export default function EditClientPage({ params }: { params: Promise<{ id: string }> }) {
@@ -63,7 +64,8 @@ interface ProjectItem {
   const [newProjDesc, setNewProjDesc] = useState("");
   const [newProjSetup, setNewProjSetup] = useState<number>(0);
   const [newProjInstallments, setNewProjInstallments] = useState<Array<{ amount: number; scheduledDate: string; description: string }>>([]);
-  const [newProjSustPlan, setNewProjSustPlan] = useState<"NONE" | "ESSENTIAL" | "DEVELOPMENT" | "ADVANCED">("NONE");
+  const [newProjSustPlan, setNewProjSustPlan] = useState<"NONE" | "ESSENTIAL" | "DEVELOPMENT" | "ADVANCED" | "CUSTOM">("NONE");
+  const [newProjCustomAmount, setNewProjCustomAmount] = useState<number | string>("");
   const [newProjSustStartDate, setNewProjSustStartDate] = useState(new Date().toISOString().split("T")[0]);
 
   const [newInstallmentContractId, setNewInstallmentContractId] = useState<string | null>(null);
@@ -208,6 +210,7 @@ interface ProjectItem {
           description: inst.description,
         })),
         sustainabilityPlan: newProjSustPlan,
+        customPlanAmount: newProjSustPlan === "CUSTOM" ? Number(newProjCustomAmount) || 0 : undefined,
         sustainabilityStartDate: newProjSustStartDate,
       });
 
@@ -220,6 +223,7 @@ interface ProjectItem {
         setNewProjSetup(0);
         setNewProjInstallments([]);
         setNewProjSustPlan("NONE");
+        setNewProjCustomAmount("");
         await reloadClient();
       } else {
         showNotification(res.error || "Erro ao criar projeto.", "error");
@@ -328,9 +332,21 @@ interface ProjectItem {
         <div className="mxd-block" style={{ paddingTop: "4rem", paddingBottom: "2.5rem", borderBottom: "1px solid var(--st-medium)", marginBottom: "4rem" }}>
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end", flexWrap: "wrap", gap: "2rem" }}>
             <div>
-              <span className="tag tag-s tag-medium" style={{ color: "var(--accent)", display: "inline-block", marginBottom: "0.5rem" }}>
-                Gestão do Cliente
-              </span>
+              <Link
+                href="/admin/dashboard"
+                className="tag tag-s tag-medium"
+                style={{
+                  color: "var(--accent)",
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: "0.5rem",
+                  marginBottom: "0.5rem",
+                  textDecoration: "none",
+                  fontWeight: 700,
+                }}
+              >
+                ← DASHBOARD // Clientes
+              </Link>
               <h1 style={{ fontSize: "clamp(2.4rem, 3vw, 3.8rem)", fontWeight: 700, margin: 0, color: "var(--t-bright)", fontFamily: "var(--_font-default)" }}>
                 Editar: {fullName || primaryEmail}
               </h1>
@@ -368,6 +384,16 @@ interface ProjectItem {
               <Link className="btn btn-line-icon btn-line-icon-small btn-line-medium slide-left" href="/admin/clients">
                 <span className="btn-caption" style={{ fontSize: "1.3rem" }}>Voltar à Lista</span>
               </Link>
+
+              <form action={signOut}>
+                <button
+                  type="submit"
+                  className="btn btn-line-icon btn-line-icon-small btn-line-medium slide-left"
+                  style={{ height: "4.2rem", padding: "0 1.6rem", fontSize: "1.3rem" }}
+                >
+                  <span className="btn-caption">Sair [→</span>
+                </button>
+              </form>
             </div>
           </div>
         </div>
@@ -868,23 +894,46 @@ interface ProjectItem {
                   {newProjSetup > 0 && (
                     <div style={{ display: "flex", flexDirection: "column", gap: "1.2rem" }}>
                       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: "1rem", padding: "1rem 1.2rem", backgroundColor: "var(--base-tint)", border: "1px solid var(--st-medium)", borderRadius: "0.3rem" }}>
-                        <div style={{ fontSize: "1.2rem", fontFamily: "var(--_font-accent)" }}>
-                          <span style={{ color: "var(--t-muted)" }}>Total Setup: </span>
-                          <strong style={{ color: "var(--t-bright)" }}>R$ {newProjSetup.toFixed(2).replace(".", ",")}</strong>
-                          <span style={{ margin: "0 0.8rem", color: "var(--st-medium)" }}>|</span>
-                          <span style={{ color: "var(--t-muted)" }}>Parcelado: </span>
-                          <strong style={{ color: "#10b981" }}>
-                            R$ {newProjInstallments.reduce((sum, i) => sum + (Number(i.amount) || 0), 0).toFixed(2).replace(".", ",")}
-                          </strong>
-                          <span style={{ margin: "0 0.8rem", color: "var(--st-medium)" }}>|</span>
-                          <span style={{ color: "var(--t-muted)" }}>Saldo Restante: </span>
-                          <strong style={{
-                            color: Math.abs(newProjSetup - newProjInstallments.reduce((sum, i) => sum + (Number(i.amount) || 0), 0)) < 0.01
-                              ? "#10b981"
-                              : "var(--accent)"
-                          }}>
-                            R$ {(newProjSetup - newProjInstallments.reduce((sum, i) => sum + (Number(i.amount) || 0), 0)).toFixed(2).replace(".", ",")}
-                          </strong>
+                        <div style={{ display: "flex", alignItems: "center", gap: "1rem", flexWrap: "wrap", fontSize: "1.2rem", fontFamily: "var(--_font-accent)" }}>
+                          <div>
+                            <span style={{ color: "var(--t-muted)" }}>Total Setup: </span>
+                            <strong style={{ color: "var(--t-bright)" }}>R$ {newProjSetup.toFixed(2).replace(".", ",")}</strong>
+                          </div>
+                          <span style={{ color: "var(--st-medium)" }}>|</span>
+                          <div>
+                            <span style={{ color: "var(--t-muted)" }}>Parcelado: </span>
+                            <strong style={{ color: "#10b981" }}>
+                              R$ {newProjInstallments.reduce((sum, i) => sum + (Number(i.amount) || 0), 0).toFixed(2).replace(".", ",")}
+                            </strong>
+                          </div>
+                          
+                          {/* Badge de Validação em Tempo Real */}
+                          {(() => {
+                            const allocated = newProjInstallments.reduce((sum, i) => sum + (Number(i.amount) || 0), 0);
+                            const remaining = Math.round((newProjSetup - allocated) * 100) / 100;
+                            const isMatch = Math.abs(remaining) === 0;
+
+                            return (
+                              <span
+                                style={{
+                                  fontFamily: "var(--_font-accent)",
+                                  fontSize: "1.1rem",
+                                  fontWeight: 700,
+                                  padding: "0.3rem 0.8rem",
+                                  borderRadius: "0.2rem",
+                                  backgroundColor: isMatch ? "rgba(16, 185, 129, 0.15)" : remaining > 0 ? "rgba(245, 158, 11, 0.15)" : "rgba(239, 68, 68, 0.15)",
+                                  color: isMatch ? "#10b981" : remaining > 0 ? "#f59e0b" : "#ef4444",
+                                  border: `1px solid ${isMatch ? "rgba(16, 185, 129, 0.4)" : remaining > 0 ? "rgba(245, 158, 11, 0.4)" : "rgba(239, 68, 68, 0.4)"}`,
+                                }}
+                              >
+                                {isMatch
+                                  ? "✓ Montante a receber definido"
+                                  : remaining > 0
+                                  ? `Parcelas a definir: R$ ${remaining.toFixed(2).replace(".", ",")}`
+                                  : `Excedido em R$ ${Math.abs(remaining).toFixed(2).replace(".", ",")}`}
+                              </span>
+                            );
+                          })()}
                         </div>
 
                         <button
@@ -914,7 +963,7 @@ interface ProjectItem {
                                 type="text"
                                 value={inst.description}
                                 onChange={(e) => handleUpdateDynamicInstallment(idx, "description", e.target.value)}
-                                placeholder="Descrição da parcela"
+                                placeholder="Descrição da parcela (Ex: Entrada, Parcela 2)"
                                 style={{ height: "3.8rem", padding: "0 1rem", backgroundColor: "var(--base-tint)", border: "1px solid var(--st-medium)", color: "var(--t-bright)", fontFamily: "var(--_font-accent)", fontSize: "1.2rem" }}
                               />
                               <input
@@ -953,22 +1002,40 @@ interface ProjectItem {
                   <span style={{ display: "block", fontFamily: "var(--_font-accent)", fontSize: "1.1rem", textTransform: "uppercase", color: "var(--accent)", fontWeight: 700, marginBottom: "1.2rem" }}>
                     3. Plano de Sustentação Mensal
                   </span>
-                  <div style={{ display: "grid", gridTemplateColumns: newProjSustPlan !== "NONE" ? "1fr 1fr" : "1fr", gap: "1.4rem" }}>
+                  <div style={{ display: "grid", gridTemplateColumns: newProjSustPlan === "CUSTOM" ? "1.5fr 1fr 1fr" : newProjSustPlan !== "NONE" ? "1fr 1fr" : "1fr", gap: "1.4rem" }}>
                     <div>
                       <label style={{ display: "block", fontFamily: "var(--_font-accent)", fontSize: "1.1rem", textTransform: "uppercase", color: "var(--t-medium)", marginBottom: "0.6rem" }}>
                         Plano Selecionado
                       </label>
                       <select
                         value={newProjSustPlan}
-                        onChange={(e) => setNewProjSustPlan(e.target.value as "NONE" | "ESSENTIAL" | "DEVELOPMENT" | "ADVANCED")}
+                        onChange={(e) => setNewProjSustPlan(e.target.value as "NONE" | "ESSENTIAL" | "DEVELOPMENT" | "ADVANCED" | "CUSTOM")}
                         style={{ width: "100%", height: "4.2rem", padding: "0 1.2rem", backgroundColor: "var(--base-tint)", border: "1px solid var(--st-medium)", color: "var(--t-bright)", fontFamily: "var(--_font-accent)", fontSize: "1.3rem", outline: "none" }}
                       >
                         <option value="NONE">Nenhum (Somente Setup)</option>
                         <option value="ESSENTIAL">Essential — R$ 100,00 / mês</option>
                         <option value="DEVELOPMENT">Development — R$ 300,00 / mês</option>
                         <option value="ADVANCED">Advanced — R$ 700,00 / mês</option>
+                        <option value="CUSTOM">Customizado (Definir valor manual)</option>
                       </select>
                     </div>
+
+                    {newProjSustPlan === "CUSTOM" && (
+                      <div>
+                        <label style={{ display: "block", fontFamily: "var(--_font-accent)", fontSize: "1.1rem", textTransform: "uppercase", color: "var(--t-medium)", marginBottom: "0.6rem" }}>
+                          Valor Mensal Customizado (R$) *
+                        </label>
+                        <input
+                          type="number"
+                          step="0.01"
+                          min="0"
+                          value={newProjCustomAmount === "" || newProjCustomAmount === 0 ? "" : newProjCustomAmount}
+                          onChange={(e) => setNewProjCustomAmount(e.target.value === "" ? "" : parseFloat(e.target.value) || 0)}
+                          placeholder="Ex: 450,00"
+                          style={{ width: "100%", height: "4.2rem", padding: "0 1.2rem", backgroundColor: "var(--base-tint)", border: "1px solid var(--accent)", color: "var(--t-bright)", fontFamily: "var(--_font-accent)", fontSize: "1.3rem", fontWeight: 700, outline: "none" }}
+                        />
+                      </div>
+                    )}
 
                     {newProjSustPlan !== "NONE" && (
                       <div>

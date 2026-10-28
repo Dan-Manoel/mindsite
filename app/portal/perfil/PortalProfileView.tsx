@@ -4,6 +4,7 @@ import { useState, useTransition, useRef } from "react";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
 import { updateClientProfileAction, logPasswordChangeAuditAction } from "@/app/actions/portal";
+import { signOut } from "@/app/actions/auth";
 
 interface ProfileProps {
   initialData: {
@@ -195,12 +196,21 @@ export default function PortalProfileView({ initialData }: ProfileProps) {
             }}
           >
             <div>
-              <span
+              <Link
+                href="/portal/dashboard"
                 className="tag tag-s tag-medium"
-                style={{ color: "var(--accent)", display: "inline-block", marginBottom: "0.5rem" }}
+                style={{
+                  color: "var(--accent)",
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: "0.5rem",
+                  marginBottom: "0.5rem",
+                  textDecoration: "none",
+                  fontWeight: 700,
+                }}
               >
-                Autonomia Cadastral
-              </span>
+                ← DASHBOARD // Meu Perfil
+              </Link>
               <h1
                 style={{
                   fontSize: "clamp(2.4rem, 3.2vw, 3.8rem)",
@@ -225,15 +235,24 @@ export default function PortalProfileView({ initialData }: ProfileProps) {
               </p>
             </div>
 
-            <Link
-              href="/portal/dashboard"
-              className="btn btn-line-icon btn-line-icon-small btn-line-medium slide-left"
-              style={{ textDecoration: "none" }}
-            >
-              <span className="btn-caption" style={{ fontSize: "1.3rem" }}>
-                ← Voltar ao Portal
-              </span>
-            </Link>
+            <div style={{ display: "flex", alignItems: "center", gap: "1.2rem", flexWrap: "wrap" }}>
+              <Link
+                href="/portal/dashboard"
+                className="btn btn-line-icon btn-line-icon-small btn-line-medium slide-left"
+                style={{ height: "4.4rem", padding: "0 1.6rem", fontSize: "1.3rem" }}
+              >
+                <span className="btn-caption">Dashboard</span>
+              </Link>
+              <form action={signOut}>
+                <button
+                  type="submit"
+                  className="btn btn-line-icon btn-line-icon-small btn-line-medium slide-left"
+                  style={{ height: "4.4rem", padding: "0 1.6rem", fontSize: "1.3rem" }}
+                >
+                  <span className="btn-caption">Sair [→</span>
+                </button>
+              </form>
+            </div>
           </div>
         </div>
 

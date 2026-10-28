@@ -10,34 +10,7 @@ import { renderWelcomeEmailHtml } from "@/lib/mail/welcomeTemplate";
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
-export interface ProjectInputDTO {
-  id?: string;
-  name: string;
-  domain?: string;
-  description?: string;
-  setupAmount: number;
-  installments: Array<{
-    id?: string;
-    amount: number;
-    scheduledDate: string;
-    description: string;
-  }>;
-  sustainabilityPlan: "NONE" | "ESSENTIAL" | "DEVELOPMENT" | "ADVANCED";
-  sustainabilityStartDate?: string;
-}
-
-export interface ClientDTO {
-  fullName: string;
-  primaryEmail: string;
-  secondaryEmail?: string;
-  password?: string;
-  phone?: string;
-  document?: string;
-  companyName?: string;
-  address?: string;
-  autentiqueDocId?: string;
-  projects: ProjectInputDTO[];
-}
+import type { ProjectInputDTO, ClientDTO } from "./adminClients.types";
 
 // 1. Criar Cliente com Rollback Seguro, Telemetria Ativa e Remetente Oficial Resend
 export async function createClientWithProjectsAction(data: ClientDTO) {
@@ -152,6 +125,9 @@ export async function createClientWithProjectsAction(data: ClientDTO) {
             } else if (proj.sustainabilityPlan === "ADVANCED") {
               planPrice = 700;
               planTitle = "Plano Advanced";
+            } else if (proj.sustainabilityPlan === "CUSTOM") {
+              planPrice = Number(proj.customPlanAmount) || 0;
+              planTitle = `Plano Customizado (R$ ${planPrice.toFixed(2)})`;
             }
 
             await tx.contract.create({
@@ -464,6 +440,9 @@ export async function addProjectToClientAction(clientId: string, proj: ProjectIn
           } else if (proj.sustainabilityPlan === "ADVANCED") {
             planPrice = 700;
             planTitle = "Plano Advanced";
+          } else if (proj.sustainabilityPlan === "CUSTOM") {
+            planPrice = Number(proj.customPlanAmount) || 0;
+            planTitle = `Plano Customizado (R$ ${planPrice.toFixed(2)})`;
           }
 
           await tx.contract.create({
@@ -488,6 +467,11 @@ export async function addProjectToClientAction(clientId: string, proj: ProjectIn
     const message = err instanceof Error ? err.message : "Erro desconhecido";
     return { success: false, error: message };
   }
+}
+
+// Alias de compatibilidade para criação de projeto
+export async function createProjectAction(clientId: string, proj: ProjectInputDTO) {
+  return addProjectToClientAction(clientId, proj);
 }
 
 // 6. Baixa Manual de Parcela

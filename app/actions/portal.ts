@@ -5,7 +5,7 @@ import { prisma } from "@/lib/prisma";
 import { TicketCategory, InvoiceStatus } from "@prisma/client";
 import { revalidatePath } from "next/cache";
 import { createInfinitePayCheckoutLink } from "@/lib/payment/infinitepay";
-import { createAdminClient } from "@/lib/supabase/admin";
+import { createAdminClient, supabaseAdmin } from "@/lib/supabase/admin";
 import { logAudit } from "@/lib/audit";
 import { getAutentiqueDocument } from "@/lib/integrations/autentique";
 
@@ -352,6 +352,8 @@ export async function getClientDashboardData() {
       status: t.status,
       slaHours: t.slaHours,
       slaDueAt: t.slaDueAt.toISOString(),
+      slaPausedAt: t.slaPausedAt ? t.slaPausedAt.toISOString() : null,
+      reopenReason: t.reopenReason || null,
       createdAt: t.createdAt.toISOString(),
       isOverdue: t.status !== "RESOLVED" && t.status !== "CANCELLED" && new Date(t.slaDueAt) < now,
       projectName: t.project.name,
@@ -365,6 +367,7 @@ export async function getClientDashboardData() {
         message: c.message,
         authorName: c.authorName,
         isAdmin: c.isAdmin,
+        attachments: c.attachments || [],
         createdAt: c.createdAt.toISOString(),
       })),
     })),
@@ -537,6 +540,141 @@ export async function createTicketAction(formData: {
     return { success: true, ticketId: ticket.id };
   } catch (error: unknown) {
     const message = error instanceof Error ? error.message : "Erro ao registrar chamado.";
+    return { success: false, error: message };
+  }
+}
+
+// 1. Geração de Signed URL segura com validade temporária (60 minutos)
+export async function getAttachmentSignedUrlAction(attachmentIdOrUrl: string) {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    return { success: false, error: "Usuário não autenticado." };
+  }
+
+  try {
+    let filePath = attachmentIdOrUrl;
+
+    // Localiza registro do anexo no banco caso seja passado o ID ou a URL
+    const attachment = await prisma.ticketAttachment.findFirst({
+      where: {
+        OR: [{ id: attachmentIdOrUrl }, { fileUrl: attachmentIdOrUrl }],
+      },
+      include: {
+        ticket: true,
+      },
+    });
+
+    if (attachment) {
+      const isAdmin =
+        user.app_metadata?.role === "ADMIN" ||
+        user.user_metadata?.role === "ADMIN" ||
+        user.email === "contato@mindsite.com.br";
+      if (!isAdmin && attachment.ticket.userId !== user.id) {
+        return { success: false, error: "Acesso não autorizado a este anexo." };
+      }
+      filePath = attachment.fileUrl;
+    }
+
+    // Normaliza o caminho caso venha com URL pública estática antiga do Supabase
+    if (filePath.includes("ticket-attachments/")) {
+      filePath = filePath.split("ticket-attachments/")[1];
+    } else if (filePath.startsWith("http://") || filePath.startsWith("https://")) {
+      const urlObj = new URL(filePath);
+      const segments = urlObj.pathname.split("/").filter(Boolean);
+      const bucketIdx = segments.indexOf("ticket-attachments");
+      if (bucketIdx !== -1 && bucketIdx < segments.length - 1) {
+        filePath = segments.slice(bucketIdx + 1).join("/");
+      } else {
+        filePath = segments.slice(-2).join("/");
+      }
+    }
+
+    if (filePath.includes("?")) {
+      filePath = filePath.split("?")[0];
+    }
+
+    // Garante a existência do bucket privado no Supabase
+    try {
+      await supabaseAdmin.storage.createBucket("ticket-attachments", { public: false });
+    } catch {
+      // Ignora caso bucket já exista
+    }
+
+    // Gera Signed URL com validade de 60 minutos (3600 segundos)
+    const { data: signedData, error: signedError } = await supabaseAdmin.storage
+      .from("ticket-attachments")
+      .createSignedUrl(filePath, 3600);
+
+    if (signedError || !signedData?.signedUrl) {
+      console.error("Erro ao gerar Signed URL do anexo:", signedError);
+      return {
+        success: false,
+        error: signedError?.message || "Arquivo não encontrado no armazenamento seguro.",
+      };
+    }
+
+    return { success: true, signedUrl: signedData.signedUrl };
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : "Erro interno ao processar anexo.";
+    console.error("Exceção ao gerar Signed URL:", message);
+    return { success: false, error: message };
+  }
+}
+
+// 2. Upload de anexo sob demanda (apenas ao Salvar o chamado)
+export async function uploadTicketAttachmentAction(formData: FormData) {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    return { success: false, error: "Usuário não autenticado." };
+  }
+
+  const file = formData.get("file") as File;
+  if (!file) {
+    return { success: false, error: "Nenhum arquivo enviado." };
+  }
+
+  try {
+    const bytes = await file.arrayBuffer();
+    const buffer = Buffer.from(bytes);
+    const fileExt = file.name.split(".").pop() || "bin";
+    const fileName = `${Date.now()}-${Math.random().toString(36).substring(7)}.${fileExt}`;
+    const filePath = `${user.id}/${fileName}`;
+
+    try {
+      await supabaseAdmin.storage.createBucket("ticket-attachments", { public: false });
+    } catch {
+      // Ignora caso bucket já exista
+    }
+
+    const { error: uploadError } = await supabaseAdmin.storage
+      .from("ticket-attachments")
+      .upload(filePath, buffer, {
+        contentType: file.type || "application/octet-stream",
+        upsert: true,
+      });
+
+    if (uploadError) {
+      console.error("Erro no upload do anexo:", uploadError);
+      return { success: false, error: uploadError.message };
+    }
+
+    return {
+      success: true,
+      fileName: file.name,
+      fileUrl: filePath,
+      fileSize: file.size,
+      mimeType: file.type,
+    };
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : "Erro desconhecido no upload do anexo.";
     return { success: false, error: message };
   }
 }

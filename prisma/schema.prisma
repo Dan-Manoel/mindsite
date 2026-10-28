@@ -151,6 +151,9 @@ model Ticket {
   slaHours        Int             @default(24) // 24, 72 ou 168
   slaDueAt        DateTime
   resolvedAt      DateTime?
+  slaPausedAt     DateTime?
+  slaTotalPausedSeconds Int         @default(0)
+  reopenReason    String?         @db.Text
 
   userId          String
   user            User            @relation(fields: [userId], references: [id], onDelete: Cascade)
@@ -181,13 +184,14 @@ model TicketAttachment {
 }
 
 model TicketComment {
-  id         String   @id @default(uuid())
-  message    String   @db.Text
-  authorName String
-  isAdmin    Boolean  @default(false)
-  createdAt  DateTime @default(now())
-  ticketId   String
-  ticket     Ticket   @relation(fields: [ticketId], references: [id], onDelete: Cascade)
+  id          String   @id @default(uuid())
+  message     String   @db.Text
+  authorName  String
+  isAdmin     Boolean  @default(false)
+  attachments String[] @default([])
+  createdAt   DateTime @default(now())
+  ticketId    String
+  ticket      Ticket   @relation(fields: [ticketId], references: [id], onDelete: Cascade)
 
   @@map("ticket_comments")
 }
@@ -260,10 +264,17 @@ model Invoice {
   paidAt            DateTime?
 
   // Flags da Régua de Cobrança (Para evitar spam)
-  reminder5DaysSent Boolean        @default(false)
-  dueDaySent        Boolean        @default(false)
-  overdue1DaySent   Boolean        @default(false)
-  critical2DaysSent Boolean        @default(false)
+  reminder5DaysSent      Boolean        @default(false)
+  dueDaySent             Boolean        @default(false)
+  overdue1DaySent        Boolean        @default(false)
+  critical2DaysSent      Boolean        @default(false)
+
+  // Auditoria e rastreabilidade da régua automatizada
+  reminderSentAt         DateTime?      // Disparo de 5 dias antes
+  dueTodaySentAt         DateTime?      // Disparo do dia do vencimento
+  overdueSentAt          DateTime?      // Disparo de 1 dia de atraso
+  criticalOverdueSentAt  DateTime?      // Disparo de 3+ dias de atraso
+  adminAlertSentAt       DateTime?      // Alerta interno enviado para contato@mindsite.com.br
 
   userId            String
   user              User           @relation(fields: [userId], references: [id], onDelete: Cascade)

@@ -68,7 +68,7 @@ export async function sendContactLead(
 
     // 5. Definição dos parâmetros do e-mail
     const fromSender =
-      process.env.CONTACT_EMAIL_FROM || "MindSite - Vitrine <no-reply@mindsite.com.br>";
+      process.env.CONTACT_EMAIL_FROM || "Mindsite <no-reply@mindsite.com.br>";
     const recipient = process.env.CONTACT_RECIPIENT_EMAIL || "contato@mindsite.com.br";
     const companyLabel = company && company.length > 0 ? company : "Sem Empresa";
     const subject = `Novo Lead Capturado: ${name} (${companyLabel})`;

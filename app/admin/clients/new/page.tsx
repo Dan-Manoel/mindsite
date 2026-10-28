@@ -3,7 +3,9 @@
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { createClientWithProjectsAction, ProjectInputDTO } from "@/app/actions/adminClients";
+import { createClientWithProjectsAction } from "@/app/actions/adminClients";
+import type { ProjectInputDTO } from "@/app/actions/adminClients.types";
+import { signOut } from "@/app/actions/auth";
 import { isValidDocument, maskDocument } from "@/lib/validators";
 
 export default function NewClientPage() {
@@ -158,18 +160,41 @@ export default function NewClientPage() {
     <main className="mxd-page-content inner-page-content" style={{ minHeight: "100vh", backgroundColor: "var(--base)", paddingBottom: "10rem" }}>
       <div className="mxd-container grid-l-container" style={{ maxWidth: "1000px" }}>
         <div className="mxd-block" style={{ paddingTop: "4rem", paddingBottom: "2.5rem", borderBottom: "1px solid var(--st-medium)", marginBottom: "4rem" }}>
-          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: "2rem" }}>
             <div>
-              <span className="tag tag-s tag-medium" style={{ color: "var(--accent)", display: "inline-block", marginBottom: "0.5rem" }}>
-                Gestão de Clientes MindSite
-              </span>
+              <Link
+                href="/admin/dashboard"
+                className="tag tag-s tag-medium"
+                style={{
+                  color: "var(--accent)",
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: "0.5rem",
+                  marginBottom: "0.5rem",
+                  textDecoration: "none",
+                  fontWeight: 700,
+                }}
+              >
+                ← DASHBOARD // Clientes
+              </Link>
               <h1 style={{ fontSize: "clamp(2.4rem, 3vw, 3.8rem)", fontWeight: 700, margin: 0, color: "var(--t-bright)" }}>
                 Novo Cadastro de Cliente
               </h1>
             </div>
-            <Link className="btn btn-line-icon btn-line-icon-small btn-line-medium slide-left" href="/admin/clients">
-              <span className="btn-caption" style={{ fontSize: "1.3rem" }}>Ver Lista de Clientes</span>
-            </Link>
+            <div style={{ display: "flex", alignItems: "center", gap: "1.2rem" }}>
+              <Link className="btn btn-line-icon btn-line-icon-small btn-line-medium slide-left" href="/admin/clients">
+                <span className="btn-caption" style={{ fontSize: "1.3rem" }}>Ver Lista de Clientes</span>
+              </Link>
+              <form action={signOut}>
+                <button
+                  type="submit"
+                  className="btn btn-line-icon btn-line-icon-small btn-line-medium slide-left"
+                  style={{ height: "4.4rem", padding: "0 1.6rem", fontSize: "1.3rem" }}
+                >
+                  <span className="btn-caption">Sair [→</span>
+                </button>
+              </form>
+            </div>
           </div>
         </div>
 
@@ -474,22 +499,40 @@ export default function NewClientPage() {
                     </div>
                   </div>
 
-                  <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "2rem" }}>
+                  <div style={{ display: "grid", gridTemplateColumns: proj.sustainabilityPlan === "CUSTOM" ? "1.5fr 1fr 1fr" : "1fr 1fr", gap: "2rem" }}>
                     <div>
                       <label style={{ display: "block", fontFamily: "var(--_font-accent)", fontSize: "1.1rem", textTransform: "uppercase", color: "var(--t-medium)", marginBottom: "0.6rem" }}>
                         Plano de Sustentação Mensal
                       </label>
                       <select
                         value={proj.sustainabilityPlan}
-                        onChange={(e) => updateProject(pIdx, "sustainabilityPlan", e.target.value as "NONE" | "ESSENTIAL" | "DEVELOPMENT" | "ADVANCED")}
+                        onChange={(e) => updateProject(pIdx, "sustainabilityPlan", e.target.value as "NONE" | "ESSENTIAL" | "DEVELOPMENT" | "ADVANCED" | "CUSTOM")}
                         style={{ width: "100%", height: "4.5rem", padding: "0 1rem", backgroundColor: "var(--base)", border: "1px solid var(--st-medium)", color: "var(--t-bright)", fontFamily: "var(--_font-accent)", fontSize: "1.2rem", outline: "none" }}
                       >
                         <option value="NONE">Sem Sustentação (R$ 0,00/mês)</option>
                         <option value="ESSENTIAL">Essential (R$ 100,00/mês — 5 e-mails / SLA 24h)</option>
                         <option value="DEVELOPMENT">Development (R$ 300,00/mês — 15 e-mails / SLA 72h)</option>
                         <option value="ADVANCED">Advanced (R$ 700,00/mês — 30+ e-mails / SLA 7d)</option>
+                        <option value="CUSTOM">Customizado (Definir valor manual)</option>
                       </select>
                     </div>
+
+                    {proj.sustainabilityPlan === "CUSTOM" && (
+                      <div>
+                        <label style={{ display: "block", fontFamily: "var(--_font-accent)", fontSize: "1.1rem", textTransform: "uppercase", color: "var(--t-medium)", marginBottom: "0.6rem" }}>
+                          Valor Mensal Customizado (R$) *
+                        </label>
+                        <input
+                          type="number"
+                          step="0.01"
+                          min="0"
+                          value={proj.customPlanAmount === undefined || proj.customPlanAmount === 0 ? "" : proj.customPlanAmount}
+                          onChange={(e) => updateProject(pIdx, "customPlanAmount", e.target.value === "" ? 0 : parseFloat(e.target.value) || 0)}
+                          placeholder="Ex: 450,00"
+                          style={{ width: "100%", height: "4.5rem", padding: "0 1.5rem", backgroundColor: "var(--base)", border: "1px solid var(--accent)", color: "var(--t-bright)", fontFamily: "var(--_font-accent)", fontSize: "1.3rem", fontWeight: 700, outline: "none" }}
+                        />
+                      </div>
+                    )}
 
                     <div>
                       <label style={{ display: "block", fontFamily: "var(--_font-accent)", fontSize: "1.1rem", textTransform: "uppercase", color: "var(--t-medium)", marginBottom: "0.6rem" }}>
