@@ -2,6 +2,16 @@ import { createServerClient } from "@supabase/ssr";
 import { type NextRequest, NextResponse } from "next/server";
 
 export async function middleware(request: NextRequest) {
+  const pathname = request.nextUrl.pathname;
+
+  // 1. Bypass irrestrito para Webhooks e Cron jobs
+  if (
+    pathname.startsWith("/api/webhooks") ||
+    pathname.startsWith("/api/cron")
+  ) {
+    return NextResponse.next();
+  }
+
   let supabaseResponse = NextResponse.next({
     request: {
       headers: request.headers,
@@ -35,9 +45,7 @@ export async function middleware(request: NextRequest) {
     data: { user },
   } = await supabase.auth.getUser();
 
-  const pathname = request.nextUrl.pathname;
-
-  // 1. Bloqueio de rotas privadas se deslogado
+  // 2. Bloqueio de rotas protegidas
   if (!user && (pathname.startsWith("/portal") || pathname.startsWith("/admin"))) {
     const url = request.nextUrl.clone();
     url.pathname = "/login";
@@ -45,7 +53,7 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(url);
   }
 
-  // 2. Isolamento de área administrativa
+  // 3. Controle de acesso por Role
   if (user && pathname.startsWith("/admin")) {
     const role = user.app_metadata?.role || user.user_metadata?.role;
     if (role !== "ADMIN") {
@@ -55,7 +63,7 @@ export async function middleware(request: NextRequest) {
     }
   }
 
-  // 3. Redirecionar usuário logado se tentar acessar a tela de login
+  // 4. Redirecionamento da tela de login para usuários autenticados
   if (user && pathname === "/login") {
     const role = user.app_metadata?.role || user.user_metadata?.role;
     const url = request.nextUrl.clone();
@@ -68,6 +76,6 @@ export async function middleware(request: NextRequest) {
 
 export const config = {
   matcher: [
-    "/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)",
+    "/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp|mp4|webm)$).*)",
   ],
 };

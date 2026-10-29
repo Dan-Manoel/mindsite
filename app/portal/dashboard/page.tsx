@@ -33,18 +33,10 @@ export default async function ClientDashboardPage({
         : undefined;
 
     const slug = typeof params.slug === "string" ? params.slug : undefined;
+    const receiptUrl = typeof params.receipt_url === "string" ? params.receipt_url : undefined;
+    const captureMethod = typeof params.capture_method === "string" ? params.capture_method.toLowerCase() : "pix";
 
-    const receiptUrl =
-      typeof params.receipt_url === "string" ? params.receipt_url : undefined;
-
-    const captureMethod =
-      typeof params.capture_method === "string"
-        ? params.capture_method.toLowerCase()
-        : "pix";
-
-    // Se o retorno indicar sucesso e trouxer qualquer identificador (order_nsu, slug ou transaction_nsu)
     if (isPaymentSuccess && (orderNsu || slug || transactionNsu)) {
-      // 1. Busca resiliente: tenta por invoiceNumber, ID, slug na URL ou transaction_nsu
       const orConditions: Array<Record<string, unknown>> = [];
 
       if (orderNsu) {
@@ -55,6 +47,7 @@ export default async function ClientDashboardPage({
 
       if (slug) {
         orConditions.push({ gatewayInvoiceUrl: { contains: slug } });
+        orConditions.push({ gatewayPaymentId: slug });
       }
 
       if (transactionNsu) {
@@ -66,7 +59,6 @@ export default async function ClientDashboardPage({
         include: { items: { include: { installment: true } } },
       });
 
-      // 2. Se a fatura existir e não estiver paga, dá a baixa imediata
       if (invoice && invoice.status !== "PAID") {
         await prisma.$transaction([
           prisma.invoice.update({
@@ -96,19 +88,13 @@ export default async function ClientDashboardPage({
           }
         }
 
-        console.info(
-          `[ClientDashboardPage] Baixa síncrona executada com sucesso para a fatura #${invoice.invoiceNumber}.`
-        );
+        console.info(`[Sync Settle] Fatura #${invoice.invoiceNumber} liquidada via retorno de checkout.`);
       }
     }
   } catch (reconcileError: unknown) {
-    console.warn(
-      "[ClientDashboardPage] Erro na reconciliação síncrona InfinitePay:",
-      reconcileError
-    );
+    console.error("[Sync Settle Error]:", reconcileError);
   }
 
-  // Carregamento dos dados do portal
   let data;
   try {
     data = await getClientDashboardData();
