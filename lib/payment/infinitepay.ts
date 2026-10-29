@@ -20,15 +20,15 @@ export async function createInfinitePayCheckoutLink(params: CreateCheckoutLinkPa
   const apiKey = process.env.INFINITEPAY_API_KEY;
   const handle = (process.env.INFINITEPAY_HANDLE || "mindsite").replace(/^\$/, "");
 
-  const rawBaseUrl =
+  const baseUrl =
     process.env.NEXT_PUBLIC_APP_URL ||
     (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : "https://mindsite.com.br");
-  const baseUrl = rawBaseUrl.replace(/\/$/, "");
+  const cleanBaseUrl = baseUrl.replace(/\/$/, "");
 
   const redirectUrl =
     params.redirectUrl ||
-    `${baseUrl}/portal/dashboard?payment=success&order_nsu=${encodeURIComponent(params.orderNsu)}`;
-  const webhookUrl = params.webhookUrl || `${baseUrl}/api/webhooks/infinitepay`;
+    `${cleanBaseUrl}/portal/dashboard?payment=success&order_nsu=${encodeURIComponent(params.orderNsu)}`;
+  const webhookUrl = params.webhookUrl || `${cleanBaseUrl}/api/webhooks/infinitepay`;
 
   const formattedItems = params.items.map((item) => ({
     quantity: item.quantity || 1,

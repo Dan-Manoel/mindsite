@@ -9,67 +9,76 @@ export const metadata: Metadata = {
   description: "Gerencie chamados técnicos com SLA e faturas do seu projeto.",
 };
 
-interface ClientDashboardPageProps {
-  searchParams?: Promise<{ [key: string]: string | string[] | undefined }>;
-}
+type SearchParams = Promise<{ [key: string]: string | string[] | undefined }>;
 
-export default async function ClientDashboardPage({ searchParams }: ClientDashboardPageProps) {
-  // Reconciliação Síncrona no Retorno do Checkout InfinitePay
+export default async function ClientDashboardPage({
+  searchParams,
+}: {
+  searchParams: SearchParams;
+}) {
   try {
-    const resolvedSearchParams = searchParams ? await searchParams : {};
-    const paymentStatus =
-      typeof resolvedSearchParams.payment === "string" ? resolvedSearchParams.payment : undefined;
+    const params = searchParams ? await searchParams : {};
+    const isPaymentSuccess = params.payment === "success";
+
     const orderNsu =
-      typeof resolvedSearchParams.order_nsu === "string"
-        ? resolvedSearchParams.order_nsu
-        : typeof resolvedSearchParams.orderNsu === "string"
-        ? resolvedSearchParams.orderNsu
-        : undefined;
-    const transactionNsu =
-      typeof resolvedSearchParams.transaction_nsu === "string"
-        ? resolvedSearchParams.transaction_nsu
-        : typeof resolvedSearchParams.slug === "string"
-        ? resolvedSearchParams.slug
-        : undefined;
-    const receiptUrl =
-      typeof resolvedSearchParams.receipt_url === "string"
-        ? resolvedSearchParams.receipt_url
-        : undefined;
-    const captureMethod =
-      typeof resolvedSearchParams.capture_method === "string"
-        ? resolvedSearchParams.capture_method
+      typeof params.order_nsu === "string"
+        ? params.order_nsu
+        : typeof params.orderNsu === "string"
+        ? params.orderNsu
         : undefined;
 
-    if (paymentStatus === "success" && orderNsu) {
+    const transactionNsu =
+      typeof params.transaction_nsu === "string"
+        ? params.transaction_nsu
+        : undefined;
+
+    const slug = typeof params.slug === "string" ? params.slug : undefined;
+
+    const receiptUrl =
+      typeof params.receipt_url === "string" ? params.receipt_url : undefined;
+
+    const captureMethod =
+      typeof params.capture_method === "string"
+        ? params.capture_method.toLowerCase()
+        : "pix";
+
+    // Se o retorno indicar sucesso e trouxer qualquer identificador (order_nsu, slug ou transaction_nsu)
+    if (isPaymentSuccess && (orderNsu || slug || transactionNsu)) {
+      // 1. Busca resiliente: tenta por invoiceNumber, ID, slug na URL ou transaction_nsu
+      const orConditions: Array<Record<string, unknown>> = [];
+
+      if (orderNsu) {
+        orConditions.push({ invoiceNumber: orderNsu });
+        orConditions.push({ gatewayPaymentId: orderNsu });
+        orConditions.push({ id: orderNsu });
+      }
+
+      if (slug) {
+        orConditions.push({ gatewayInvoiceUrl: { contains: slug } });
+      }
+
+      if (transactionNsu) {
+        orConditions.push({ gatewayPaymentId: transactionNsu });
+      }
+
       const invoice = await prisma.invoice.findFirst({
-        where: {
-          OR: [
-            { invoiceNumber: orderNsu },
-            { id: orderNsu },
-            { gatewayPaymentId: orderNsu },
-          ],
-        },
-        include: {
-          items: { include: { installment: true } },
-        },
+        where: { OR: orConditions },
+        include: { items: { include: { installment: true } } },
       });
 
+      // 2. Se a fatura existir e não estiver paga, dá a baixa imediata
       if (invoice && invoice.status !== "PAID") {
-        const isPixPayment = String(captureMethod || "pix").toLowerCase() === "pix";
-
         await prisma.$transaction([
-          // 1. Atualiza a fatura para PAID
           prisma.invoice.update({
             where: { id: invoice.id },
             data: {
               status: "PAID",
               paidAt: new Date(),
               receiptUrl: receiptUrl || invoice.receiptUrl,
-              paymentMethod: isPixPayment ? "PIX" : "CREDIT_CARD",
-              gatewayPaymentId: transactionNsu || invoice.gatewayPaymentId,
+              paymentMethod: captureMethod === "pix" ? "PIX" : "CREDIT_CARD",
+              gatewayPaymentId: transactionNsu || slug || invoice.gatewayPaymentId,
             },
           }),
-          // 2. Atualiza parcelas vinculadas para PAID
           prisma.contractInstallment.updateMany({
             where: {
               invoiceItemId: { in: invoice.items.map((it) => it.id) },
@@ -78,7 +87,6 @@ export default async function ClientDashboardPage({ searchParams }: ClientDashbo
           }),
         ]);
 
-        // 3. Atualiza valor pago nos contratos
         for (const item of invoice.items) {
           if (item.installment?.contractId) {
             await prisma.contract.update({
@@ -87,12 +95,20 @@ export default async function ClientDashboardPage({ searchParams }: ClientDashbo
             });
           }
         }
+
+        console.info(
+          `[ClientDashboardPage] Baixa síncrona executada com sucesso para a fatura #${invoice.invoiceNumber}.`
+        );
       }
     }
   } catch (reconcileError: unknown) {
-    console.warn("[ClientDashboardPage] Erro não fatal na reconciliação síncrona InfinitePay:", reconcileError);
+    console.warn(
+      "[ClientDashboardPage] Erro na reconciliação síncrona InfinitePay:",
+      reconcileError
+    );
   }
 
+  // Carregamento dos dados do portal
   let data;
   try {
     data = await getClientDashboardData();

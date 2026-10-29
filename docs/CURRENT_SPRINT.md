@@ -63,9 +63,10 @@
 - [x] Integração Definitiva da API InfinitePay (`POST /links`), Webhook Idempotente (`/api/webhooks/infinitepay`) e Reconciliação Síncrona no Retorno (`/portal/dashboard`):
   - **Arquivos modificados:** `lib/payment/infinitepay.ts`, `app/api/webhooks/infinitepay/route.ts`, `app/portal/dashboard/page.tsx`, `docs/CURRENT_SPRINT.md`.
   - **Melhorias implementadas:**
-    - Padronização de `createInfinitePayCheckoutLink` (`lib/payment/infinitepay.ts`) com remoção de `$` no `handle`, resolução dinâmica de `baseUrl` (`NEXT_PUBLIC_APP_URL` / `VERCEL_URL`), propagação de `order_nsu` na `redirect_url` (`/portal/dashboard?payment=success&order_nsu=...`), `webhook_url` oficial (`/api/webhooks/infinitepay`) e normalização de itens em centavos.
-    - Webhook idempotente e atômico em `app/api/webhooks/infinitepay/route.ts` utilizando `prisma.$transaction([prisma.invoice.update, prisma.contractInstallment.updateMany])` e incremento de `paidAmount` em `prisma.contract.update`.
-    - Reconciliação síncrona imediata em `app/portal/dashboard/page.tsx` via `searchParams` (`payment=success&order_nsu=...`), liquidando a fatura e parcelas atreladas antes de `getClientDashboardData()` caso o redirecionamento do cliente ocorra antes da entrega do webhook.
+    - Remoção definitiva de validação de secrets customizados (`x-webhook-secret` / Bearer) na rota pública do webhook da InfinitePay (`app/api/webhooks/infinitepay/route.ts`), eliminando bloqueios 401/403 e logando `[InfinitePay Webhook RAW Body]` em JSON no runtime da Vercel.
+    - Suporte unificado aos identificadores `order_nsu`, `transaction_nsu`, `id` ou `invoice_number` no webhook com execução de `prisma.$transaction` atômica (`Invoice` -> `PAID`, `ContractInstallment` -> `PAID` e `Contract.paidAmount` incrementado).
+    - Conciliação síncrona garantida no Server Component (`app/portal/dashboard/page.tsx`) aceitando `order_nsu` ou `transaction_nsu` quando `payment=success`, liquidando faturas e parcelas vinculadas antes da renderização do painel do cliente.
+    - Padronização de `createInfinitePayCheckoutLink` (`lib/payment/infinitepay.ts`) com remoção de `$` no `handle`, resolução de `cleanBaseUrl` e links canônicos de redirect e webhook.
 - [x] Linter e Typecheck auditados: `0 errors / 0 warnings`.
 
 ## 4. Próximas Implementações Planejadas
