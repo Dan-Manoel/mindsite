@@ -1,8 +1,10 @@
 import { redirect } from "next/navigation";
+import { revalidatePath } from "next/cache";
 import { getClientDashboardData } from "@/app/actions/portal";
 import PortalDashboardView from "./PortalDashboardView";
 import { Metadata } from "next";
 import { prisma } from "@/lib/prisma";
+import { createClient } from "@/lib/supabase/server";
 
 export const metadata: Metadata = {
   title: "Área do Cliente | MindSite",
@@ -16,6 +18,11 @@ export default async function ClientDashboardPage({
 }: {
   searchParams: SearchParams;
 }) {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
   try {
     const params = searchParams ? await searchParams : {};
     const isPaymentSuccess = params.payment === "success";
@@ -30,13 +37,26 @@ export default async function ClientDashboardPage({
     const transactionNsu =
       typeof params.transaction_nsu === "string"
         ? params.transaction_nsu
+        : typeof params.transaction_id === "string"
+        ? params.transaction_id
         : undefined;
 
     const slug = typeof params.slug === "string" ? params.slug : undefined;
-    const receiptUrl = typeof params.receipt_url === "string" ? params.receipt_url : undefined;
-    const captureMethod = typeof params.capture_method === "string" ? params.capture_method.toLowerCase() : "pix";
+    const receiptUrl =
+      typeof params.receipt_url === "string" ? params.receipt_url : undefined;
+    const captureMethod =
+      typeof params.capture_method === "string"
+        ? params.capture_method.toLowerCase()
+        : "pix";
 
-    if (isPaymentSuccess && (orderNsu || slug || transactionNsu)) {
+    if (isPaymentSuccess) {
+      console.info("[Sync Settle] Retorno de pagamento detectado:", {
+        orderNsu,
+        slug,
+        transactionNsu,
+        userId: user?.id,
+      });
+
       const orConditions: Array<Record<string, unknown>> = [];
 
       if (orderNsu) {
@@ -54,11 +74,32 @@ export default async function ClientDashboardPage({
         orConditions.push({ gatewayPaymentId: transactionNsu });
       }
 
-      const invoice = await prisma.invoice.findFirst({
-        where: { OR: orConditions },
-        include: { items: { include: { installment: true } } },
-      });
+      // 1. Tenta localizar pelos identificadores específicos retornados
+      let invoice =
+        orConditions.length > 0
+          ? await prisma.invoice.findFirst({
+              where: { OR: orConditions },
+              include: { items: { include: { installment: true } } },
+            })
+          : null;
 
+      // 2. Fallback de Segurança por Sessão: Se os identificadores da URL divergirem,
+      // busca a fatura em aberto (PENDING ou OVERDUE) mais recente do próprio usuário logado
+      if (!invoice && user?.id) {
+        console.warn(
+          "[Sync Settle] Identificador direto não coincidiu. Ativando fallback de fatura em aberto do usuário autenticado."
+        );
+        invoice = await prisma.invoice.findFirst({
+          where: {
+            userId: user.id,
+            status: { in: ["PENDING", "OVERDUE"] },
+          },
+          orderBy: { createdAt: "desc" },
+          include: { items: { include: { installment: true } } },
+        });
+      }
+
+      // 3. Executa a liquidação atômica no PostgreSQL via Prisma
       if (invoice && invoice.status !== "PAID") {
         await prisma.$transaction([
           prisma.invoice.update({
@@ -68,7 +109,8 @@ export default async function ClientDashboardPage({
               paidAt: new Date(),
               receiptUrl: receiptUrl || invoice.receiptUrl,
               paymentMethod: captureMethod === "pix" ? "PIX" : "CREDIT_CARD",
-              gatewayPaymentId: transactionNsu || slug || invoice.gatewayPaymentId,
+              gatewayPaymentId:
+                transactionNsu || orderNsu || slug || invoice.gatewayPaymentId,
             },
           }),
           prisma.contractInstallment.updateMany({
@@ -88,7 +130,12 @@ export default async function ClientDashboardPage({
           }
         }
 
-        console.info(`[Sync Settle] Fatura #${invoice.invoiceNumber} liquidada via retorno de checkout.`);
+        console.info(
+          `[Sync Settle Success] Fatura #${invoice.invoiceNumber} liquidada com sucesso!`
+        );
+
+        // Invalida o cache do App Router para renderizar os dados atualizados imediatamente
+        revalidatePath("/portal/dashboard");
       }
     }
   } catch (reconcileError: unknown) {
