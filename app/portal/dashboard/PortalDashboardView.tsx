@@ -6,8 +6,7 @@ import Link from "next/link";
 import { TicketCategory } from "@prisma/client";
 import {
   createTicketAction,
-  generateConsolidatedPaymentAction,
-  completeFirstLoginAction,
+  clientSelfIssueInvoiceAction,
   uploadTicketAttachmentAction,
 } from "@/app/actions/portal";
 import {
@@ -16,8 +15,9 @@ import {
   reopenTicketAction,
   getAttachmentSignedUrlAction,
 } from "@/app/actions/tickets";
-import { createClient } from "@/lib/supabase/client";
 import { signOut } from "@/app/actions/auth";
+import { isDateStrictlyOverdue, isDateDueToday } from "@/lib/utils";
+import FirstLoginPasswordModal from "./FirstLoginPasswordModal";
 
 function SLACountdownBadge({
   slaDueAt,
@@ -237,6 +237,13 @@ interface PortalProps {
       status?: string;
       items: Array<{ id: string; description: string; amount: number }>;
     } | null;
+    unbilledSustainability?: {
+      contractId: string;
+      planName: string;
+      description: string;
+      amount: number;
+      dueDate: string;
+    } | null;
     upcomingInstallments?: Array<{
       id: string;
       installmentNumber: number;
@@ -268,11 +275,9 @@ export default function PortalDashboardView({ data, isFirstLogin }: PortalProps)
 
   // Estados de Primeiro Login
   const [showFirstLoginModal, setShowFirstLoginModal] = useState(isFirstLogin ?? false);
-  const [firstLoginStep, setFirstLoginStep] = useState<"CHOICE" | "SET_PASSWORD">("CHOICE");
-  const [firstLoginPassword, setFirstLoginPassword] = useState("");
-  const [firstLoginConfirm, setFirstLoginConfirm] = useState("");
-  const [firstLoginError, setFirstLoginError] = useState("");
-  const [firstLoginLoading, setFirstLoginLoading] = useState(false);
+
+  // Isolamento da Fila de Chamados (Ativos vs Concluídos)
+  const [showCompletedTickets, setShowCompletedTickets] = useState(false);
 
   // Estados de Chamados & Comentários
   const [title, setTitle] = useState("");
@@ -298,8 +303,11 @@ export default function PortalDashboardView({ data, isFirstLogin }: PortalProps)
   const [acceptFeedbackText, setAcceptFeedbackText] = useState("");
   const [isAcceptingResolution, setIsAcceptingResolution] = useState(false);
 
-  // Estados de Pagamento e Adiantamento
+  // Estados de Auto-Emissão de Parcelas e Sustentação
   const [selectedInstallments, setSelectedInstallments] = useState<string[]>([]);
+  const [includeSustainability, setIncludeSustainability] = useState<boolean>(
+    Boolean(data.unbilledSustainability)
+  );
   const [isConsolidating, setIsConsolidating] = useState(false);
 
   const toggleInstallment = (id: string) => {
@@ -308,25 +316,29 @@ export default function PortalDashboardView({ data, isFirstLogin }: PortalProps)
     );
   };
 
-  const handleAdvancePayment = async () => {
-    if (selectedInstallments.length === 0) {
-      alert("Selecione ao menos uma parcela futura para adiantamento.");
+  const handleSelfIssueInvoice = async () => {
+    const hasSust = Boolean(data.unbilledSustainability) && includeSustainability;
+    if (selectedInstallments.length === 0 && !hasSust) {
+      alert("Selecione ao menos uma parcela ou a mensalidade de sustentação para gerar a fatura.");
       return;
     }
     setIsConsolidating(true);
     try {
-      const res = await generateConsolidatedPaymentAction({
-        includeCurrentInvoice: false,
+      const res = await clientSelfIssueInvoiceAction({
         selectedInstallmentIds: selectedInstallments,
+        includeSustainability: hasSust,
         paymentMethod: "PIX",
       });
       if (res.success && res.checkoutUrl) {
         window.open(res.checkoutUrl, "_blank", "noopener,noreferrer");
+        setSelectedInstallments([]);
+        setIncludeSustainability(false);
+        router.refresh();
       } else {
-        alert(res.error || "Erro ao gerar link de pagamento.");
+        alert(res.error || "Erro ao gerar fatura e link de pagamento.");
       }
     } catch (err: unknown) {
-      const message = err instanceof Error ? err.message : "Erro de conexão ao gerar adiantamento.";
+      const message = err instanceof Error ? err.message : "Erro de conexão ao emitir fatura.";
       alert(message);
     } finally {
       setIsConsolidating(false);
@@ -1227,31 +1239,103 @@ export default function PortalDashboardView({ data, isFirstLogin }: PortalProps)
           <div style={{ display: "flex", flexDirection: "column", gap: "5rem" }}>
             {/* Lista de Chamados com Timeline Interativa */}
             <div style={{ display: "flex", flexDirection: "column", gap: "2rem" }}>
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                <h3 style={{ fontSize: "2rem", fontWeight: 700, color: "var(--t-bright)", margin: 0, fontFamily: "var(--_font-default)" }}>
-                  Fila de Chamados do Projeto
-                </h3>
-                <span style={{ fontSize: "1.2rem", color: "var(--t-muted)", fontFamily: "var(--_font-accent)" }}>
-                  Clique no chamado para expandir a timeline e enviar comentários
-                </span>
-              </div>
+              {(() => {
+                const activeTicketsList = data.tickets.filter(
+                  (t) => t.status === "OPEN" || t.status === "IN_PROGRESS" || t.status === "WAITING_CLIENT"
+                );
+                const completedTicketsList = data.tickets.filter(
+                  (t) => t.status === "RESOLVED" || t.status === "CANCELLED"
+                );
+                const displayedTickets = showCompletedTickets ? completedTicketsList : activeTicketsList;
 
-              {data.tickets.length === 0 ? (
-                <div
-                  style={{
-                    backgroundColor: "var(--base-tint)",
-                    border: "1px solid var(--st-medium)",
-                    padding: "4rem",
-                    textAlign: "center",
-                    color: "var(--t-muted)",
-                    fontFamily: "var(--_font-accent)",
-                    fontSize: "1.3rem",
-                  }}
-                >
-                  Você não possui chamados abertos no momento. Clique em &quot;Abrir Chamado&quot; para solicitar suporte técnico.
-                </div>
-              ) : (
-                data.tickets.map((t) => {
+                return (
+                  <>
+                    <div style={{ display: "flex", flexWrap: "wrap", justifyContent: "space-between", alignItems: "center", gap: "1.5rem" }}>
+                      <div>
+                        <h3 style={{ fontSize: "2rem", fontWeight: 700, color: "var(--t-bright)", margin: 0, fontFamily: "var(--_font-default)" }}>
+                          {showCompletedTickets ? "Histórico de Chamados Concluídos" : "Fila de Chamados em Aberto"}
+                        </h3>
+                        <span style={{ fontSize: "1.2rem", color: "var(--t-muted)", fontFamily: "var(--_font-accent)" }}>
+                          Clique no chamado para expandir a timeline e enviar comentários
+                        </span>
+                      </div>
+
+                      {completedTicketsList.length > 0 && (
+                        <button
+                          type="button"
+                          onClick={() => setShowCompletedTickets(!showCompletedTickets)}
+                          style={{
+                            padding: "0.8rem 1.6rem",
+                            backgroundColor: showCompletedTickets ? "rgba(0, 43, 186, 0.15)" : "var(--base-tint)",
+                            border: `1px solid ${showCompletedTickets ? "var(--accent)" : "var(--st-medium)"}`,
+                            color: showCompletedTickets ? "#819ffe" : "var(--t-bright)",
+                            fontFamily: "var(--_font-accent)",
+                            fontSize: "1.2rem",
+                            fontWeight: 700,
+                            borderRadius: "0.2rem",
+                            cursor: "pointer",
+                          }}
+                        >
+                          {showCompletedTickets
+                            ? `← Voltar aos Chamados Abertos (${activeTicketsList.length})`
+                            : `Ver Chamados Concluídos (${completedTicketsList.length})`}
+                        </button>
+                      )}
+                    </div>
+
+                    {displayedTickets.length === 0 ? (
+                      <div
+                        style={{
+                          backgroundColor: "var(--base-tint)",
+                          border: "1px solid var(--st-medium)",
+                          padding: "4.5rem 3rem",
+                          textAlign: "center",
+                          borderRadius: "0.4rem",
+                          display: "flex",
+                          flexDirection: "column",
+                          alignItems: "center",
+                          gap: "1.8rem",
+                        }}
+                      >
+                        <p
+                          style={{
+                            margin: 0,
+                            color: "var(--t-medium)",
+                            fontFamily: "var(--_font-accent)",
+                            fontSize: "1.4rem",
+                          }}
+                        >
+                          {showCompletedTickets
+                            ? "Nenhum chamado concluído no histórico."
+                            : "Não há chamados em aberto no momento."}
+                        </p>
+                        {!showCompletedTickets && (
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setTitle("");
+                              setDescription("");
+                              setCategory("BASIC");
+                              setIsModalOpen(true);
+                            }}
+                            className="btn btn-default-icon btn-default-accent"
+                            style={{
+                              height: "4.4rem",
+                              padding: "0.4rem 0.4rem 0.4rem 1.8rem",
+                              fontSize: "1.3rem",
+                            }}
+                          >
+                            <span className="btn-caption" style={{ fontFamily: "var(--_font-accent)", fontWeight: 700 }}>
+                              + Abrir Chamado
+                            </span>
+                            <i className="btn-icon" style={{ width: "3.4rem", height: "3.4rem" }}>
+                              +
+                            </i>
+                          </button>
+                        )}
+                      </div>
+                    ) : (
+                      displayedTickets.map((t) => {
                   const slaDate = new Date(t.slaDueAt);
                   const isExpanded = expandedTicketId === t.id;
 
@@ -1521,7 +1605,7 @@ export default function PortalDashboardView({ data, isFirstLogin }: PortalProps)
                             })}
                         </div>
 
-                        {/* Botão Enviar nova mensagem alinhado embaixo e em azul */}
+                        {/* Botão Enviar nova mensagem / Ocultar mensagens */}
                         <div style={{ marginLeft: "auto" }}>
                           <button
                             type="button"
@@ -1541,19 +1625,19 @@ export default function PortalDashboardView({ data, isFirstLogin }: PortalProps)
                               fontSize: "1.2rem",
                               fontFamily: "var(--_font-accent)",
                               fontWeight: 700,
-                              borderColor: "#002bba",
-                              backgroundColor: "#002bba",
-                              color: "#ffffff",
+                              backgroundColor: isExpanded ? "var(--base)" : "#002bba",
+                              border: isExpanded ? "1px solid #ef4444" : "1px solid #002bba",
+                              color: isExpanded ? "#ef4444" : "#ffffff",
                               cursor: "pointer",
                               display: "inline-flex",
                               alignItems: "center",
                               gap: "0.6rem",
                               borderRadius: "0.2rem",
-                              boxShadow: "0 2px 10px rgba(0, 43, 186, 0.28)",
+                              boxShadow: isExpanded ? "none" : "0 2px 10px rgba(0, 43, 186, 0.28)",
                               transition: "all 0.2s ease",
                             }}
                           >
-                            <span>{isExpanded ? "Ocultar mensagens" : "Enviar nova Mensagem"}</span>
+                            <span>{isExpanded ? "OCULTAR MENSAGENS" : "Enviar nova Mensagem"}</span>
                             <span style={{ fontSize: "1rem" }}>{isExpanded ? "▲" : "▼"}</span>
                           </button>
                         </div>
@@ -1786,6 +1870,9 @@ export default function PortalDashboardView({ data, isFirstLogin }: PortalProps)
                   );
                 })
               )}
+                  </>
+                );
+              })()}
             </div>
 
             {/* Catálogo de Novos Serviços & Add-ons */}
@@ -1886,7 +1973,7 @@ export default function PortalDashboardView({ data, isFirstLogin }: PortalProps)
                         cursor: "pointer",
                       }}
                     >
-                      Solicitar Add-on ➔
+                      Solicitar ➔
                     </button>
                   </div>
                 ))}
@@ -1900,181 +1987,193 @@ export default function PortalDashboardView({ data, isFirstLogin }: PortalProps)
           <div style={{ display: "flex", flexDirection: "column", gap: "4rem" }}>
             {/* Fatura Vigente em Aberto */}
             {data.activeInvoice ? (
-              <div
-                style={{
-                  backgroundColor: "var(--base-tint)",
-                  border:
-                    data.activeInvoice.status === "OVERDUE" ||
-                    new Date(data.activeInvoice.dueDate) < new Date()
-                      ? "1px solid rgba(239, 68, 68, 0.4)"
-                      : "1px solid var(--accent)",
-                  padding: "3.5rem",
-                  borderRadius: "0.4rem",
-                }}
-              >
-                <span
-                  className="tag tag-s tag-medium"
-                  style={{
-                    backgroundColor:
-                      data.activeInvoice.status === "OVERDUE" ||
-                      new Date(data.activeInvoice.dueDate) < new Date()
-                        ? "rgba(239, 68, 68, 0.15)"
-                        : undefined,
-                    color:
-                      data.activeInvoice.status === "OVERDUE" ||
-                      new Date(data.activeInvoice.dueDate) < new Date()
-                        ? "#ef4444"
-                        : "var(--accent)",
-                    border:
-                      data.activeInvoice.status === "OVERDUE" ||
-                      new Date(data.activeInvoice.dueDate) < new Date()
-                        ? "1px solid rgba(239, 68, 68, 0.3)"
-                        : undefined,
-                    marginBottom: "1rem",
-                    display: "inline-block",
-                    fontFamily: "var(--_font-accent)",
-                    fontWeight: 700,
-                  }}
-                >
-                  {data.activeInvoice.status === "OVERDUE" ||
-                  new Date(data.activeInvoice.dueDate) < new Date()
-                    ? "EM ATRASO"
-                    : "Fatura em Aberto"}
-                </span>
-                <h3
-                  style={{
-                    fontSize: "2.4rem",
-                    fontWeight: 700,
-                    color: "var(--t-bright)",
-                    margin: "0 0 1rem 0",
-                    fontFamily: "var(--_font-default)",
-                  }}
-                >
-                  {data.activeInvoice.invoiceNumber} — Vencimento:{" "}
-                  {new Date(data.activeInvoice.dueDate).toLocaleDateString("pt-BR", { timeZone: "America/Sao_Paulo" })}
-                </h3>
+              (() => {
+                const isInvoiceOverdue =
+                  data.activeInvoice.status === "OVERDUE" ||
+                  isDateStrictlyOverdue(data.activeInvoice.dueDate);
 
-                <div
-                  style={{
-                    borderTop: "1px solid var(--st-medium)",
-                    borderBottom: "1px solid var(--st-medium)",
-                    padding: "1.5rem 0",
-                    margin: "2rem 0",
-                    display: "flex",
-                    flexDirection: "column",
-                    gap: "0.8rem",
-                  }}
-                >
-                  {data.activeInvoice.items.map((item) => (
-                    <div
-                      key={item.id}
-                      style={{
-                        display: "flex",
-                        justifyContent: "space-between",
-                        fontFamily: "var(--_font-accent)",
-                        fontSize: "1.3rem",
-                      }}
-                    >
-                      <span style={{ color: "var(--t-medium)" }}>{item.description}</span>
-                      <strong style={{ color: "var(--t-bright)" }}>
-                        R$ {item.amount.toFixed(2).replace(".", ",")}
-                      </strong>
-                    </div>
-                  ))}
+                const isInvoiceDueToday =
+                  isDateDueToday(data.activeInvoice.dueDate) && !isInvoiceOverdue;
+
+                return (
                   <div
                     style={{
-                      display: "flex",
-                      justifyContent: "space-between",
-                      fontFamily: "var(--_font-accent)",
-                      fontSize: "1.6rem",
-                      marginTop: "1rem",
-                      paddingTop: "1rem",
-                      borderTop: "1px dashed var(--st-medium)",
-                    }}
-                  >
-                    <span style={{ color: "var(--t-bright)", fontWeight: 700 }}>Total a Pagar:</span>
-                    <strong style={{ color: "var(--accent)" }}>
-                      R$ {data.activeInvoice.totalAmount.toFixed(2).replace(".", ",")}
-                    </strong>
-                  </div>
-                </div>
-
-                {data.activeInvoice.pixCopyPaste && (
-                  <div
-                    style={{
-                      backgroundColor: "var(--base)",
-                      border: "1px solid var(--st-medium)",
-                      padding: "2rem",
-                      borderRadius: "0.2rem",
-                      marginTop: "2rem",
+                      backgroundColor: "var(--base-tint)",
+                      border: isInvoiceOverdue
+                        ? "1px solid rgba(239, 68, 68, 0.4)"
+                        : isInvoiceDueToday
+                        ? "1px solid rgba(245, 158, 11, 0.5)"
+                        : "1px solid var(--accent)",
+                      padding: "3.5rem",
+                      borderRadius: "0.4rem",
                     }}
                   >
                     <span
+                      className="tag tag-s tag-medium"
                       style={{
-                        display: "block",
+                        backgroundColor: isInvoiceOverdue
+                          ? "rgba(239, 68, 68, 0.15)"
+                          : isInvoiceDueToday
+                          ? "rgba(245, 158, 11, 0.15)"
+                          : undefined,
+                        color: isInvoiceOverdue
+                          ? "#ef4444"
+                          : isInvoiceDueToday
+                          ? "#f59e0b"
+                          : "var(--accent)",
+                        border: isInvoiceOverdue
+                          ? "1px solid rgba(239, 68, 68, 0.3)"
+                          : isInvoiceDueToday
+                          ? "1px solid rgba(245, 158, 11, 0.4)"
+                          : undefined,
+                        marginBottom: "1rem",
+                        display: "inline-block",
                         fontFamily: "var(--_font-accent)",
-                        fontSize: "1.1rem",
-                        textTransform: "uppercase",
-                        color: "var(--t-muted)",
-                        marginBottom: "0.6rem",
-                      }}
-                    >
-                      Código Pix Copia e Cola
-                    </span>
-                    <div style={{ display: "flex", gap: "1rem" }}>
-                      <input
-                        readOnly
-                        value={data.activeInvoice.pixCopyPaste}
-                        style={{
-                          width: "100%",
-                          height: "4.2rem",
-                          padding: "0 1.2rem",
-                          backgroundColor: "var(--base-tint)",
-                          border: "1px solid var(--st-medium)",
-                          color: "var(--t-bright)",
-                          fontFamily: "var(--_font-accent)",
-                          fontSize: "1.2rem",
-                        }}
-                      />
-                      <button
-                        type="button"
-                        onClick={() => {
-                          navigator.clipboard.writeText(data.activeInvoice!.pixCopyPaste!);
-                          alert("Código Pix copiado!");
-                        }}
-                        className="btn btn-default-icon btn-default-accent"
-                        style={{ height: "4.2rem", padding: "0 1.6rem", fontSize: "1.2rem", whiteSpace: "nowrap" }}
-                      >
-                        Copiar Pix
-                      </button>
-                    </div>
-                  </div>
-                )}
-
-                {data.activeInvoice.gatewayInvoiceUrl && (
-                  <div style={{ marginTop: "2.5rem" }}>
-                    <a
-                      href={data.activeInvoice.gatewayInvoiceUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="btn btn-default-icon btn-default-accent"
-                      style={{
-                        height: "4.8rem",
-                        padding: "0 2.4rem",
-                        fontSize: "1.3rem",
-                        fontFamily: "var(--_font-accent)",
-                        textDecoration: "none",
-                        display: "inline-flex",
-                        alignItems: "center",
-                        gap: "1rem",
                         fontWeight: 700,
                       }}
                     >
-                      💳 Pagar no Checkout InfinitePay (Pix ou Cartão) ➔
-                    </a>
+                      {isInvoiceOverdue
+                        ? "EM ATRASO"
+                        : isInvoiceDueToday
+                        ? "VENCE HOJE"
+                        : "Fatura em Aberto"}
+                    </span>
+                    <h3
+                      style={{
+                        fontSize: "2.4rem",
+                        fontWeight: 700,
+                        color: "var(--t-bright)",
+                        margin: "0 0 1rem 0",
+                        fontFamily: "var(--_font-default)",
+                      }}
+                    >
+                      {data.activeInvoice.invoiceNumber} — Vencimento:{" "}
+                      {new Date(data.activeInvoice.dueDate).toLocaleDateString("pt-BR", { timeZone: "America/Sao_Paulo" })}
+                    </h3>
+
+                    <div
+                      style={{
+                        borderTop: "1px solid var(--st-medium)",
+                        borderBottom: "1px solid var(--st-medium)",
+                        padding: "1.5rem 0",
+                        margin: "2rem 0",
+                        display: "flex",
+                        flexDirection: "column",
+                        gap: "0.8rem",
+                      }}
+                    >
+                      {data.activeInvoice.items.map((item) => (
+                        <div
+                          key={item.id}
+                          style={{
+                            display: "flex",
+                            justifyContent: "space-between",
+                            fontFamily: "var(--_font-accent)",
+                            fontSize: "1.3rem",
+                          }}
+                        >
+                          <span style={{ color: "var(--t-medium)" }}>{item.description}</span>
+                          <strong style={{ color: "var(--t-bright)" }}>
+                            R$ {item.amount.toFixed(2).replace(".", ",")}
+                          </strong>
+                        </div>
+                      ))}
+                      <div
+                        style={{
+                          display: "flex",
+                          justifyContent: "space-between",
+                          fontFamily: "var(--_font-accent)",
+                          fontSize: "1.6rem",
+                          marginTop: "1rem",
+                          paddingTop: "1rem",
+                          borderTop: "1px dashed var(--st-medium)",
+                        }}
+                      >
+                        <span style={{ color: "var(--t-bright)", fontWeight: 700 }}>Total a Pagar:</span>
+                        <strong style={{ color: "var(--accent)" }}>
+                          R$ {data.activeInvoice.totalAmount.toFixed(2).replace(".", ",")}
+                        </strong>
+                      </div>
+                    </div>
+
+                    {data.activeInvoice.pixCopyPaste && (
+                      <div
+                        style={{
+                          backgroundColor: "var(--base)",
+                          border: "1px solid var(--st-medium)",
+                          padding: "2rem",
+                          borderRadius: "0.2rem",
+                          marginTop: "2rem",
+                        }}
+                      >
+                        <span
+                          style={{
+                            display: "block",
+                            fontFamily: "var(--_font-accent)",
+                            fontSize: "1.1rem",
+                            textTransform: "uppercase",
+                            color: "var(--t-muted)",
+                            marginBottom: "0.6rem",
+                          }}
+                        >
+                          Código Pix Copia e Cola
+                        </span>
+                        <div style={{ display: "flex", gap: "1rem" }}>
+                          <input
+                            readOnly
+                            value={data.activeInvoice.pixCopyPaste}
+                            style={{
+                              width: "100%",
+                              height: "4.2rem",
+                              padding: "0 1.2rem",
+                              backgroundColor: "var(--base-tint)",
+                              border: "1px solid var(--st-medium)",
+                              color: "var(--t-bright)",
+                              fontFamily: "var(--_font-accent)",
+                              fontSize: "1.2rem",
+                            }}
+                          />
+                          <button
+                            type="button"
+                            onClick={() => {
+                              navigator.clipboard.writeText(data.activeInvoice!.pixCopyPaste!);
+                              alert("Código Pix copiado!");
+                            }}
+                            className="btn btn-default-icon btn-default-accent"
+                            style={{ height: "4.2rem", padding: "0 1.6rem", fontSize: "1.2rem", whiteSpace: "nowrap" }}
+                          >
+                            Copiar Pix
+                          </button>
+                        </div>
+                      </div>
+                    )}
+
+                    {data.activeInvoice.gatewayInvoiceUrl && (
+                      <div style={{ marginTop: "2.5rem" }}>
+                        <a
+                          href={data.activeInvoice.gatewayInvoiceUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="btn btn-default-icon btn-default-accent"
+                          style={{
+                            height: "4.8rem",
+                            padding: "0 2.4rem",
+                            fontSize: "1.3rem",
+                            fontFamily: "var(--_font-accent)",
+                            textDecoration: "none",
+                            display: "inline-flex",
+                            alignItems: "center",
+                            gap: "1rem",
+                            fontWeight: 700,
+                          }}
+                        >
+                          💳 Pagar no Checkout InfinitePay (Pix ou Cartão) ➔
+                        </a>
+                      </div>
+                    )}
                   </div>
-                )}
-              </div>
+                );
+              })()
             ) : data.billingSummary?.hasOverdueInstallmentsWithoutInvoice ? (
               <div
                 style={{
@@ -2107,7 +2206,7 @@ export default function PortalDashboardView({ data, isFirstLogin }: PortalProps)
                     color: "#ef4444",
                   }}
                 >
-                  Você possui parcela de contrato com vencimento no passado no valor de R${" "}
+                  Você possui um ou mais pagamento em atraso no valor de R${" "}
                   {data.billingSummary.totalOverdueAmount.toFixed(2).replace(".", ",")}. Entre em contato
                   com a equipe financeira para regularização.
                 </p>
@@ -2184,7 +2283,8 @@ export default function PortalDashboardView({ data, isFirstLogin }: PortalProps)
                 </div>
               </div>
 
-              {!data.upcomingInstallments || data.upcomingInstallments.length === 0 ? (
+              {(!data.upcomingInstallments || data.upcomingInstallments.length === 0) &&
+              !data.unbilledSustainability ? (
                 <div
                   style={{
                     padding: "3rem",
@@ -2193,7 +2293,7 @@ export default function PortalDashboardView({ data, isFirstLogin }: PortalProps)
                     fontFamily: "var(--_font-accent)",
                   }}
                 >
-                  Nenhuma parcela de implantação pendente. Seu projeto está 100% quitado!
+                  Nenhuma parcela agendada ou mensalidade pendente de faturamento. Seu projeto está 100% em dia!
                 </div>
               ) : (
                 <div style={{ overflowX: "auto" }}>
@@ -2224,8 +2324,64 @@ export default function PortalDashboardView({ data, isFirstLogin }: PortalProps)
                       </tr>
                     </thead>
                     <tbody>
-                      {data.upcomingInstallments.map((inst) => {
+                      {data.unbilledSustainability && (
+                        <tr
+                          onClick={() => setIncludeSustainability(!includeSustainability)}
+                          style={{
+                            borderBottom: "1px solid var(--st-medium)",
+                            cursor: "pointer",
+                            backgroundColor: includeSustainability ? "rgba(0, 43, 186, 0.08)" : "transparent",
+                          }}
+                        >
+                          <td style={{ padding: "1.2rem 1rem", textAlign: "center" }}>
+                            <input
+                              type="checkbox"
+                              checked={includeSustainability}
+                              onChange={() => {}}
+                              style={{ width: "1.6rem", height: "1.6rem", cursor: "pointer" }}
+                            />
+                          </td>
+                          <td style={{ padding: "1.2rem 1rem", color: "var(--t-bright)" }}>
+                            <strong>SUSTENTAÇÃO</strong> — {data.unbilledSustainability.description}
+                          </td>
+                          <td style={{ padding: "1.2rem 1rem", color: "var(--t-medium)" }}>
+                            {data.client.activeProject?.name || "Sustentação Contínua"}
+                          </td>
+                          <td style={{ padding: "1.2rem 1rem", color: "var(--t-medium)" }}>
+                            {new Date(data.unbilledSustainability.dueDate).toLocaleDateString("pt-BR", {
+                              timeZone: "America/Sao_Paulo",
+                            })}
+                          </td>
+                          <td
+                            style={{
+                              padding: "1.2rem 1rem",
+                              textAlign: "right",
+                              color: "var(--t-bright)",
+                              fontWeight: 700,
+                            }}
+                          >
+                            R$ {data.unbilledSustainability.amount.toFixed(2).replace(".", ",")}
+                          </td>
+                          <td style={{ padding: "1.2rem 1rem", textAlign: "center" }}>
+                            <span
+                              style={{
+                                padding: "0.2rem 0.6rem",
+                                fontSize: "1rem",
+                                borderRadius: "0.2rem",
+                                backgroundColor: "rgba(16, 185, 129, 0.1)",
+                                color: "#10b981",
+                                border: "1px solid rgba(16, 185, 129, 0.3)",
+                              }}
+                            >
+                              MÊS VIGENTE
+                            </span>
+                          </td>
+                        </tr>
+                      )}
+                      {(data.upcomingInstallments || []).map((inst) => {
                         const isSelected = selectedInstallments.includes(inst.id);
+                        const isPast = isDateStrictlyOverdue(inst.scheduledDate);
+                        const isDueToday = isDateDueToday(inst.scheduledDate);
                         return (
                           <tr
                             key={inst.id}
@@ -2250,7 +2406,7 @@ export default function PortalDashboardView({ data, isFirstLogin }: PortalProps)
                             <td style={{ padding: "1.2rem 1rem", color: "var(--t-medium)" }}>
                               {inst.projectName}
                             </td>
-                            <td style={{ padding: "1.2rem 1rem", color: "var(--t-medium)" }}>
+                            <td style={{ padding: "1.2rem 1rem", color: isPast ? "#ef4444" : "var(--t-medium)" }}>
                               {new Date(inst.scheduledDate).toLocaleDateString("pt-BR", { timeZone: "America/Sao_Paulo" })}
                             </td>
                             <td
@@ -2269,12 +2425,26 @@ export default function PortalDashboardView({ data, isFirstLogin }: PortalProps)
                                   padding: "0.2rem 0.6rem",
                                   fontSize: "1rem",
                                   borderRadius: "0.2rem",
-                                  backgroundColor: "rgba(59, 130, 246, 0.1)",
-                                  color: "#3b82f6",
-                                  border: "1px solid rgba(59, 130, 246, 0.3)",
+                                  backgroundColor: isPast
+                                    ? "rgba(239, 68, 68, 0.1)"
+                                    : isDueToday
+                                    ? "rgba(245, 158, 11, 0.15)"
+                                    : "rgba(59, 130, 246, 0.1)",
+                                  color: isPast
+                                    ? "#ef4444"
+                                    : isDueToday
+                                    ? "#f59e0b"
+                                    : "#3b82f6",
+                                  border: `1px solid ${
+                                    isPast
+                                      ? "rgba(239, 68, 68, 0.3)"
+                                      : isDueToday
+                                      ? "rgba(245, 158, 11, 0.4)"
+                                      : "rgba(59, 130, 246, 0.3)"
+                                  }`,
                                 }}
                               >
-                                {inst.status}
+                                {isPast ? "VENCIDA (NÃO FATURADA)" : isDueToday ? "VENCE HOJE" : "AGENDADO"}
                               </span>
                             </td>
                           </tr>
@@ -2283,21 +2453,36 @@ export default function PortalDashboardView({ data, isFirstLogin }: PortalProps)
                     </tbody>
                   </table>
 
-                  {selectedInstallments.length > 0 && (
-                    <div style={{ marginTop: "2rem", display: "flex", justifyContent: "flex-end" }}>
-                      <button
-                        type="button"
-                        disabled={isConsolidating}
-                        onClick={handleAdvancePayment}
-                        className="btn btn-default-icon btn-default-accent"
-                        style={{ height: "4.5rem", padding: "0 2.2rem", fontSize: "1.3rem" }}
-                      >
-                        {isConsolidating
-                          ? "Gerando Checkout..."
-                          : `Adiantar ${selectedInstallments.length} Parcela(s) na InfinitePay ➔`}
-                      </button>
-                    </div>
-                  )}
+                  <div style={{ marginTop: "2rem", display: "flex", justifyContent: "flex-end", alignItems: "center", gap: "1.5rem", flexWrap: "wrap" }}>
+                    <button
+                      type="button"
+                      disabled={
+                        isConsolidating ||
+                        (selectedInstallments.length === 0 && !(data.unbilledSustainability && includeSustainability))
+                      }
+                      onClick={handleSelfIssueInvoice}
+                      className="btn btn-default-icon btn-default-accent"
+                      style={{
+                        height: "4.6rem",
+                        padding: "0 2.4rem",
+                        fontSize: "1.3rem",
+                        fontFamily: "var(--_font-accent)",
+                        fontWeight: 700,
+                        opacity:
+                          selectedInstallments.length === 0 && !(data.unbilledSustainability && includeSustainability)
+                            ? 0.5
+                            : 1,
+                        cursor:
+                          selectedInstallments.length === 0 && !(data.unbilledSustainability && includeSustainability)
+                            ? "not-allowed"
+                            : "pointer",
+                      }}
+                    >
+                      {isConsolidating
+                        ? "GERANDO FATURA & CHECKOUT..."
+                        : "GERAR FATURA & PAGAR AGORA (PIX / CARTÃO) →"}
+                    </button>
+                  </div>
                 </div>
               )}
             </div>
@@ -3414,234 +3599,15 @@ export default function PortalDashboardView({ data, isFirstLogin }: PortalProps)
         </div>
       )}
 
-      {/* MODAL: BOAS-VINDAS / PRIMEIRO LOGIN & TROCA DE SENHA */}
-      {showFirstLoginModal && (
-        <div
-          style={{
-            position: "fixed",
-            inset: 0,
-            zIndex: 10001,
-            backgroundColor: "rgba(0,0,0,0.85)",
-            backdropFilter: "blur(6px)",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            padding: "2rem",
-          }}
-        >
-          <div
-            style={{
-              backgroundColor: "var(--base-tint)",
-              border: "1px solid var(--accent)",
-              borderRadius: "0.4rem",
-              width: "100%",
-              maxWidth: "520px",
-              padding: "3.5rem",
-              boxShadow: "0 25px 50px rgba(0,0,0,0.5)",
-            }}
-          >
-            {firstLoginStep === "CHOICE" ? (
-              <div>
-                <span className="tag tag-s tag-medium" style={{ color: "var(--accent)", fontFamily: "var(--_font-accent)", marginBottom: "1rem", display: "inline-block" }}>
-                  Primeiro Acesso
-                </span>
-                <h3 style={{ fontSize: "2.4rem", fontWeight: 700, color: "var(--t-bright)", margin: "0 0 1.2rem 0", fontFamily: "var(--_font-default)" }}>
-                  Bem-vindo(a) ao seu Portal!
-                </h3>
-                <p style={{ fontSize: "1.4rem", color: "var(--t-medium)", lineHeight: 1.6, marginBottom: "3rem" }}>
-                  Deseja definir sua senha pessoal agora ou continuar com a senha atual recebida por e-mail?
-                </p>
-
-                <div style={{ display: "flex", flexDirection: "column", gap: "1.2rem" }}>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setFirstLoginError("");
-                      setFirstLoginStep("SET_PASSWORD");
-                    }}
-                    className="btn btn-default-icon btn-default-accent slide-right"
-                    style={{ height: "4.6rem", fontSize: "1.3rem", width: "100%", justifyContent: "center" }}
-                  >
-                    <span className="btn-caption" style={{ fontFamily: "var(--_font-accent)", fontWeight: 700 }}>
-                      Definir Nova Senha
-                    </span>
-                  </button>
-
-                  <button
-                    type="button"
-                    disabled={firstLoginLoading}
-                    onClick={async () => {
-                      setFirstLoginLoading(true);
-                      try {
-                        await completeFirstLoginAction({ passwordChanged: false });
-                        setShowFirstLoginModal(false);
-                      } catch {
-                        setShowFirstLoginModal(false);
-                      } finally {
-                        setFirstLoginLoading(false);
-                      }
-                    }}
-                    style={{
-                      height: "4.4rem",
-                      backgroundColor: "transparent",
-                      border: "1px solid var(--st-medium)",
-                      color: "var(--t-medium)",
-                      fontFamily: "var(--_font-accent)",
-                      fontSize: "1.3rem",
-                      borderRadius: "0.2rem",
-                      cursor: "pointer",
-                      transition: "all 0.2s ease",
-                    }}
-                  >
-                    {firstLoginLoading ? "Atualizando..." : "Continuar com a senha atual"}
-                  </button>
-                </div>
-              </div>
-            ) : (
-              <div>
-                <span className="tag tag-s tag-medium" style={{ color: "var(--accent)", fontFamily: "var(--_font-accent)", marginBottom: "1rem", display: "inline-block" }}>
-                  Segurança
-                </span>
-                <h3 style={{ fontSize: "2.2rem", fontWeight: 700, color: "var(--t-bright)", margin: "0 0 1rem 0", fontFamily: "var(--_font-default)" }}>
-                  Definir Senha Pessoal
-                </h3>
-                <p style={{ fontSize: "1.3rem", color: "var(--t-medium)", marginBottom: "2rem" }}>
-                  Crie uma nova senha de no mínimo 6 caracteres para os seus próximos acessos ao portal.
-                </p>
-
-                {firstLoginError && (
-                  <div
-                    style={{
-                      padding: "1rem 1.4rem",
-                      backgroundColor: "rgba(239, 68, 68, 0.15)",
-                      border: "1px solid #ef4444",
-                      color: "#ef4444",
-                      fontSize: "1.2rem",
-                      fontFamily: "var(--_font-accent)",
-                      marginBottom: "1.5rem",
-                      borderRadius: "0.2rem",
-                    }}
-                  >
-                    {firstLoginError}
-                  </div>
-                )}
-
-                <div style={{ display: "flex", flexDirection: "column", gap: "1.5rem", marginBottom: "2.5rem" }}>
-                  <div>
-                    <label style={{ display: "block", fontFamily: "var(--_font-accent)", fontSize: "1.1rem", textTransform: "uppercase", color: "var(--t-medium)", marginBottom: "0.6rem" }}>
-                      Nova Senha *
-                    </label>
-                    <input
-                      type="password"
-                      value={firstLoginPassword}
-                      onChange={(e) => setFirstLoginPassword(e.target.value)}
-                      placeholder="Mínimo 6 caracteres"
-                      style={{
-                        width: "100%",
-                        height: "4.4rem",
-                        padding: "0 1.5rem",
-                        backgroundColor: "var(--base)",
-                        border: "1px solid var(--st-medium)",
-                        color: "var(--t-bright)",
-                        fontFamily: "var(--_font-accent)",
-                        fontSize: "1.3rem",
-                        outline: "none",
-                      }}
-                    />
-                  </div>
-
-                  <div>
-                    <label style={{ display: "block", fontFamily: "var(--_font-accent)", fontSize: "1.1rem", textTransform: "uppercase", color: "var(--t-medium)", marginBottom: "0.6rem" }}>
-                      Confirmar Nova Senha *
-                    </label>
-                    <input
-                      type="password"
-                      value={firstLoginConfirm}
-                      onChange={(e) => setFirstLoginConfirm(e.target.value)}
-                      placeholder="Repita a nova senha"
-                      style={{
-                        width: "100%",
-                        height: "4.4rem",
-                        padding: "0 1.5rem",
-                        backgroundColor: "var(--base)",
-                        border: "1px solid var(--st-medium)",
-                        color: "var(--t-bright)",
-                        fontFamily: "var(--_font-accent)",
-                        fontSize: "1.3rem",
-                        outline: "none",
-                      }}
-                    />
-                  </div>
-                </div>
-
-                <div style={{ display: "flex", gap: "1.2rem" }}>
-                  <button
-                    type="button"
-                    disabled={firstLoginLoading}
-                    onClick={async () => {
-                      if (!firstLoginPassword || firstLoginPassword.length < 6) {
-                        setFirstLoginError("A senha deve ter no mínimo 6 caracteres.");
-                        return;
-                      }
-                      if (firstLoginPassword !== firstLoginConfirm) {
-                        setFirstLoginError("As senhas digitadas não coincidem.");
-                        return;
-                      }
-
-                      setFirstLoginLoading(true);
-                      setFirstLoginError("");
-                      try {
-                        const supabase = createClient();
-                        const { error } = await supabase.auth.updateUser({
-                          password: firstLoginPassword,
-                        });
-                        if (error) {
-                          setFirstLoginError(error.message);
-                          setFirstLoginLoading(false);
-                          return;
-                        }
-
-                        await completeFirstLoginAction({ passwordChanged: true });
-                        setShowFirstLoginModal(false);
-                      } catch (err: unknown) {
-                        const message = err instanceof Error ? err.message : "Erro ao salvar nova senha.";
-                        setFirstLoginError(message);
-                      } finally {
-                        setFirstLoginLoading(false);
-                      }
-                    }}
-                    className="btn btn-default-icon btn-default-accent slide-right"
-                    style={{ flex: 1, height: "4.4rem", fontSize: "1.3rem" }}
-                  >
-                    <span className="btn-caption" style={{ fontFamily: "var(--_font-accent)", fontWeight: 700 }}>
-                      {firstLoginLoading ? "Salvando..." : "Salvar Senha"}
-                    </span>
-                  </button>
-
-                  <button
-                    type="button"
-                    disabled={firstLoginLoading}
-                    onClick={() => setFirstLoginStep("CHOICE")}
-                    style={{
-                      height: "4.4rem",
-                      padding: "0 2rem",
-                      backgroundColor: "transparent",
-                      border: "1px solid var(--st-medium)",
-                      color: "var(--t-medium)",
-                      fontFamily: "var(--_font-accent)",
-                      fontSize: "1.3rem",
-                      borderRadius: "0.2rem",
-                      cursor: "pointer",
-                    }}
-                  >
-                    Voltar
-                  </button>
-                </div>
-              </div>
-            )}
-          </div>
-        </div>
-      )}
+      {/* MODAL: BOAS-VINDAS / PRIMEIRO LOGIN & TROCA DE SENHA COM VALIDAÇÃO ESTRITA */}
+      <FirstLoginPasswordModal
+        isOpen={showFirstLoginModal}
+        onClose={() => setShowFirstLoginModal(false)}
+        onSuccess={(msg) => {
+          setFeedback(msg);
+          setTimeout(() => setFeedback(null), 5000);
+        }}
+      />
     </main>
   );
 }

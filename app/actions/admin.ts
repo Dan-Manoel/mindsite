@@ -21,7 +21,7 @@ import {
   UserRole,
 } from "@prisma/client";
 import { settleInstallmentManuallyAction as settleAction } from "@/app/actions/adminClients";
-import { parseLocalDate } from "@/lib/utils";
+import { parseLocalDate, isDateStrictlyOverdue } from "@/lib/utils";
 import { calculateRevenueAnalytics } from "./finance";
 
 
@@ -58,63 +58,59 @@ export async function getAdminDashboardData() {
 
   const now = new Date();
 
-  // Busca concorrente (zero waterfall) de clientes, despesas, tickets, faturas e analytics de receita
-  const [
-    clients,
-    expenses,
-    allExpenseMetrics,
-    tickets,
-    allTicketMetrics,
-    allInvoices,
-    revenueAnalytics,
-  ] = await Promise.all([
-    prisma.user.findMany({
-      where: { role: UserRole.CLIENT },
-      orderBy: { createdAt: "desc" },
-      select: {
-        id: true,
-        fullName: true,
-        email: true,
-        phone: true,
-        companyName: true,
-        document: true,
-        _count: {
-          select: {
-            tickets: true,
-            invoices: true,
+  // Busca concorrente cirúrgica (apenas 4 queries — 1 por tabela — sem duplicidade e com tratamento de erro granular)
+  const [clients, expenses, tickets, allInvoices] = await Promise.all([
+    prisma.user
+      .findMany({
+        where: { role: UserRole.CLIENT },
+        orderBy: { createdAt: "desc" },
+        select: {
+          id: true,
+          fullName: true,
+          email: true,
+          phone: true,
+          companyName: true,
+          document: true,
+          _count: {
+            select: {
+              tickets: true,
+              invoices: true,
+            },
           },
-        },
-        projects: {
-          select: {
-            id: true,
-            name: true,
-            domain: true,
-            isActive: true,
-            contracts: {
-              select: {
-                id: true,
-                title: true,
-                contractType: true,
-                status: true,
-                totalAmount: true,
-                paidAmount: true,
-                installments: {
-                  orderBy: { scheduledDate: "asc" },
-                  take: 20,
-                  select: {
-                    id: true,
-                    installmentNumber: true,
-                    amount: true,
-                    scheduledDate: true,
-                    status: true,
-                    description: true,
-                    invoiceItem: {
-                      select: {
-                        invoice: {
-                          select: {
-                            id: true,
-                            invoiceNumber: true,
-                            status: true,
+          projects: {
+            select: {
+              id: true,
+              name: true,
+              domain: true,
+              isActive: true,
+              contracts: {
+                select: {
+                  id: true,
+                  title: true,
+                  contractType: true,
+                  status: true,
+                  totalAmount: true,
+                  paidAmount: true,
+                  installments: {
+                    orderBy: { scheduledDate: "asc" },
+                    take: 20,
+                    select: {
+                      id: true,
+                      installmentNumber: true,
+                      amount: true,
+                      scheduledDate: true,
+                      updatedAt: true,
+                      status: true,
+                      description: true,
+                      invoiceItemId: true,
+                      invoiceItem: {
+                        select: {
+                          invoice: {
+                            select: {
+                              id: true,
+                              invoiceNumber: true,
+                              status: true,
+                            },
                           },
                         },
                       },
@@ -124,108 +120,126 @@ export async function getAdminDashboardData() {
               },
             },
           },
-        },
-        invoices: {
-          orderBy: { dueDate: "desc" },
-          take: 10,
-          select: {
-            id: true,
-            invoiceNumber: true,
-            status: true,
-            totalAmount: true,
-            dueDate: true,
+          invoices: {
+            orderBy: { dueDate: "desc" },
+            take: 10,
+            select: {
+              id: true,
+              invoiceNumber: true,
+              status: true,
+              totalAmount: true,
+              dueDate: true,
+            },
           },
         },
-      },
-    }),
-    prisma.companyExpense.findMany({
-      orderBy: { dueDate: "asc" },
-      take: 20,
-      select: {
-        id: true,
-        name: true,
-        category: true,
-        frequency: true,
-        currency: true,
-        estimatedAmount: true,
-        actualAmountPaid: true,
-        exchangeRateUsed: true,
-        dueDate: true,
-        paymentDate: true,
-        isPaid: true,
-        receiptUrl: true,
-        notes: true,
-      },
-    }),
-    prisma.companyExpense.findMany({
-      select: {
-        estimatedAmount: true,
-        actualAmountPaid: true,
-        dueDate: true,
-        isPaid: true,
-      },
-    }),
-    prisma.ticket.findMany({
-      orderBy: { createdAt: "desc" },
-      take: 20,
-      select: {
-        id: true,
-        ticketNumber: true,
-        title: true,
-        description: true,
-        category: true,
-        status: true,
-        slaHours: true,
-        slaDueAt: true,
-        createdAt: true,
-        user: {
-          select: {
-            fullName: true,
-            email: true,
+      })
+      .catch((err) => {
+        console.error("Erro ao buscar clientes no AdminDashboard:", err);
+        return [];
+      }),
+    prisma.companyExpense
+      .findMany({
+        orderBy: { dueDate: "asc" },
+        take: 100,
+        select: {
+          id: true,
+          name: true,
+          category: true,
+          frequency: true,
+          currency: true,
+          estimatedAmount: true,
+          actualAmountPaid: true,
+          exchangeRateUsed: true,
+          dueDate: true,
+          paymentDate: true,
+          isPaid: true,
+          receiptUrl: true,
+          notes: true,
+        },
+      })
+      .catch((err) => {
+        console.error("Erro ao buscar despesas no AdminDashboard:", err);
+        return [];
+      }),
+    prisma.ticket
+      .findMany({
+        orderBy: { createdAt: "desc" },
+        take: 50,
+        select: {
+          id: true,
+          ticketNumber: true,
+          title: true,
+          description: true,
+          category: true,
+          status: true,
+          slaHours: true,
+          slaDueAt: true,
+          createdAt: true,
+          user: {
+            select: {
+              fullName: true,
+              email: true,
+            },
+          },
+          project: {
+            select: {
+              name: true,
+              domain: true,
+            },
+          },
+          attachments: {
+            select: {
+              id: true,
+              fileName: true,
+              fileUrl: true,
+            },
+          },
+          comments: {
+            orderBy: { createdAt: "asc" },
+            select: {
+              id: true,
+              message: true,
+              authorName: true,
+              isAdmin: true,
+              attachments: true,
+              createdAt: true,
+            },
           },
         },
-        project: {
-          select: {
-            name: true,
-            domain: true,
-          },
+      })
+      .catch((err) => {
+        console.error("Erro ao buscar chamados no AdminDashboard:", err);
+        return [];
+      }),
+    prisma.invoice
+      .findMany({
+        select: {
+          id: true,
+          dueDate: true,
+          paidAt: true,
+          totalAmount: true,
+          status: true,
         },
-        attachments: {
-          select: {
-            id: true,
-            fileName: true,
-            fileUrl: true,
-          },
-        },
-        comments: {
-          orderBy: { createdAt: "asc" },
-          select: {
-            id: true,
-            message: true,
-            authorName: true,
-            isAdmin: true,
-            attachments: true,
-            createdAt: true,
-          },
-        },
-      },
-    }),
-    prisma.ticket.findMany({
-      select: {
-        status: true,
-        slaDueAt: true,
-      },
-    }),
-    prisma.invoice.findMany({
-      select: {
-        id: true,
-        dueDate: true,
-        totalAmount: true,
-        status: true,
-      },
-    }),
-    calculateRevenueAnalytics(),
+      })
+      .catch((err) => {
+        console.error("Erro ao buscar faturas no AdminDashboard:", err);
+        return [];
+      }),
   ]);
+
+  const allExpenseMetrics = expenses;
+  const allTicketMetrics = tickets;
+  const unbilledInstallments = clients.flatMap((c) =>
+    c.projects.flatMap((p) =>
+      p.contracts.flatMap((ct) =>
+        ct.installments.filter((inst) => !inst.invoiceItemId && inst.status !== "CANCELLED")
+      )
+    )
+  );
+  const revenueAnalytics = await calculateRevenueAnalytics({
+    invoices: allInvoices,
+    unbilledInstallments,
+  });
 
   let mrrTotal = 0;
   let activeSustainabilityCount = 0;
@@ -264,11 +278,11 @@ export async function getAdminDashboardData() {
       invoiceStatus?: string | null;
     }> = [];
 
-    // Checa faturas vencidas do cliente
+    // Checa faturas estritamente vencidas do cliente (anteriores a hoje em Brasília)
     client.invoices.forEach((inv) => {
       const isOverdue =
-        inv.status === InvoiceStatus.OVERDUE ||
-        (inv.status === InvoiceStatus.PENDING && new Date(inv.dueDate) < now);
+        (inv.status === InvoiceStatus.OVERDUE || inv.status === InvoiceStatus.PENDING) &&
+        isDateStrictlyOverdue(inv.dueDate);
       if (isOverdue) {
         hasOverdueInvoice = true;
       }
@@ -333,8 +347,8 @@ export async function getAdminDashboardData() {
                 });
               }
 
-              // Verifica se a parcela passou da data prevista sem baixa
-              if (instDate < now) {
+              // Verifica se a parcela passou estritamente da data prevista sem baixa (D+1 em Brasília)
+              if (isDateStrictlyOverdue(inst.scheduledDate)) {
                 hasOverdueInstallment = true;
               }
 
@@ -512,7 +526,9 @@ export async function getAdminDashboardData() {
 
   // 5. Métricas Operacionais Adicionais (Faturas em Atraso consolidado, Distribuição de Assinantes, Resumo de Chamados)
   const overdueInvoices = allInvoices.filter(
-    (inv) => inv.status === InvoiceStatus.OVERDUE || (inv.status === InvoiceStatus.PENDING && new Date(inv.dueDate) < now)
+    (inv) =>
+      (inv.status === InvoiceStatus.OVERDUE || inv.status === InvoiceStatus.PENDING) &&
+      isDateStrictlyOverdue(inv.dueDate)
   );
   const overdueInvoicesCount = overdueInvoices.length;
   const overdueInvoicesTotal = overdueInvoices.reduce((sum, inv) => sum + Number(inv.totalAmount), 0);
@@ -866,29 +882,55 @@ export async function uploadExpenseReceiptAction(formData: FormData) {
   }
 }
 
-// Abertura Administrativa de Chamado em nome do Cliente (Triagem via WhatsApp)
-export async function createTicketForClientAction(data: {
-  clientId: string;
-  projectId: string;
-  title: string;
-  category: TicketCategory;
-  description: string;
-}) {
+// Abertura Administrativa de Chamado em nome do Cliente (Triagem via WhatsApp com Upload de Anexos)
+export async function createTicketForClientAction(
+  input:
+    | FormData
+    | {
+        clientId: string;
+        projectId: string;
+        title: string;
+        category: TicketCategory;
+        description: string;
+      }
+) {
   await assertAdmin();
 
-  if (!data.clientId || !data.projectId || !data.title?.trim() || !data.description?.trim()) {
+  let clientId = "";
+  let projectId = "";
+  let title = "";
+  let category: TicketCategory = TicketCategory.BASIC;
+  let description = "";
+  let files: File[] = [];
+
+  if (input instanceof FormData) {
+    clientId = (input.get("clientId") as string) || "";
+    projectId = (input.get("projectId") as string) || "";
+    title = (input.get("title") as string) || "";
+    category = ((input.get("category") as TicketCategory) || TicketCategory.BASIC);
+    description = (input.get("description") as string) || "";
+    files = (input.getAll("files") as File[]).filter((f) => f && f.size > 0);
+  } else {
+    clientId = input.clientId;
+    projectId = input.projectId;
+    title = input.title;
+    category = input.category;
+    description = input.description;
+  }
+
+  if (!clientId || !projectId || !title?.trim() || !description?.trim()) {
     return { success: false, error: "Preencha todos os campos obrigatórios." };
   }
 
   const client = await prisma.user.findUnique({
-    where: { id: data.clientId },
+    where: { id: clientId },
     select: {
       id: true,
       email: true,
       fullName: true,
       companyName: true,
       projects: {
-        where: { id: data.projectId },
+        where: { id: projectId },
         select: { id: true, name: true },
       },
     },
@@ -904,16 +946,16 @@ export async function createTicketForClientAction(data: {
   }
 
   let slaHours = 24;
-  if (data.category === TicketCategory.INTERMEDIATE) slaHours = 72;
-  if (data.category === TicketCategory.ADVANCED) slaHours = 168; // 7 dias
+  if (category === TicketCategory.INTERMEDIATE) slaHours = 72;
+  if (category === TicketCategory.ADVANCED) slaHours = 168; // 7 dias
 
   const slaDueAt = new Date(Date.now() + slaHours * 60 * 60 * 1000);
 
   const ticket = await prisma.ticket.create({
     data: {
-      title: data.title.trim(),
-      description: data.description.trim(),
-      category: data.category,
+      title: title.trim(),
+      description: description.trim(),
+      category,
       slaHours,
       slaDueAt,
       userId: client.id,
@@ -921,6 +963,58 @@ export async function createTicketForClientAction(data: {
       status: TicketStatus.OPEN,
     },
   });
+
+  // Upload de múltiplos anexos enviados pelo Admin para o bucket privado ticket-attachments
+  if (files.length > 0) {
+    try {
+      await supabaseAdmin.storage.createBucket("ticket-attachments", {
+        public: false,
+        fileSizeLimit: 10485760,
+      });
+    } catch {
+      // Bucket já existe
+    }
+
+    const attachmentRecords: Array<{
+      ticketId: string;
+      fileName: string;
+      fileUrl: string;
+      fileSize: number;
+      mimeType: string;
+    }> = [];
+
+    for (const file of files) {
+      const safeName = file.name.replace(/[^a-zA-Z0-9._-]/g, "_");
+      const filePath = `tickets/${ticket.id}/admin_${Date.now()}_${safeName}`;
+      const arrayBuffer = await file.arrayBuffer();
+      const buffer = Buffer.from(arrayBuffer);
+
+      const { error: upErr } = await supabaseAdmin.storage
+        .from("ticket-attachments")
+        .upload(filePath, buffer, {
+          contentType: file.type || "application/octet-stream",
+          upsert: false,
+        });
+
+      if (!upErr) {
+        attachmentRecords.push({
+          ticketId: ticket.id,
+          fileName: file.name,
+          fileUrl: filePath,
+          fileSize: file.size,
+          mimeType: file.type || "application/octet-stream",
+        });
+      } else {
+        console.error("Erro ao enviar anexo admin para ticket-attachments:", upErr);
+      }
+    }
+
+    if (attachmentRecords.length > 0) {
+      await prisma.ticketAttachment.createMany({
+        data: attachmentRecords,
+      });
+    }
+  }
 
   // Notificar cliente por e-mail com template institucional
   try {
@@ -930,7 +1024,7 @@ export async function createTicketForClientAction(data: {
         clientName: client.fullName || client.companyName || "Cliente",
         ticketNumber: ticket.ticketNumber,
         ticketTitle: ticket.title,
-        category: data.category as "BASIC" | "INTERMEDIATE" | "ADVANCED",
+        category: category as "BASIC" | "INTERMEDIATE" | "ADVANCED",
         slaHours,
         slaDueAt: slaDueAt.toLocaleString("pt-BR"),
         description: ticket.description,
@@ -993,7 +1087,7 @@ export async function createInvoiceWithItemsAction(input: CreateInvoiceInput) {
       }
     }
 
-    const isOverdue = invoiceDueDate <= new Date();
+    const isOverdue = isDateStrictlyOverdue(invoiceDueDate);
     const initialStatus: InvoiceStatus = isOverdue ? "OVERDUE" : "PENDING";
 
     const invoice = await prisma.$transaction(async (tx) => {
@@ -1132,7 +1226,7 @@ export async function issueImmediateInvoiceAction(data: {
     }
   }
 
-  const isOverdue = dueDate <= new Date();
+  const isOverdue = isDateStrictlyOverdue(dueDate);
   const initialStatus: InvoiceStatus = isOverdue ? "OVERDUE" : "PENDING";
 
   // 1. Gera link oficial na InfinitePay

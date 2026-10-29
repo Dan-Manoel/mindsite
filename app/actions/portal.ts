@@ -8,6 +8,7 @@ import { createInfinitePayCheckoutLink } from "@/lib/payment/infinitepay";
 import { createAdminClient, supabaseAdmin } from "@/lib/supabase/admin";
 import { logAudit } from "@/lib/audit";
 import { getAutentiqueDocument } from "@/lib/integrations/autentique";
+import { isDateStrictlyOverdue, isDateDueToday } from "@/lib/utils";
 
 export async function getClientDashboardData() {
   const supabase = await createClient();
@@ -121,105 +122,71 @@ export async function getClientDashboardData() {
     },
   } as const;
 
-  // 1. Busca concorrente (sem waterfall) de usuário, projetos, chamados, métricas de SLA e faturas
-  const [initialClientRecord, initialProjects, tickets, allTicketMetrics, initialInvoices] =
+  // 1. Busca concorrente cirúrgica (apenas 4 queries — 1 por tabela — sem duplicidade e com tratamento de erro granular)
+  const [initialClientRecord, initialProjects, tickets, initialInvoices] =
     await Promise.all([
-      prisma.user.findUnique({
-        where: { id: user.id },
-        select: userSelect,
-      }),
-      prisma.project.findMany({
-        where: { userId: user.id, isActive: true },
-        select: projectSelect,
-      }),
-      prisma.ticket.findMany({
-        where: { userId: user.id },
-        orderBy: { createdAt: "desc" },
-        take: 20,
-        select: ticketSelect,
-      }),
-      prisma.ticket.findMany({
-        where: { userId: user.id },
-        select: {
-          status: true,
-          slaDueAt: true,
-          createdAt: true,
-        },
-      }),
-      prisma.invoice.findMany({
-        where: { userId: user.id },
-        orderBy: { dueDate: "desc" },
-        take: 20,
-        select: invoiceSelect,
-      }),
+      prisma.user
+        .findUnique({
+          where: { id: user.id },
+          select: userSelect,
+        })
+        .catch((err) => {
+          console.error("[Portal Error] Falha ao buscar user:", err);
+          return null;
+        }),
+      prisma.project
+        .findMany({
+          where: { userId: user.id, isActive: true },
+          select: projectSelect,
+        })
+        .catch((err) => {
+          console.error("[Portal Error] Falha ao buscar projects:", err);
+          return [];
+        }),
+      prisma.ticket
+        .findMany({
+          where: { userId: user.id },
+          orderBy: { createdAt: "desc" },
+          take: 50,
+          select: ticketSelect,
+        })
+        .catch((err) => {
+          console.error("[Portal Error] Falha ao buscar tickets:", err);
+          return [];
+        }),
+      prisma.invoice
+        .findMany({
+          where: {
+            userId: user.id,
+            status: { in: ["PENDING", "OVERDUE", "PAID"] },
+          },
+          orderBy: { dueDate: "desc" },
+          take: 20,
+          select: invoiceSelect,
+        })
+        .catch((err) => {
+          console.error("[Portal Error] Falha ao buscar invoices:", err);
+          return [];
+        }),
     ]);
 
-  let clientRecord = initialClientRecord;
-  let projects = initialProjects;
-  let invoices = initialInvoices;
+  const allTicketMetrics = tickets;
 
-  // Garante inicialização no banco caso seja primeiro login
-  if (!clientRecord) {
-    clientRecord = await prisma.user.create({
-      data: {
-        id: user.id,
-        email: user.email!,
-        fullName: user.user_metadata?.full_name || user.email?.split("@")[0] || "Cliente",
-        role: "CLIENT",
-      },
-      select: userSelect,
-    });
-  }
-
-  // Se o cliente ainda não possuir projeto, cria um inicial e fatura de demonstração em paralelo
-  if (projects.length === 0) {
-    const [newProject, pendingInv] = await Promise.all([
-      prisma.project.create({
-        data: {
-          name: clientRecord.companyName || `${clientRecord.fullName || "Cliente"} - Website`,
-          slug: `projeto-${clientRecord.id.substring(0, 8)}`,
-          domain: "meudominio.com.br",
-          stagingUrl: "https://staging.mindsite.com.br",
-          description: "Projeto principal de presença digital e sustentação contínua.",
-          userId: clientRecord.id,
-          contracts: {
-            create: {
-              title: "Sustentação Development",
-              contractType: "SUSTAINABILITY",
-              status: "ACTIVE",
-              totalAmount: 300.0,
-              paidAmount: 0.0,
-              userId: clientRecord.id,
-            },
-          },
-        },
-        select: projectSelect,
-      }),
-      prisma.invoice.create({
-        data: {
-          invoiceNumber: `INV-${new Date().getFullYear()}-${Math.floor(1000 + Math.random() * 9000)}`,
-          dueDate: new Date(Date.now() + 5 * 24 * 60 * 60 * 1000),
-          totalAmount: 300.0,
-          status: "PENDING",
-          pixCopyPaste:
-            "00020126580014br.gov.bcb.pix0136contato@mindsite.com.br5204000053039865406300.005802BR5916Mindsite Agencia6009Sao Paulo62070503***6304E8A2",
-          userId: clientRecord.id,
-          items: {
-            create: [
-              {
-                description: "Sustentação Mensal Development",
-                amount: 300.0,
-              },
-            ],
-          },
-        },
-        select: invoiceSelect,
-      }),
-    ]);
-
-    projects = [newProject];
-    invoices = [pendingInv];
-  }
+  // Fallback estritamente em memória (NUNCA executa prisma.user.create em caso de falha de leitura para evitar erro P2002)
+  const clientRecord = initialClientRecord ?? {
+    id: user.id,
+    fullName: (user.user_metadata?.full_name as string) || user.email?.split("@")[0] || "Cliente",
+    email: user.email || "",
+    secondaryEmail: null,
+    phone: null,
+    document: null,
+    address: null,
+    avatarUrl: null,
+    companyName: null,
+    autentiqueDocId: null,
+  };
+  const projects = initialProjects;
+  const invoices = initialInvoices;
 
   const client = {
     ...clientRecord,
@@ -246,14 +213,16 @@ export async function getClientDashboardData() {
     )
   );
 
-  // 1. Faturas em atraso (status === 'OVERDUE' ou PENDING com dueDate < now)
+  // 1. Faturas estritamente em atraso (vencimento anterior ao dia civil de hoje em Brasília)
   const overdueInvoices = client.invoices.filter(
-    (inv) => inv.status === "OVERDUE" || (inv.status === "PENDING" && new Date(inv.dueDate) < now)
+    (inv) =>
+      (inv.status === "OVERDUE" || inv.status === "PENDING") &&
+      isDateStrictlyOverdue(inv.dueDate)
   );
 
-  // 2. Parcelas agendadas com vencimento expirado (mesmo que sem fatura gerada)
+  // 2. Parcelas agendadas com vencimento estritamente expirado (anterior a hoje em Brasília)
   const overdueScheduledInstallments = allInstallments.filter(
-    (inst) => inst.status === "SCHEDULED" && new Date(inst.scheduledDate) < now
+    (inst) => inst.status === "SCHEDULED" && isDateStrictlyOverdue(inst.scheduledDate)
   );
 
   const isOverdue = overdueInvoices.length > 0 || overdueScheduledInstallments.length > 0;
@@ -262,22 +231,28 @@ export async function getClientDashboardData() {
   const overdueInstallmentsAmount = overdueScheduledInstallments.reduce((sum, inst) => sum + inst.amount, 0);
   const totalOverdueAmount = overdueInvoicesAmount + overdueInstallmentsAmount;
 
-  // Faturas pendentes vigentes (vencimento futuro)
+  // Faturas pendentes vigentes (vencimento hoje ou futuro em Brasília)
   const pendingInvoices = client.invoices.filter(
-    (inv) => inv.status === "PENDING" && new Date(inv.dueDate) >= now
+    (inv) =>
+      (inv.status === "PENDING" || inv.status === "OVERDUE") &&
+      !isDateStrictlyOverdue(inv.dueDate)
   );
 
   // Fatura ativa em aberto: a em atraso mais antiga, ou a pendente futura mais próxima.
   // Se não houver fatura aberta, activeInvoice será null (NUNCA fallback para faturas pagas)
   const openInvoice = overdueInvoices[0] || pendingInvoices[0] || null;
 
-  // Verificação estrita de liquidação de faturas e parcelas até a data corrente
+  // Verificação estrita de liquidação de faturas e parcelas até a data corrente (passadas ou vencendo hoje)
   const hasUnsettledPastOrCurrent =
     client.invoices.some(
-      (inv) => (inv.status === "PENDING" || inv.status === "OVERDUE") && new Date(inv.dueDate) <= now
+      (inv) =>
+        (inv.status === "PENDING" || inv.status === "OVERDUE") &&
+        (isDateStrictlyOverdue(inv.dueDate) || isDateDueToday(inv.dueDate))
     ) ||
     allInstallments.some(
-      (inst) => (inst.status === "SCHEDULED" || inst.status === "BILLED") && new Date(inst.scheduledDate) <= now
+      (inst) =>
+        (inst.status === "SCHEDULED" || inst.status === "BILLED") &&
+        (isDateStrictlyOverdue(inst.scheduledDate) || isDateDueToday(inst.scheduledDate))
     );
 
   const hasAnyTransactions = client.invoices.length > 0 || allInstallments.length > 0;
@@ -333,7 +308,29 @@ export async function getClientDashboardData() {
     }
   }
 
+  // Verifica se a mensalidade de sustentação do mês vigente já está faturada
   const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+  const endOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59);
+  const hasBilledSustainabilityThisMonth = client.invoices.some((inv) => {
+    const invDate = new Date(inv.dueDate);
+    const inCurrentMonth = invDate >= startOfMonth && invDate <= endOfMonth;
+    const hasSustItem = inv.items.some((item) =>
+      item.description.toLowerCase().includes("sustenta")
+    );
+    return (inCurrentMonth && hasSustItem) || ((inv.status === "PENDING" || inv.status === "OVERDUE") && hasSustItem);
+  });
+
+  const unbilledSustainability =
+    sustContract && Number(sustContract.totalAmount) > 0 && !hasBilledSustainabilityThisMonth
+      ? {
+          contractId: sustContract.id,
+          planName,
+          description: `Sustentação Mensal ${planName} (${now.toLocaleDateString("pt-BR", { month: "2-digit", year: "numeric" })})`,
+          amount: Number(sustContract.totalAmount),
+          dueDate: new Date(now.getFullYear(), now.getMonth(), Math.max(now.getDate(), 10)).toISOString(),
+        }
+      : null;
+
   const ticketsConsumedThisMonth = allTicketMetrics.filter(
     (t) => new Date(t.createdAt) >= startOfMonth
   ).length;
@@ -450,11 +447,11 @@ export async function getClientDashboardData() {
           pixCopyPaste: openInvoice.pixCopyPaste,
           pixQrCode: openInvoice.pixQrCode,
           gatewayInvoiceUrl: openInvoice.gatewayInvoiceUrl,
-          status:
-            openInvoice.status === "OVERDUE" ||
-            (openInvoice.status === "PENDING" && new Date(openInvoice.dueDate) < now)
-              ? "OVERDUE"
-              : openInvoice.status,
+          status: isDateStrictlyOverdue(openInvoice.dueDate)
+            ? "OVERDUE"
+            : openInvoice.status === "OVERDUE"
+            ? "PENDING"
+            : openInvoice.status,
           items: openInvoice.items.map((i) => ({
             id: i.id,
             description: i.description,
@@ -470,8 +467,9 @@ export async function getClientDashboardData() {
       overdueInstallmentsCount: overdueScheduledInstallments.length,
       hasOverdueInstallmentsWithoutInvoice: overdueScheduledInstallments.length > 0,
     },
+    unbilledSustainability,
     upcomingInstallments: allInstallments
-      .filter((inst) => inst.status === "SCHEDULED" && new Date(inst.scheduledDate) >= now)
+      .filter((inst) => inst.status === "SCHEDULED")
       .sort((a, b) => new Date(a.scheduledDate).getTime() - new Date(b.scheduledDate).getTime())
       .map((inst) => ({
         id: inst.id,
@@ -484,13 +482,14 @@ export async function getClientDashboardData() {
       })),
     invoicesHistory: client.invoices.map((inv) => {
       const isInvOverdue =
-        inv.status === "OVERDUE" || (inv.status === "PENDING" && new Date(inv.dueDate) < now);
+        (inv.status === "OVERDUE" || inv.status === "PENDING") &&
+        isDateStrictlyOverdue(inv.dueDate);
       return {
         id: inv.id,
         invoiceNumber: inv.invoiceNumber,
         dueDate: inv.dueDate.toISOString(),
         totalAmount: Number(inv.totalAmount),
-        status: isInvOverdue ? "OVERDUE" : inv.status,
+        status: isInvOverdue ? "OVERDUE" : inv.status === "OVERDUE" ? "PENDING" : inv.status,
         paidAt: inv.paidAt ? inv.paidAt.toISOString() : null,
         receiptUrl: inv.receiptUrl || null,
         gatewayInvoiceUrl: inv.gatewayInvoiceUrl || null,
@@ -755,10 +754,11 @@ export async function uploadTicketAttachmentAction(formData: FormData) {
   }
 }
 
-export async function generateConsolidatedPaymentAction(payload: {
-  includeCurrentInvoice: boolean;
+export async function clientSelfIssueInvoiceAction(payload: {
   selectedInstallmentIds: string[];
-  paymentMethod: "PIX" | "BOLETO";
+  includeSustainability?: boolean;
+  includeCurrentInvoice?: boolean;
+  paymentMethod?: "PIX" | "BOLETO" | "CREDIT_CARD";
 }) {
   const supabase = await createClient();
   const {
@@ -769,43 +769,58 @@ export async function generateConsolidatedPaymentAction(payload: {
     return { success: false, error: "Não autenticado." };
   }
 
-  const client = await prisma.user.findUnique({
-    where: { id: user.id },
-    select: {
-      id: true,
-      fullName: true,
-      email: true,
-      phone: true,
-      invoices: {
-        where: { status: "PENDING" },
-        take: 10,
-        select: {
-          id: true,
-          invoiceNumber: true,
-          totalAmount: true,
-          dueDate: true,
+  const [client, sustContract] = await Promise.all([
+    prisma.user.findUnique({
+      where: { id: user.id },
+      select: {
+        id: true,
+        fullName: true,
+        email: true,
+        phone: true,
+        invoices: {
+          where: { status: "PENDING" },
+          take: 10,
+          select: {
+            id: true,
+            invoiceNumber: true,
+            totalAmount: true,
+            dueDate: true,
+          },
         },
-      },
-      projects: {
-        select: {
-          name: true,
-          contracts: {
-            select: {
-              installments: {
-                where: { id: { in: payload.selectedInstallmentIds }, status: "SCHEDULED" },
-                select: {
-                  id: true,
-                  amount: true,
-                  scheduledDate: true,
-                  description: true,
+        projects: {
+          select: {
+            name: true,
+            contracts: {
+              select: {
+                installments: {
+                  where: { id: { in: payload.selectedInstallmentIds }, status: "SCHEDULED" },
+                  select: {
+                    id: true,
+                    installmentNumber: true,
+                    amount: true,
+                    scheduledDate: true,
+                    description: true,
+                  },
                 },
               },
             },
           },
         },
       },
-    },
-  });
+    }),
+    prisma.contract.findFirst({
+      where: {
+        userId: user.id,
+        contractType: "SUSTAINABILITY",
+        status: "ACTIVE",
+      },
+      select: {
+        id: true,
+        title: true,
+        totalAmount: true,
+      },
+    }),
+  ]);
 
   if (!client) {
     return { success: false, error: "Cliente não encontrado." };
@@ -813,7 +828,6 @@ export async function generateConsolidatedPaymentAction(payload: {
 
   let totalAmount = 0;
   const itemsToBill: Array<{ description: string; amount: number; installmentId?: string }> = [];
-
   const selectedInstallmentsList: Array<{ id: string; amount: number; scheduledDate: Date }> = [];
 
   // 1. Inclui fatura corrente se solicitado
@@ -825,14 +839,25 @@ export async function generateConsolidatedPaymentAction(payload: {
     });
   }
 
-  // 2. Soma as parcelas futuras adiantadas selecionadas pelo cliente
+  // 2. Inclui mensalidade de sustentação do mês vigente se selecionado
+  if (payload.includeSustainability && sustContract && Number(sustContract.totalAmount) > 0) {
+    const sustAmount = Number(sustContract.totalAmount);
+    totalAmount += sustAmount;
+    const now = new Date();
+    itemsToBill.push({
+      description: `${sustContract.title || "Sustentação Mensal"} (${now.toLocaleDateString("pt-BR", { month: "2-digit", year: "numeric" })})`,
+      amount: sustAmount,
+    });
+  }
+
+  // 3. Soma as parcelas SCHEDULED selecionadas pelo cliente
   client.projects.forEach((proj) => {
     proj.contracts.forEach((cont) => {
       cont.installments.forEach((inst) => {
         const val = Number(inst.amount);
         totalAmount += val;
         itemsToBill.push({
-          description: `Adiantamento: ${inst.description || "Parcela"} (${proj.name})`,
+          description: `${inst.description || `Parcela ${inst.installmentNumber}`} (${proj.name})`,
           amount: val,
           installmentId: inst.id,
         });
@@ -846,14 +871,13 @@ export async function generateConsolidatedPaymentAction(payload: {
   });
 
   if (totalAmount <= 0) {
-    return { success: false, error: "Nenhum valor selecionado para cobrança." };
+    return { success: false, error: "Nenhum item selecionado para emissão da fatura." };
   }
 
   const invoiceNumber = `INV-${Date.now().toString().slice(-6)}`;
 
   // Herança Obrigatória de Vencimento: A Invoice gerada para uma parcela de contrato
-  // NUNCA deve inventar uma data de vencimento aleatória (ex: +3 dias).
-  // Ela DEVE herdar exatamente a data acordada: dueDate: installment.scheduledDate
+  // DEVE herdar a data acordada da parcela mais antiga, ou hoje se apenas sustentação
   let dueDate = new Date();
   if (selectedInstallmentsList.length > 0) {
     selectedInstallmentsList.sort((a, b) => a.scheduledDate.getTime() - b.scheduledDate.getTime());
@@ -862,10 +886,10 @@ export async function generateConsolidatedPaymentAction(payload: {
     dueDate = client.invoices[0].dueDate;
   }
 
-  const isOverdue = dueDate <= new Date();
+  const isOverdue = isDateStrictlyOverdue(dueDate);
   const initialStatus: InvoiceStatus = isOverdue ? "OVERDUE" : "PENDING";
 
-  // 3. Comunica com a InfinitePay para gerar o link oficial de checkout
+  // 4. Comunica com a InfinitePay para gerar o link oficial de checkout
   const checkoutRes = await createInfinitePayCheckoutLink({
     orderNsu: invoiceNumber,
     amountInCents: Math.round(totalAmount * 100),
@@ -881,50 +905,61 @@ export async function generateConsolidatedPaymentAction(payload: {
     },
   });
 
-  const checkoutUrl = checkoutRes.success && checkoutRes.url ? checkoutRes.url : `https://pay.infinitepay.io/checkout/${invoiceNumber}`;
+  const checkoutUrl =
+    checkoutRes.success && checkoutRes.url
+      ? checkoutRes.url
+      : `https://pay.infinitepay.io/checkout/${invoiceNumber}`;
 
-  // 4. Salva a fatura no Prisma com status calculado (OVERDUE se vencimento <= hoje, senão PENDING)
-  const createdInvoice = await prisma.invoice.create({
-    data: {
-      invoiceNumber,
-      dueDate,
-      totalAmount,
-      status: initialStatus,
-      paymentMethod: payload.paymentMethod,
-      gatewayPaymentId: checkoutRes.slug || invoiceNumber,
-      gatewayInvoiceUrl: checkoutUrl,
-      userId: client.id,
-      items: {
-        create: itemsToBill.map((item) => ({
-          description: item.description,
-          amount: item.amount,
-        })),
-      },
-    },
-    select: {
-      id: true,
-      items: {
+  // 5. Salva a fatura no Prisma e vincula as parcelas dentro de uma transação resiliente
+  const invoice = await prisma.$transaction(
+    async (tx) => {
+      const createdInvoice = await tx.invoice.create({
+        data: {
+          invoiceNumber,
+          dueDate,
+          totalAmount: Number(totalAmount),
+          status: initialStatus,
+          paymentMethod: payload.paymentMethod === "BOLETO" ? "BOLETO" : "PIX",
+          gatewayPaymentId: checkoutRes.slug || invoiceNumber,
+          gatewayInvoiceUrl: checkoutUrl,
+          userId: client.id,
+          items: {
+            create: itemsToBill.map((item) => ({
+              description: item.description,
+              amount: Number(item.amount),
+            })),
+          },
+        },
         select: {
           id: true,
-        },
-      },
-    },
-  });
-
-  // Vincula as parcelas à nova fatura e ao item correspondente com status BILLED em paralelo
-  await Promise.all(
-    itemsToBill.map((item, i) => {
-      if (item.installmentId && createdInvoice.items[i]) {
-        return prisma.contractInstallment.update({
-          where: { id: item.installmentId },
-          data: {
-            status: "BILLED",
-            invoiceItemId: createdInvoice.items[i].id,
+          invoiceNumber: true,
+          gatewayInvoiceUrl: true,
+          pixQrCode: true,
+          pixCopyPaste: true,
+          items: {
+            select: {
+              id: true,
+            },
           },
-        });
+        },
+      });
+
+      for (let i = 0; i < itemsToBill.length; i++) {
+        const item = itemsToBill[i];
+        if (item.installmentId && createdInvoice.items[i]) {
+          await tx.contractInstallment.update({
+            where: { id: item.installmentId },
+            data: {
+              status: "BILLED",
+              invoiceItemId: createdInvoice.items[i].id,
+            },
+          });
+        }
       }
-      return Promise.resolve();
-    })
+
+      return createdInvoice;
+    },
+    { maxWait: 10000, timeout: 20000 }
   );
 
   revalidatePath("/portal/dashboard");
@@ -932,10 +967,22 @@ export async function generateConsolidatedPaymentAction(payload: {
   revalidatePath("/admin/clients");
   return {
     success: true,
-    invoiceId: createdInvoice.id,
-    checkoutUrl: checkoutUrl,
-    orderNsu: invoiceNumber,
+    invoiceId: invoice.id,
+    invoiceNumber: invoice.invoiceNumber,
+    orderNsu: invoice.invoiceNumber,
+    checkoutUrl: invoice.gatewayInvoiceUrl,
+    pixQrCode: invoice.pixQrCode,
+    pixCopyPaste: invoice.pixCopyPaste,
   };
+}
+
+export async function generateConsolidatedPaymentAction(payload: {
+  includeCurrentInvoice: boolean;
+  selectedInstallmentIds: string[];
+  includeSustainability?: boolean;
+  paymentMethod: "PIX" | "BOLETO";
+}) {
+  return clientSelfIssueInvoiceAction(payload);
 }
 
 export async function updateClientProfileAction(data: {

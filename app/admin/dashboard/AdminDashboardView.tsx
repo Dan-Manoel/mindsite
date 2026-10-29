@@ -23,6 +23,7 @@ import {
 } from "@/app/actions/admin";
 import { resetClientPasswordAction } from "@/app/actions/adminClients";
 import { setTicketAwaitingClientAction } from "@/app/actions/tickets";
+import { isDateStrictlyOverdue } from "@/lib/utils";
 import {
   getExpenseReceiptSignedUrlAction,
   attachExpenseReceiptAction,
@@ -273,6 +274,11 @@ export default function AdminDashboardView({ initialData }: { initialData: Admin
   const [ticketTitle, setTicketTitle] = useState("");
   const [ticketCategory, setTicketCategory] = useState<TicketCategory>("BASIC");
   const [ticketDescription, setTicketDescription] = useState("");
+  const [ticketFiles, setTicketFiles] = useState<File[]>([]);
+
+  // Isolamento de Chamados Abertos vs Concluídos e Expansão de Mensagens no Admin
+  const [showCompletedAdminTickets, setShowCompletedAdminTickets] = useState(false);
+  const [expandedAdminTicketId, setExpandedAdminTicketId] = useState<string | null>(null);
 
   // Modal Emissão Fatura Contextual por Cliente
   const [isInvoiceModalOpen, setIsInvoiceModalOpen] = useState(false);
@@ -307,13 +313,16 @@ export default function AdminDashboardView({ initialData }: { initialData: Admin
   // ----------------------------------------------------
   // COMPUTED: Métricas Operacionais & Filtros
   // ----------------------------------------------------
-  // Despesas em atraso de meses anteriores
+  // Despesas em atraso de meses anteriores (estritamente vencidas no fuso de Brasília)
   const overdueExpensesPastMonths = useMemo(() => {
     const now = new Date();
     return expenses.filter((e) => {
       if (e.isPaid) return false;
       const due = new Date(e.dueDate);
-      return due < now && (due.getMonth() < now.getMonth() || due.getFullYear() < now.getFullYear());
+      return (
+        isDateStrictlyOverdue(e.dueDate) &&
+        (due.getMonth() < now.getMonth() || due.getFullYear() < now.getFullYear())
+      );
     });
   }, [expenses]);
 
@@ -699,13 +708,17 @@ export default function AdminDashboardView({ initialData }: { initialData: Admin
     }
 
     startTransition(async () => {
-      const res = await createTicketForClientAction({
-        clientId: ticketClientId,
-        projectId: ticketProjectId,
-        title: ticketTitle,
-        category: ticketCategory,
-        description: ticketDescription,
-      });
+      const formData = new FormData();
+      formData.append("clientId", ticketClientId);
+      formData.append("projectId", ticketProjectId);
+      formData.append("title", ticketTitle);
+      formData.append("category", ticketCategory);
+      formData.append("description", ticketDescription);
+      for (const file of ticketFiles) {
+        formData.append("files", file);
+      }
+
+      const res = await createTicketForClientAction(formData);
 
       if (res.success) {
         showNotification("Chamado aberto com sucesso e cliente notificado por e-mail!");
@@ -715,6 +728,7 @@ export default function AdminDashboardView({ initialData }: { initialData: Admin
         setTicketProjectId("");
         setTicketTitle("");
         setTicketDescription("");
+        setTicketFiles([]);
         router.refresh();
       } else {
         showNotification(res.error || "Erro ao criar chamado.", "error");
@@ -1597,16 +1611,85 @@ export default function AdminDashboardView({ initialData }: { initialData: Admin
               ))}
             </div>
 
-            {/* Fila de Chamados */}
-            {tickets.length === 0 ? (
-              <div style={{ textAlign: "center", padding: "4rem", color: "var(--t-muted)", fontFamily: "var(--_font-accent)", fontSize: "1.3rem" }}>
-                Nenhum chamado aberto na fila no momento.
-              </div>
-            ) : (
-              <div style={{ display: "flex", flexDirection: "column", gap: "2rem" }}>
-                {tickets.map((ticket) => {
-                  const slaDate = new Date(ticket.slaDueAt);
-                  return (
+            {/* Fila de Chamados (Isolamento de Chamados Abertos vs Concluídos) */}
+            {(() => {
+              const activeTicketsList = tickets.filter(
+                (t) => t.status === "OPEN" || t.status === "IN_PROGRESS" || t.status === "WAITING_CLIENT"
+              );
+              const completedTicketsList = tickets.filter(
+                (t) => t.status === "RESOLVED" || t.status === "CANCELLED"
+              );
+              const displayedTickets = showCompletedAdminTickets ? completedTicketsList : activeTicketsList;
+
+              return (
+                <>
+                  <div style={{ display: "flex", flexWrap: "wrap", justifyContent: "space-between", alignItems: "center", gap: "1.5rem", marginBottom: "2rem" }}>
+                    <h4 style={{ fontSize: "1.6rem", fontFamily: "var(--_font-default)", fontWeight: 700, color: "var(--t-bright)", margin: 0 }}>
+                      {showCompletedAdminTickets
+                        ? `Histórico de Chamados Concluídos (${completedTicketsList.length})`
+                        : `Fila de Chamados em Aberto (${activeTicketsList.length})`}
+                    </h4>
+
+                    {completedTicketsList.length > 0 && (
+                      <button
+                        type="button"
+                        onClick={() => setShowCompletedAdminTickets(!showCompletedAdminTickets)}
+                        style={{
+                          padding: "0.8rem 1.6rem",
+                          backgroundColor: showCompletedAdminTickets ? "rgba(0, 43, 186, 0.15)" : "var(--base)",
+                          border: `1px solid ${showCompletedAdminTickets ? "var(--accent)" : "var(--st-medium)"}`,
+                          color: showCompletedAdminTickets ? "#819ffe" : "var(--t-bright)",
+                          fontFamily: "var(--_font-accent)",
+                          fontSize: "1.2rem",
+                          fontWeight: 700,
+                          borderRadius: "0.2rem",
+                          cursor: "pointer",
+                        }}
+                      >
+                        {showCompletedAdminTickets
+                          ? `← Voltar aos Chamados Abertos (${activeTicketsList.length})`
+                          : `Ver Chamados Concluídos (${completedTicketsList.length})`}
+                      </button>
+                    )}
+                  </div>
+
+                  {displayedTickets.length === 0 ? (
+                    <div
+                      style={{
+                        backgroundColor: "var(--base)",
+                        border: "1px solid var(--st-medium)",
+                        textAlign: "center",
+                        padding: "4.5rem 3rem",
+                        borderRadius: "0.4rem",
+                        display: "flex",
+                        flexDirection: "column",
+                        alignItems: "center",
+                        gap: "1.8rem",
+                      }}
+                    >
+                      <p style={{ margin: 0, color: "var(--t-medium)", fontFamily: "var(--_font-accent)", fontSize: "1.4rem" }}>
+                        {showCompletedAdminTickets
+                          ? "Nenhum chamado concluído no histórico."
+                          : "Não há chamados em aberto no momento."}
+                      </p>
+                      {!showCompletedAdminTickets && (
+                        <button
+                          type="button"
+                          onClick={() => setIsNewTicketModalOpen(true)}
+                          className="btn btn-default-icon btn-default-accent"
+                          style={{ height: "4.4rem", padding: "0.4rem 0.4rem 0.4rem 1.8rem", fontSize: "1.3rem" }}
+                        >
+                          <span className="btn-caption">+ Abrir Chamado</span>
+                          <i className="btn-icon" style={{ width: "3.4rem", height: "3.4rem" }}>+</i>
+                        </button>
+                      )}
+                    </div>
+                  ) : (
+                    <div style={{ display: "flex", flexDirection: "column", gap: "2rem" }}>
+                      {displayedTickets.map((ticket) => {
+                        const slaDate = new Date(ticket.slaDueAt);
+                        const isExpanded = expandedAdminTicketId === ticket.id;
+                        return (
                     <div
                       key={ticket.id}
                       style={{
@@ -1734,114 +1817,142 @@ export default function AdminDashboardView({ initialData }: { initialData: Admin
                               {st === "RESOLVED" && "Resolvido"}
                             </button>
                           ))}
+
+                          <button
+                            type="button"
+                            onClick={() => setExpandedAdminTicketId(isExpanded ? null : ticket.id)}
+                            style={{
+                              height: "3.2rem",
+                              padding: "0 1.4rem",
+                              fontSize: "1.1rem",
+                              fontFamily: "var(--_font-accent)",
+                              fontWeight: 700,
+                              backgroundColor: isExpanded ? "var(--base)" : "#002bba",
+                              border: isExpanded ? "1px solid #ef4444" : "1px solid #002bba",
+                              color: isExpanded ? "#ef4444" : "#ffffff",
+                              cursor: "pointer",
+                              borderRadius: "0.2rem",
+                              display: "inline-flex",
+                              alignItems: "center",
+                              gap: "0.5rem",
+                            }}
+                          >
+                            <span>{isExpanded ? "OCULTAR MENSAGENS" : `Mensagens (${ticket.comments?.length || 0})`}</span>
+                            <span style={{ fontSize: "0.9rem" }}>{isExpanded ? "▲" : "▼"}</span>
+                          </button>
                         </div>
                       </div>
 
                       {/* Thread de Comentários */}
-                      <div style={{ marginTop: "2rem", borderTop: "1px solid var(--st-medium)", paddingTop: "1.5rem" }}>
-                        {ticket.comments && ticket.comments.length > 0 && (
-                          <div style={{ display: "flex", flexDirection: "column", gap: "1rem", marginBottom: "1.5rem" }}>
-                            {ticket.comments.map((c) => (
-                              <div
-                                key={c.id}
-                                style={{
-                                  padding: "1.2rem 1.5rem",
-                                  backgroundColor: c.isAdmin ? "rgba(0, 43, 186, 0.08)" : "var(--base-tint)",
-                                  border: `1px solid ${c.isAdmin ? "var(--accent)" : "var(--st-medium)"}`,
-                                  borderRadius: "0.2rem",
-                                }}
-                              >
-                                <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "0.4rem" }}>
-                                  <strong style={{ fontSize: "1.2rem", color: c.isAdmin ? "var(--accent)" : "var(--t-bright)", fontFamily: "var(--_font-accent)" }}>
-                                    {c.authorName} {c.isAdmin && "🛡️ (Suporte MindSite)"}
-                                  </strong>
-                                  <span style={{ fontSize: "1.1rem", color: "var(--t-muted)", fontFamily: "var(--_font-accent)" }}>
-                                    {new Date(c.createdAt).toLocaleString("pt-BR")}
-                                  </span>
-                                </div>
-                                <p style={{ fontSize: "1.2rem", color: "var(--t-medium)", margin: 0, lineHeight: 1.4, whiteSpace: "pre-line" }}>
-                                  {c.message}
-                                </p>
-                                {c.attachments && c.attachments.length > 0 && (
-                                  <div style={{ marginTop: "0.8rem", display: "flex", flexWrap: "wrap", gap: "0.6rem" }}>
-                                    {c.attachments.map((attPath: string, attIdx: number) => {
-                                      const cleanFileName =
-                                        attPath.split("/").pop()?.split("_").slice(2).join("_") ||
-                                        attPath.split("/").pop() ||
-                                        `Anexo_${attIdx + 1}`;
-                                      const isOpeningThis = openingAttachmentId === attPath;
-                                      return (
-                                        <button
-                                          key={attIdx}
-                                          type="button"
-                                          onClick={() => handleOpenAttachment(attPath, cleanFileName)}
-                                          disabled={isOpeningThis}
-                                          style={{
-                                            fontSize: "1.1rem",
-                                            fontFamily: "var(--_font-accent)",
-                                            padding: "0.3rem 0.8rem",
-                                            backgroundColor: "var(--base)",
-                                            border: "1px solid var(--st-medium)",
-                                            borderRadius: "0.2rem",
-                                            color: "var(--t-bright)",
-                                            cursor: "pointer",
-                                            display: "inline-flex",
-                                            alignItems: "center",
-                                            gap: "0.5rem",
-                                            opacity: isOpeningThis ? 0.6 : 1,
-                                          }}
-                                        >
-                                          📎 {isOpeningThis ? "Abrindo..." : cleanFileName} ↗
-                                        </button>
-                                      );
-                                    })}
+                      {isExpanded && (
+                        <div style={{ marginTop: "2rem", borderTop: "1px solid var(--st-medium)", paddingTop: "1.5rem" }}>
+                          {ticket.comments && ticket.comments.length > 0 && (
+                            <div style={{ display: "flex", flexDirection: "column", gap: "1rem", marginBottom: "1.5rem" }}>
+                              {ticket.comments.map((c) => (
+                                <div
+                                  key={c.id}
+                                  style={{
+                                    padding: "1.2rem 1.5rem",
+                                    backgroundColor: c.isAdmin ? "rgba(0, 43, 186, 0.08)" : "var(--base-tint)",
+                                    border: `1px solid ${c.isAdmin ? "var(--accent)" : "var(--st-medium)"}`,
+                                    borderRadius: "0.2rem",
+                                  }}
+                                >
+                                  <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "0.4rem" }}>
+                                    <strong style={{ fontSize: "1.2rem", color: c.isAdmin ? "var(--accent)" : "var(--t-bright)", fontFamily: "var(--_font-accent)" }}>
+                                      {c.authorName} {c.isAdmin && "🛡️ (Suporte MindSite)"}
+                                    </strong>
+                                    <span style={{ fontSize: "1.1rem", color: "var(--t-muted)", fontFamily: "var(--_font-accent)" }}>
+                                      {new Date(c.createdAt).toLocaleString("pt-BR")}
+                                    </span>
                                   </div>
-                                )}
-                              </div>
-                            ))}
-                          </div>
-                        )}
+                                  <p style={{ fontSize: "1.2rem", color: "var(--t-medium)", margin: 0, lineHeight: 1.4, whiteSpace: "pre-line" }}>
+                                    {c.message}
+                                  </p>
+                                  {c.attachments && c.attachments.length > 0 && (
+                                    <div style={{ marginTop: "0.8rem", display: "flex", flexWrap: "wrap", gap: "0.6rem" }}>
+                                      {c.attachments.map((attPath: string, attIdx: number) => {
+                                        const cleanFileName =
+                                          attPath.split("/").pop()?.split("_").slice(2).join("_") ||
+                                          attPath.split("/").pop() ||
+                                          `Anexo_${attIdx + 1}`;
+                                        const isOpeningThis = openingAttachmentId === attPath;
+                                        return (
+                                          <button
+                                            key={attIdx}
+                                            type="button"
+                                            onClick={() => handleOpenAttachment(attPath, cleanFileName)}
+                                            disabled={isOpeningThis}
+                                            style={{
+                                              fontSize: "1.1rem",
+                                              fontFamily: "var(--_font-accent)",
+                                              padding: "0.3rem 0.8rem",
+                                              backgroundColor: "var(--base)",
+                                              border: "1px solid var(--st-medium)",
+                                              borderRadius: "0.2rem",
+                                              color: "var(--t-bright)",
+                                              cursor: "pointer",
+                                              display: "inline-flex",
+                                              alignItems: "center",
+                                              gap: "0.5rem",
+                                              opacity: isOpeningThis ? 0.6 : 1,
+                                            }}
+                                          >
+                                            📎 {isOpeningThis ? "Abrindo..." : cleanFileName} ↗
+                                          </button>
+                                        );
+                                      })}
+                                    </div>
+                                  )}
+                                </div>
+                              ))}
+                            </div>
+                          )}
 
-                        <div style={{ display: "flex", gap: "1rem" }}>
-                          <input
-                            type="text"
-                            placeholder="Escrever resposta técnica ao cliente..."
-                            value={ticketCommentInputs[ticket.id] || ""}
-                            onChange={(e) => setTicketCommentInputs((prev) => ({ ...prev, [ticket.id]: e.target.value }))}
-                            onKeyDown={(e) => {
-                              if (e.key === "Enter" && !e.shiftKey) {
-                                e.preventDefault();
-                                handleAdminComment(ticket.id);
-                              }
-                            }}
-                            style={{
-                              flex: 1,
-                              height: "4rem",
-                              padding: "0 1.2rem",
-                              backgroundColor: "var(--base-tint)",
-                              border: "1px solid var(--st-medium)",
-                              color: "var(--t-bright)",
-                              fontFamily: "var(--_font-accent)",
-                              fontSize: "1.2rem",
-                              outline: "none",
-                            }}
-                          />
-                          <button
-                            type="button"
-                            disabled={isPending}
-                            onClick={() => handleAdminComment(ticket.id)}
-                            className="btn btn-default-icon btn-default-accent"
-                            style={{ height: "4rem", padding: "0 1.6rem", fontSize: "1.2rem", whiteSpace: "nowrap" }}
-                          >
-                            Responder
-                          </button>
+                          <div style={{ display: "flex", gap: "1rem" }}>
+                            <input
+                              type="text"
+                              placeholder="Escrever resposta técnica ao cliente..."
+                              value={ticketCommentInputs[ticket.id] || ""}
+                              onChange={(e) => setTicketCommentInputs((prev) => ({ ...prev, [ticket.id]: e.target.value }))}
+                              onKeyDown={(e) => {
+                                if (e.key === "Enter" && !e.shiftKey) {
+                                  e.preventDefault();
+                                  handleAdminComment(ticket.id);
+                                }
+                              }}
+                              style={{
+                                flex: 1,
+                                height: "4rem",
+                                padding: "0 1.2rem",
+                                backgroundColor: "var(--base-tint)",
+                                border: "1px solid var(--st-medium)",
+                                color: "var(--t-bright)",
+                                fontFamily: "var(--_font-accent)",
+                                fontSize: "1.2rem",
+                                outline: "none",
+                              }}
+                            />
+                            <button
+                              type="button"
+                              disabled={isPending}
+                              onClick={() => handleAdminComment(ticket.id)}
+                              className="btn btn-default-icon btn-default-accent"
+                              style={{ height: "4rem", padding: "0 1.6rem", fontSize: "1.2rem", whiteSpace: "nowrap" }}
+                            >
+                              Responder
+                            </button>
+                          </div>
                         </div>
-                      </div>
+                      )}
                     </div>
                   );
                 })}
               </div>
-            )}
+                  )}
+                </>
+              );
+            })()}
           </div>
         )}
 
@@ -2528,10 +2639,92 @@ export default function AdminDashboardView({ initialData }: { initialData: Admin
                 />
               </div>
 
+              {/* Upload de Múltiplos Anexos (Deferred Upload) */}
+              <div>
+                <label style={{ display: "block", fontFamily: "var(--_font-accent)", fontSize: "1.1rem", textTransform: "uppercase", color: "var(--t-medium)", marginBottom: "0.6rem", fontWeight: 700 }}>
+                  Anexos / Evidências (PNG, JPG, WEBP, PDF)
+                </label>
+                <label
+                  style={{
+                    display: "inline-flex",
+                    alignItems: "center",
+                    gap: "0.8rem",
+                    padding: "1rem 1.6rem",
+                    backgroundColor: "var(--base)",
+                    border: "1px dashed var(--st-medium)",
+                    borderRadius: "0.2rem",
+                    color: "var(--accent)",
+                    fontFamily: "var(--_font-accent)",
+                    fontSize: "1.2rem",
+                    cursor: "pointer",
+                    width: "100%",
+                    justifyContent: "center",
+                  }}
+                >
+                  <span>📎 Selecionar Arquivos (PNG, JPG, WEBP, PDF)</span>
+                  <input
+                    type="file"
+                    multiple
+                    accept=".png,.jpg,.jpeg,.webp,.pdf"
+                    style={{ display: "none" }}
+                    onChange={(e) => {
+                      if (!e.target.files) return;
+                      const filesArray = Array.from(e.target.files);
+                      setTicketFiles((prev) => [...prev, ...filesArray]);
+                    }}
+                  />
+                </label>
+
+                {ticketFiles.length > 0 && (
+                  <div style={{ display: "flex", flexWrap: "wrap", gap: "0.8rem", marginTop: "1rem" }}>
+                    {ticketFiles.map((file, idx) => (
+                      <span
+                        key={`${file.name}-${idx}`}
+                        style={{
+                          display: "inline-flex",
+                          alignItems: "center",
+                          gap: "0.6rem",
+                          padding: "0.5rem 1rem",
+                          backgroundColor: "var(--base)",
+                          border: "1px solid var(--st-medium)",
+                          borderRadius: "0.2rem",
+                          fontFamily: "var(--_font-accent)",
+                          fontSize: "1.1rem",
+                          color: "var(--t-bright)",
+                        }}
+                      >
+                        📎 {file.name} ({(file.size / 1024).toFixed(1)} KB)
+                        <button
+                          type="button"
+                          onClick={() =>
+                            setTicketFiles((prev) => prev.filter((_, i) => i !== idx))
+                          }
+                          style={{
+                            background: "none",
+                            border: "none",
+                            color: "#ef4444",
+                            cursor: "pointer",
+                            fontSize: "1.2rem",
+                            padding: "0 0.2rem",
+                            fontWeight: 700,
+                          }}
+                          title="Remover arquivo"
+                        >
+                          ✕
+                        </button>
+                      </span>
+                    ))}
+                  </div>
+                )}
+              </div>
+
               <div style={{ display: "flex", justifyContent: "flex-end", gap: "1.5rem", marginTop: "1rem" }}>
                 <button
                   type="button"
-                  onClick={() => setIsNewTicketModalOpen(false)}
+                  onClick={() => {
+                    setIsNewTicketModalOpen(false);
+                    setTicketFiles([]);
+                  }}
                   style={{ padding: "1rem 2rem", background: "none", border: "none", fontFamily: "var(--_font-accent)", fontSize: "1.3rem", color: "var(--t-medium)", cursor: "pointer" }}
                 >
                   Cancelar

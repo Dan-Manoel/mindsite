@@ -109,14 +109,14 @@ export function renderWelcomeEmailHtml(params: WelcomeEmailProps): string {
                   </td>
                 </tr>
                 <tr>
-                  <td style="padding: 4px 0; font-family: 'JetBrains Mono', monospace, Consolas; font-size: 12px; color: #71717a;">LOGIN:</td>
+                  <td style="padding: 4px 0; font-family: 'JetBrains Mono', monospace, Consolas; font-size: 12px; color: #71717a;">USUÁRIO:</td>
                   <td style="padding: 4px 0; font-family: 'JetBrains Mono', monospace, Consolas; font-size: 12px; color: #ffffff; font-weight: 600;">${params.userEmail}</td>
                 </tr>
                 ${
                   params.temporaryPassword
                     ? `
                 <tr>
-                  <td style="padding: 4px 0; font-family: 'JetBrains Mono', monospace, Consolas; font-size: 12px; color: #71717a;">CHAVE PROV:</td>
+                  <td style="padding: 4px 0; font-family: 'JetBrains Mono', monospace, Consolas; font-size: 12px; color: #71717a;">SENHA:</td>
                   <td style="padding: 4px 0;">
                     <code style="font-family: 'JetBrains Mono', monospace, Consolas; font-size: 12px; background-color: #18181b; padding: 2px 6px; border: 1px solid #27272a; color: #60a5fa; border-radius: 2px;">${params.temporaryPassword}</code>
                   </td>
@@ -206,7 +206,7 @@ export function renderWelcomeEmailHtml(params: WelcomeEmailProps): string {
           MindSite Agência Digital — CNPJ 19.725.535/0001-58
         </p>
         <p style="margin: 0; font-family: 'JetBrains Mono', monospace, Consolas; font-size: 11px; color: #3f3f46;">
-          Dúvidas operacionais? Responda a este e-mail ou utilize <a href="mailto:contato@mindsite.com.br" style="color: #71717a; text-decoration: underline;">contato@mindsite.com.br</a>
+          Dúvidas? Responda a este e-mail ou utilize <a href="mailto:contato@mindsite.com.br" style="color: #71717a; text-decoration: underline;">contato@mindsite.com.br</a>
         </p>
       </td>
     </tr>

@@ -3,7 +3,7 @@
 import { createClient } from "@/lib/supabase/server";
 import { supabaseAdmin, createAdminClient } from "@/lib/supabase/admin";
 import { prisma } from "@/lib/prisma";
-import { ContractType, UserRole } from "@prisma/client";
+import { ContractType, ContractStatus, UserRole } from "@prisma/client";
 import { revalidatePath } from "next/cache";
 import { Resend } from "resend";
 import { renderWelcomeEmailHtml } from "@/lib/mail/welcomeTemplate";
@@ -737,4 +737,107 @@ export async function resetClientPasswordAction(userId: string, newPassword: str
 
   if (error) return { success: false, error: error.message };
   return { success: true, message: "Senha redefinida com sucesso!" };
+}
+
+// 9. Editar Projeto (Nome, Domínio Oficial e Descrição)
+export async function updateProjectAction(
+  projectId: string,
+  data: {
+    name: string;
+    domain?: string | null;
+    description?: string | null;
+  }
+) {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user || user.app_metadata?.role !== "ADMIN") {
+    return { success: false, error: "Acesso não autorizado." };
+  }
+
+  if (!data.name || !data.name.trim()) {
+    return { success: false, error: "O nome do projeto é obrigatório." };
+  }
+
+  try {
+    const project = await prisma.project.update({
+      where: { id: projectId },
+      data: {
+        name: data.name.trim(),
+        domain: data.domain?.trim() || null,
+        description: data.description?.trim() || null,
+      },
+      select: {
+        id: true,
+        userId: true,
+        name: true,
+        domain: true,
+        description: true,
+      },
+    });
+
+    revalidatePath("/admin/clients");
+    revalidatePath(`/admin/clients/${project.userId}/edit`);
+    revalidatePath("/admin/dashboard");
+    revalidatePath("/portal/dashboard");
+
+    return {
+      success: true,
+      project,
+      message: "Projeto atualizado com sucesso!",
+    };
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : "Erro ao atualizar projeto.";
+    return { success: false, error: message };
+  }
+}
+
+// 10. Gerenciar Status do Contrato (Pausar Cobrança / Reativar / Encerrar)
+export async function updateContractStatusAction(contractId: string, status: ContractStatus) {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user || user.app_metadata?.role !== "ADMIN") {
+    return { success: false, error: "Acesso não autorizado." };
+  }
+
+  try {
+    const isEnded = status === "COMPLETED" || status === "CANCELLED";
+    const contract = await prisma.contract.update({
+      where: { id: contractId },
+      data: {
+        status,
+        endDate: isEnded ? new Date() : status === "ACTIVE" ? null : undefined,
+      },
+      select: {
+        id: true,
+        userId: true,
+        status: true,
+        endDate: true,
+      },
+    });
+
+    revalidatePath("/admin/clients");
+    revalidatePath(`/admin/clients/${contract.userId}/edit`);
+    revalidatePath("/admin/dashboard");
+    revalidatePath("/portal/dashboard");
+
+    return {
+      success: true,
+      contract,
+      message:
+        status === "SUSPENDED"
+          ? "Cobrança de sustentação pausada com sucesso!"
+          : status === "ACTIVE"
+          ? "Contrato de sustentação reativado com sucesso!"
+          : "Contrato encerrado com sucesso!",
+    };
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : "Erro ao atualizar status do contrato.";
+    return { success: false, error: message };
+  }
 }

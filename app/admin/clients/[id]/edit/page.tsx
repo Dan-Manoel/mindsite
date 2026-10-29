@@ -10,7 +10,10 @@ import {
   addProjectToClientAction,
   addInstallmentToContractAction,
   resetClientPasswordAction,
+  updateProjectAction,
+  updateContractStatusAction,
 } from "@/app/actions/adminClients";
+import { ContractStatus } from "@prisma/client";
 import { issueImmediateInvoiceAction } from "@/app/actions/admin";
 import { signOut } from "@/app/actions/auth";
 import { isValidDocument, maskDocument } from "@/lib/validators";
@@ -97,9 +100,62 @@ interface ProjectItem {
 
   const [feedbackMsg, setFeedbackMsg] = useState<{ text: string; type: "success" | "error" } | null>(null);
 
+  // Modal: Editar Projeto
+  const [editingProject, setEditingProject] = useState<ProjectItem | null>(null);
+  const [editProjName, setEditProjName] = useState("");
+  const [editProjDomain, setEditProjDomain] = useState("");
+  const [editProjDesc, setEditProjDesc] = useState("");
+
+  // Modal: Confirmar Encerramento de Contrato de Sustentação
+  const [endingContract, setEndingContract] = useState<{ id: string; projectName: string } | null>(null);
+
   const showNotification = (text: string, type: "success" | "error" = "success") => {
     setFeedbackMsg({ text, type });
     setTimeout(() => setFeedbackMsg(null), 4000);
+  };
+
+  const handleOpenEditProject = (proj: ProjectItem) => {
+    setEditingProject(proj);
+    setEditProjName(proj.name);
+    setEditProjDomain(proj.domain || "");
+    setEditProjDesc(proj.description || "");
+  };
+
+  const handleSaveEditProject = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!editingProject) return;
+    if (!editProjName.trim()) {
+      showNotification("O nome do projeto é obrigatório.", "error");
+      return;
+    }
+
+    startTransition(async () => {
+      const res = await updateProjectAction(editingProject.id, {
+        name: editProjName.trim(),
+        domain: editProjDomain.trim() || null,
+        description: editProjDesc.trim() || null,
+      });
+      if (res.success) {
+        showNotification(res.message || "Projeto atualizado com sucesso!");
+        setEditingProject(null);
+        await reloadClient();
+      } else {
+        showNotification(res.error || "Erro ao atualizar projeto.", "error");
+      }
+    });
+  };
+
+  const handleUpdateContractStatus = (contractId: string, status: ContractStatus) => {
+    startTransition(async () => {
+      const res = await updateContractStatusAction(contractId, status);
+      if (res.success) {
+        showNotification(res.message || "Status do contrato atualizado!");
+        setEndingContract(null);
+        await reloadClient();
+      } else {
+        showNotification(res.error || "Erro ao atualizar status do contrato.", "error");
+      }
+    });
   };
 
   const reloadClient = useCallback(async () => {
@@ -343,29 +399,43 @@ interface ProjectItem {
           </div>
         )}
 
-        {/* Cabeçalho */}
+        {/* Cabeçalho Refatorado em Duas Linhas */}
         <div className="mxd-block" style={{ paddingTop: "4rem", paddingBottom: "2.5rem", borderBottom: "1px solid var(--st-medium)", marginBottom: "4rem" }}>
-          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end", flexWrap: "wrap", gap: "2rem" }}>
-            <div>
-              <Link
-                href="/admin/dashboard"
-                className="tag tag-s tag-medium"
-                style={{
-                  color: "var(--accent)",
-                  display: "inline-flex",
-                  alignItems: "center",
-                  gap: "0.5rem",
-                  marginBottom: "0.5rem",
-                  textDecoration: "none",
-                  fontWeight: 700,
-                }}
+          {/* Linha Superior: Breadcrumb à esquerda e Botão Sair [→ alinhado ao extremo direito */}
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: "1.5rem", marginBottom: "1.6rem" }}>
+            <Link
+              href="/admin/dashboard"
+              className="tag tag-s tag-medium"
+              style={{
+                color: "var(--accent)",
+                display: "inline-flex",
+                alignItems: "center",
+                gap: "0.5rem",
+                textDecoration: "none",
+                fontWeight: 700,
+                fontFamily: "var(--_font-accent)",
+                textTransform: "uppercase",
+              }}
+            >
+              ← DASHBOARD // CLIENTES
+            </Link>
+
+            <form action={signOut} style={{ margin: 0 }}>
+              <button
+                type="submit"
+                className="btn btn-line-icon btn-line-icon-small btn-line-medium slide-left"
+                style={{ height: "3.8rem", padding: "0 1.6rem", fontSize: "1.2rem" }}
               >
-                ← DASHBOARD // Clientes
-              </Link>
-              <h1 style={{ fontSize: "clamp(2.4rem, 3vw, 3.8rem)", fontWeight: 700, margin: 0, color: "var(--t-bright)", fontFamily: "var(--_font-default)" }}>
-                Editar: {fullName || primaryEmail}
-              </h1>
-            </div>
+                <span className="btn-caption">Sair [→</span>
+              </button>
+            </form>
+          </div>
+
+          {/* Linha Principal: Título Editar com quebra fluida à esquerda e botões de ação à direita */}
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: "2rem" }}>
+            <h1 style={{ fontSize: "clamp(2.4rem, 3vw, 3.8rem)", fontWeight: 700, margin: 0, color: "var(--t-bright)", fontFamily: "var(--_font-default)", flex: "1 1 300px", wordBreak: "break-word" }}>
+              Editar: {fullName || primaryEmail}
+            </h1>
 
             <div style={{ display: "flex", alignItems: "center", gap: "1.2rem", flexWrap: "wrap" }}>
               <button
@@ -399,16 +469,6 @@ interface ProjectItem {
               <Link className="btn btn-line-icon btn-line-icon-small btn-line-medium slide-left" href="/admin/clients">
                 <span className="btn-caption" style={{ fontSize: "1.3rem" }}>Voltar à Lista</span>
               </Link>
-
-              <form action={signOut}>
-                <button
-                  type="submit"
-                  className="btn btn-line-icon btn-line-icon-small btn-line-medium slide-left"
-                  style={{ height: "4.2rem", padding: "0 1.6rem", fontSize: "1.3rem" }}
-                >
-                  <span className="btn-caption">Sair [→</span>
-                </button>
-              </form>
             </div>
           </div>
         </div>
@@ -578,9 +638,28 @@ interface ProjectItem {
                           </p>
                         )}
                       </div>
-                      <span className="tag tag-s tag-medium" style={{ color: "var(--accent)", fontFamily: "var(--_font-accent)" }}>
-                        {p.contracts?.length || 0} Contrato(s)
-                      </span>
+                      <div style={{ display: "flex", alignItems: "center", gap: "1rem", flexWrap: "wrap" }}>
+                        <button
+                          type="button"
+                          onClick={() => handleOpenEditProject(p)}
+                          style={{
+                            padding: "0.5rem 1.2rem",
+                            fontSize: "1.1rem",
+                            fontFamily: "var(--_font-accent)",
+                            fontWeight: 700,
+                            backgroundColor: "var(--base-tint)",
+                            border: "1px solid var(--st-medium)",
+                            color: "var(--t-bright)",
+                            borderRadius: "0.2rem",
+                            cursor: "pointer",
+                          }}
+                        >
+                          ✎ Editar Projeto
+                        </button>
+                        <span className="tag tag-s tag-medium" style={{ color: "var(--accent)", fontFamily: "var(--_font-accent)" }}>
+                          {p.contracts?.length || 0} Contrato(s)
+                        </span>
+                      </div>
                     </div>
 
                     {/* Exibição em Tempo Real do Setup */}
@@ -649,17 +728,108 @@ interface ProjectItem {
                             )}
                           </div>
 
-                          <div style={{ display: "flex", alignItems: "center", gap: "1rem" }}>
+                          <div style={{ display: "flex", alignItems: "center", gap: "1rem", flexWrap: "wrap" }}>
                             <span style={{
                               padding: "0.3rem 0.8rem",
                               fontSize: "1rem",
+                              fontFamily: "var(--_font-accent)",
+                              fontWeight: 700,
                               borderRadius: "0.2rem",
-                              backgroundColor: c.status === "ACTIVE" ? "rgba(16, 185, 129, 0.1)" : "rgba(239, 68, 68, 0.1)",
-                              color: c.status === "ACTIVE" ? "#10b981" : "#ef4444",
-                              border: `1px solid ${c.status === "ACTIVE" ? "rgba(16, 185, 129, 0.3)" : "rgba(239, 68, 68, 0.3)"}`
+                              backgroundColor:
+                                c.status === "ACTIVE"
+                                  ? "rgba(16, 185, 129, 0.1)"
+                                  : c.status === "SUSPENDED"
+                                  ? "rgba(245, 158, 11, 0.1)"
+                                  : "rgba(239, 68, 68, 0.1)",
+                              color:
+                                c.status === "ACTIVE"
+                                  ? "#10b981"
+                                  : c.status === "SUSPENDED"
+                                  ? "#f59e0b"
+                                  : "#ef4444",
+                              border: `1px solid ${
+                                c.status === "ACTIVE"
+                                  ? "rgba(16, 185, 129, 0.3)"
+                                  : c.status === "SUSPENDED"
+                                  ? "rgba(245, 158, 11, 0.3)"
+                                  : "rgba(239, 68, 68, 0.3)"
+                              }`
                             }}>
-                              {c.status}
+                              {c.status === "ACTIVE"
+                                ? "ATIVO"
+                                : c.status === "SUSPENDED"
+                                ? "PAUSADO"
+                                : c.status === "COMPLETED" || c.status === "CANCELLED"
+                                ? "ENCERRADO"
+                                : c.status}
                             </span>
+
+                            {c.contractType === "SUSTAINABILITY" && (
+                              <>
+                                {c.status === "ACTIVE" && (
+                                  <button
+                                    type="button"
+                                    disabled={isPending}
+                                    onClick={() => handleUpdateContractStatus(c.id, "SUSPENDED")}
+                                    style={{
+                                      padding: "0.4rem 1rem",
+                                      fontSize: "1.1rem",
+                                      backgroundColor: "rgba(245, 158, 11, 0.12)",
+                                      color: "#f59e0b",
+                                      border: "1px solid rgba(245, 158, 11, 0.4)",
+                                      borderRadius: "0.2rem",
+                                      cursor: "pointer",
+                                      fontFamily: "var(--_font-accent)",
+                                      fontWeight: 600,
+                                    }}
+                                  >
+                                    ⏸ Pausar Cobrança
+                                  </button>
+                                )}
+
+                                {(c.status === "SUSPENDED" || c.status === "COMPLETED" || c.status === "CANCELLED") && (
+                                  <button
+                                    type="button"
+                                    disabled={isPending}
+                                    onClick={() => handleUpdateContractStatus(c.id, "ACTIVE")}
+                                    style={{
+                                      padding: "0.4rem 1rem",
+                                      fontSize: "1.1rem",
+                                      backgroundColor: "rgba(16, 185, 129, 0.12)",
+                                      color: "#10b981",
+                                      border: "1px solid rgba(16, 185, 129, 0.4)",
+                                      borderRadius: "0.2rem",
+                                      cursor: "pointer",
+                                      fontFamily: "var(--_font-accent)",
+                                      fontWeight: 600,
+                                    }}
+                                  >
+                                    ▶ Reativar
+                                  </button>
+                                )}
+
+                                {(c.status === "ACTIVE" || c.status === "SUSPENDED") && (
+                                  <button
+                                    type="button"
+                                    disabled={isPending}
+                                    onClick={() => setEndingContract({ id: c.id, projectName: p.name })}
+                                    style={{
+                                      padding: "0.4rem 1rem",
+                                      fontSize: "1.1rem",
+                                      backgroundColor: "rgba(239, 68, 68, 0.1)",
+                                      color: "#ef4444",
+                                      border: "1px solid rgba(239, 68, 68, 0.4)",
+                                      borderRadius: "0.2rem",
+                                      cursor: "pointer",
+                                      fontFamily: "var(--_font-accent)",
+                                      fontWeight: 600,
+                                    }}
+                                  >
+                                    ✕ Encerrar Contrato
+                                  </button>
+                                )}
+                              </>
+                            )}
 
                             <button
                               type="button"
@@ -1488,6 +1658,141 @@ interface ProjectItem {
                   </button>
                 </div>
               </form>
+            </div>
+          </div>
+        )}
+
+        {/* MODAL: EDITAR PROJETO (NOME, DOMÍNIO E DESCRIÇÃO) */}
+        {editingProject && (
+          <div style={{ position: "fixed", inset: 0, zIndex: 10000, backgroundColor: "rgba(0,0,0,0.85)", display: "flex", alignItems: "center", justifyContent: "center", padding: "2rem" }}>
+            <div style={{ backgroundColor: "var(--base-tint)", border: "1px solid var(--st-medium)", maxWidth: "560px", width: "100%", padding: "3.5rem", borderRadius: "0.4rem" }}>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "2rem" }}>
+                <h3 style={{ fontSize: "2rem", fontFamily: "var(--_font-default)", fontWeight: 700, color: "var(--t-bright)", margin: 0 }}>
+                  ✎ Editar Projeto
+                </h3>
+                <button
+                  type="button"
+                  onClick={() => setEditingProject(null)}
+                  style={{ background: "none", border: "none", color: "var(--t-muted)", fontSize: "2rem", cursor: "pointer" }}
+                >
+                  ✕
+                </button>
+              </div>
+
+              <form onSubmit={handleSaveEditProject} className="form" style={{ display: "flex", flexDirection: "column", gap: "1.8rem" }}>
+                <div>
+                  <label style={{ display: "block", fontFamily: "var(--_font-accent)", fontSize: "1.1rem", textTransform: "uppercase", color: "var(--t-medium)", marginBottom: "0.6rem" }}>
+                    Nome do Projeto *
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    value={editProjName}
+                    onChange={(e) => setEditProjName(e.target.value)}
+                    placeholder="Ex: Website Institucional"
+                    style={{ width: "100%", height: "4.5rem", padding: "0 1.5rem", backgroundColor: "var(--base)", border: "1px solid var(--st-medium)", color: "var(--t-bright)", fontFamily: "var(--_font-accent)", fontSize: "1.3rem", outline: "none" }}
+                  />
+                </div>
+
+                <div>
+                  <label style={{ display: "block", fontFamily: "var(--_font-accent)", fontSize: "1.1rem", textTransform: "uppercase", color: "var(--t-medium)", marginBottom: "0.6rem" }}>
+                    Domínio Oficial
+                  </label>
+                  <input
+                    type="text"
+                    value={editProjDomain}
+                    onChange={(e) => setEditProjDomain(e.target.value)}
+                    placeholder="Ex: cliente.com.br"
+                    style={{ width: "100%", height: "4.5rem", padding: "0 1.5rem", backgroundColor: "var(--base)", border: "1px solid var(--st-medium)", color: "var(--t-bright)", fontFamily: "var(--_font-accent)", fontSize: "1.3rem", outline: "none" }}
+                  />
+                </div>
+
+                <div>
+                  <label style={{ display: "block", fontFamily: "var(--_font-accent)", fontSize: "1.1rem", textTransform: "uppercase", color: "var(--t-medium)", marginBottom: "0.6rem" }}>
+                    Descrição do Projeto
+                  </label>
+                  <textarea
+                    rows={3}
+                    value={editProjDesc}
+                    onChange={(e) => setEditProjDesc(e.target.value)}
+                    placeholder="Escopo e detalhes do projeto..."
+                    style={{ width: "100%", padding: "1.2rem 1.5rem", backgroundColor: "var(--base)", border: "1px solid var(--st-medium)", color: "var(--t-bright)", fontFamily: "var(--_font-accent)", fontSize: "1.3rem", outline: "none", resize: "vertical" }}
+                  />
+                </div>
+
+                <div style={{ display: "flex", justifyContent: "flex-end", gap: "1.5rem", marginTop: "1rem" }}>
+                  <button
+                    type="button"
+                    onClick={() => setEditingProject(null)}
+                    style={{ padding: "1rem 2rem", background: "none", border: "none", fontFamily: "var(--_font-accent)", fontSize: "1.3rem", color: "var(--t-medium)", cursor: "pointer" }}
+                  >
+                    Cancelar
+                  </button>
+                  <button
+                    type="submit"
+                    disabled={isPending}
+                    className="btn btn-default-icon btn-default-accent"
+                    style={{ height: "4.6rem", padding: "0.4rem 0.4rem 0.4rem 1.8rem", fontSize: "1.3rem" }}
+                  >
+                    <span className="btn-caption">{isPending ? "Salvando..." : "Salvar Alterações"}</span>
+                    <i className="btn-icon" style={{ width: "3.4rem", height: "3.4rem" }}>✓</i>
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        )}
+
+        {/* MODAL: CONFIRMAR ENCERRAMENTO DE CONTRATO DE SUSTENTAÇÃO */}
+        {endingContract && (
+          <div style={{ position: "fixed", inset: 0, zIndex: 10000, backgroundColor: "rgba(0,0,0,0.85)", display: "flex", alignItems: "center", justifyContent: "center", padding: "2rem" }}>
+            <div style={{ backgroundColor: "var(--base-tint)", border: "1px solid #ef4444", maxWidth: "480px", width: "100%", padding: "3.5rem", borderRadius: "0.4rem" }}>
+              <h3 style={{ fontSize: "2rem", fontFamily: "var(--_font-default)", fontWeight: 700, color: "var(--t-bright)", margin: "0 0 1rem 0" }}>
+                Encerrar Contrato de Sustentação
+              </h3>
+              <p style={{ fontSize: "1.3rem", color: "var(--t-medium)", lineHeight: 1.6, margin: "0 0 2.5rem 0" }}>
+                Tem certeza que deseja encerrar o contrato de sustentação do projeto{" "}
+                <strong style={{ color: "var(--t-bright)" }}>{endingContract.projectName}</strong>? O status será alterado para{" "}
+                <strong>CANCELLED / ENCERRADO</strong> e a data de término (<code style={{ fontFamily: "var(--_font-accent)" }}>endDate</code>) será registrada imediatamente.
+              </p>
+
+              <div style={{ display: "flex", justifyContent: "flex-end", gap: "1.2rem" }}>
+                <button
+                  type="button"
+                  onClick={() => setEndingContract(null)}
+                  style={{
+                    padding: "0 2rem",
+                    height: "4.4rem",
+                    background: "none",
+                    border: "1px solid var(--st-medium)",
+                    color: "var(--t-medium)",
+                    fontFamily: "var(--_font-accent)",
+                    fontSize: "1.3rem",
+                    cursor: "pointer",
+                  }}
+                >
+                  Cancelar
+                </button>
+                <button
+                  type="button"
+                  disabled={isPending}
+                  onClick={() => handleUpdateContractStatus(endingContract.id, "CANCELLED")}
+                  style={{
+                    padding: "0 2.2rem",
+                    height: "4.4rem",
+                    backgroundColor: "#ef4444",
+                    border: "1px solid #ef4444",
+                    color: "#ffffff",
+                    fontFamily: "var(--_font-accent)",
+                    fontSize: "1.3rem",
+                    fontWeight: 700,
+                    borderRadius: "0.2rem",
+                    cursor: "pointer",
+                  }}
+                >
+                  {isPending ? "Encerrando..." : "Confirmar Encerramento"}
+                </button>
+              </div>
             </div>
           </div>
         )}

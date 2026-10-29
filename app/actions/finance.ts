@@ -56,9 +56,25 @@ function getSaoPauloDate(d: Date): { year: number; month: number; day: number } 
 }
 
 /**
- * Função interna de agregação da receita realizada e projetada nos últimos 12 meses
+ * Função interna de agregação da receita realizada e projetada nos últimos 12 meses.
+ * Aceita dados pré-carregados (zero queries extras) ou executa apenas 2 queries cirúrgicas (1 por tabela).
  */
-export async function calculateRevenueAnalytics(): Promise<{
+export async function calculateRevenueAnalytics(prefetched?: {
+  invoices: Array<{
+    id: string;
+    totalAmount: number | { toNumber?: () => number } | string;
+    status: string;
+    paidAt: Date | null;
+    dueDate: Date;
+  }>;
+  unbilledInstallments: Array<{
+    id: string;
+    amount: number | { toNumber?: () => number } | string;
+    status: string;
+    scheduledDate: Date;
+    updatedAt?: Date;
+  }>;
+}): Promise<{
   monthlyStats: MonthlyRealizedRevenue[];
   totalRealized: number;
   averageMonthlyRealized: number;
@@ -97,65 +113,65 @@ export async function calculateRevenueAnalytics(): Promise<{
   // Data de corte inicial para a consulta no banco
   const startWindowDate = new Date(Date.UTC(monthsList[0].year, monthsList[0].month - 1, 1));
 
-  // Busca concorrente de faturas e parcelas (realizadas e projetadas) em uma única viagem de rede
-  const [paidInvoices, paidInstallments, projectedInvoices, projectedInstallments] =
-    await Promise.all([
-      prisma.invoice.findMany({
-        where: {
-          status: "PAID",
-          paidAt: {
-            not: null,
-            gte: startWindowDate,
-          },
-        },
-        select: {
-          id: true,
-          invoiceNumber: true,
-          totalAmount: true,
-          paidAt: true,
-          dueDate: true,
-        },
-      }),
-      prisma.contractInstallment.findMany({
-        where: {
-          status: "PAID",
-          invoiceItemId: null,
-          OR: [
-            { updatedAt: { gte: startWindowDate } },
-            { scheduledDate: { gte: startWindowDate } },
-          ],
-        },
-        select: {
-          id: true,
-          amount: true,
-          scheduledDate: true,
-          updatedAt: true,
-        },
-      }),
-      prisma.invoice.findMany({
-        where: {
-          status: { notIn: ["CANCELLED", "DRAFT"] },
-          dueDate: { gte: startWindowDate },
-        },
-        select: {
-          id: true,
-          totalAmount: true,
-          dueDate: true,
-        },
-      }),
-      prisma.contractInstallment.findMany({
-        where: {
-          status: { not: "CANCELLED" },
-          invoiceItemId: null,
-          scheduledDate: { gte: startWindowDate },
-        },
-        select: {
-          id: true,
-          amount: true,
-          scheduledDate: true,
-        },
-      }),
-    ]);
+  // Se os dados já foram carregados pelo caller (ex: getAdminDashboardData), reutiliza sem abrir novas conexões;
+  // caso contrário, executa 1 query em invoice e 1 em contractInstallment com fallback granular
+  const [windowInvoices, windowInstallments] = prefetched
+    ? [prefetched.invoices, prefetched.unbilledInstallments]
+    : await Promise.all([
+        prisma.invoice
+          .findMany({
+            where: {
+              OR: [
+                { status: "PAID", paidAt: { not: null, gte: startWindowDate } },
+                { status: { notIn: ["CANCELLED", "DRAFT"] }, dueDate: { gte: startWindowDate } },
+              ],
+            },
+            select: {
+              id: true,
+              totalAmount: true,
+              status: true,
+              paidAt: true,
+              dueDate: true,
+            },
+          })
+          .catch((err) => {
+            console.error("Erro ao consultar faturas em calculateRevenueAnalytics:", err);
+            return [];
+          }),
+        prisma.contractInstallment
+          .findMany({
+            where: {
+              status: { not: "CANCELLED" },
+              invoiceItemId: null,
+              OR: [
+                { updatedAt: { gte: startWindowDate } },
+                { scheduledDate: { gte: startWindowDate } },
+              ],
+            },
+            select: {
+              id: true,
+              amount: true,
+              status: true,
+              scheduledDate: true,
+              updatedAt: true,
+            },
+          })
+          .catch((err) => {
+            console.error("Erro ao consultar parcelas em calculateRevenueAnalytics:", err);
+            return [];
+          }),
+      ]);
+
+  const paidInvoices = windowInvoices.filter(
+    (inv) => inv.status === "PAID" && inv.paidAt && inv.paidAt >= startWindowDate
+  );
+  const projectedInvoices = windowInvoices.filter(
+    (inv) => inv.status !== "CANCELLED" && inv.status !== "DRAFT" && inv.dueDate >= startWindowDate
+  );
+  const paidInstallments = windowInstallments.filter((inst) => inst.status === "PAID");
+  const projectedInstallments = windowInstallments.filter(
+    (inst) => inst.status !== "CANCELLED" && inst.scheduledDate >= startWindowDate
+  );
 
   // Agrupamento temporal pelos 12 meses
   const monthlyStats: MonthlyRealizedRevenue[] = monthsList.map((slot) => {

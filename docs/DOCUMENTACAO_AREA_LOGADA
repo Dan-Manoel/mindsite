@@ -1,0 +1,175 @@
+🏛️ Documentação Técnica Exaustiva — Área Logada MindSite SaaS
+	Arquivo Oficial no Repositório: docs/LOGGED_AREA_COMPLETE_DOCS.md
+	 Escopo: Área do Cliente (/portal/*), Painel Executivo do Dono (/admin/*), Motor Financeiro (InfinitePay + Régua Automatizada), Sistema de Chamados & SLA, Banco de Dados (Prisma + Supabase Supavisor), Storage Privado, E-mails Transacionais (Resend) e UI/UX.
+
+
+1. Visão Geral da Arquitetura & Stack Tecnológica
+A área logada da MindSite é uma plataforma SaaS B2B integrada ao ecossistema institucional da agência, desenhada para operar duas frentes isoladas por papéis (UserRole):
+	1. Portal do Cliente (app/portal/dashboard/page.tsx e app/portal/perfil/page.tsx): Central de autoatendimento onde o cliente acompanha projetos ativos, assina contratos via Autentique, abre/homologa chamados técnicos com controle de SLA em tempo real e liquida faturas ou parcelas agendadas com autonomia via InfinitePay (Pix ou Cartão).
+	2. Painel Executivo do Administrador (app/admin/dashboard/page.tsx, /admin/clients, /admin/clients/new, app/admin/clients/[id]/edit/page.tsx): ERP operacional e financeiro da MindSite para controle de MRR (Receita Recorrente Mensal), curvas de Receita Realizada vs. Projetada (12 meses), lançamento e baixa de despesas da empresa (BRL/USD com PTAX e comprovante), gestão de clientes/projetos/contratos e triagem completa de chamados técnicos.
+Stack Homologada
+Camada	Tecnologia	Papel Arquitetural
+Framework Web	Next.js 16 (App Router / Turbopack) + React 19	Renderização híbrida (RSC + Client Components), Server Actions ("use server") e Streaming UI (loading.tsx).
+Linguagem	TypeScript 5 (strict)	Tipagem ponta a ponta entre Prisma, Server Actions e Props de UI.
+Banco de Dados	Supabase PostgreSQL + Prisma ORM 6.4.1	Persistência relacional transacional com Connection Pooling via Supavisor (Porta 6543) e Direct Connection (5432).
+Autenticação	Supabase Auth (@supabase/ssr)	Gestão de sessão baseada em cookies HTTP-only, metadados de role (ADMIN / CLIENT) e flag first_login.
+Storage de Arquivos	Supabase Storage (Buckets Privados)	Armazenamento privado de anexos de chamados (ticket-attachments) e comprovantes (expense-receipts) via Signed URLs de 3600s.
+Gateway de Pagamento	InfinitePay API + Webhook	Emissão dinâmica de links de checkout (Pix/Cartão) e liquidação automática idempotente via Webhook.
+Mensageria de E-mail	Resend SDK	Disparo de 8 templates HTML responsivos (Temas Claro para Clientes e Dark para Diretoria/Suporte).
+Assinatura Digital	Autentique API v2 (GraphQL)	Consulta em tempo real de status de assinatura e links de download de contratos jurídicos.
+
+
+2. Autenticação, Sessão, RBAC & Segurança (Middleware)
+2.1 Fluxo de Login e Sincronização (app/actions/auth.ts)
+	• signInWithEmail(formData): 
+		1. Autentica credenciais no Supabase Auth via supabase.auth.signInWithPassword({ email, password }).
+		2. Extrai o papel do usuário de user.app_metadata?.role (default: CLIENT).
+		3. Executa prisma.user.upsert garantindo que o registro na tabela relacional users exista e esteja sincronizado com o UUID do Supabase Auth.
+		4. Redireciona automaticamente: 
+			§ ADMIN → /admin/dashboard
+			§ CLIENT → /portal/dashboard (ou rota informada em redirectTo).
+	• signOut(): Encerra a sessão no Supabase Auth e redireciona para /login.
+2.2 Proteção de Rotas no Edge (middleware.ts)
+O middleware intercepta todas as requisições dinâmicas e aplica 3 regras de segurança:
+	1. Bloqueio de Não Autenticados: Qualquer tentativa de acesso a /portal/* ou /admin/* sem sessão válida redireciona para /login?redirectTo=<pathname>.
+	2. Isolamento Estrito da Área Administrativa: Se um usuário autenticado tentar acessar /admin/* e seu app_metadata.role (ou user_metadata.role) não for "ADMIN", ele é imediatamente redirecionado para /portal/dashboard.
+	3. Bypass de Login para Usuários Autenticados: Acessar /login já autenticado redireciona automaticamente para /admin/dashboard (se ADMIN) ou /portal/dashboard (se CLIENT).
+2.3 Política de Primeiro Acesso (FirstLoginPasswordModal.tsx)
+Quando o administrador cadastra um novo cliente via createClientWithProjectsAction, o usuário é criado no Supabase Auth com user_metadata: { first_login: true } e uma senha temporária (enviada no e-mail de boas-vindas).
+	• Ao abrir /portal/dashboard, se isFirstLogin === true, o modal FirstLoginPasswordModal é exibido em tela cheia (zIndex: 99999).
+	• O cliente pode escolher entre: 
+		○ "Trocar para uma Nova Senha Agora (Recomendado)": Exibe formulário com validação em tempo real de 5 requisitos de segurança: 
+			1. Mínimo de 8 caracteres (password.length >= 8).
+			2. Pelo menos 1 caractere especial (/[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]/).
+			3. Pelo menos 1 dígito numérico (/[0-9]/).
+			4. Pelo menos 1 letra maiúscula (/[A-Z]/).
+			5. Proibição de sequências contínuas de 3+ caracteres numéricos ou alfabéticos ascendentes ou descendentes (ex.: 123, 321, abc, cba), validada por hasContinuousSequence(value).
+			§ Regra de UX do Botão "Olho" (👁): Ao clicar no ícone de visualizar a senha digitada, o componente sincroniza automaticamente o campo "Confirmar Nova Senha" com o valor digitado.
+			§ Ao salvar, atualiza a senha no Supabase Auth e chama completeFirstLoginAction({ passwordChanged: true }) (que limpa first_login: false via Admin API e grava log PASSWORD_CHANGE na tabela audit_logs).
+		○ "Manter a Senha Atual e Ir para o Painel": Chama completeFirstLoginAction({ passwordChanged: false }), desativando o flag first_login para não exibir o modal novamente.
+
+
+3. Modelagem Completa do Banco de Dados (prisma/schema.prisma)
+O schema é composto por 10 tabelas relacionais e 10 Enums:
+3.1 Dicionário de Enums
+	• UserRole: ADMIN | CLIENT
+	• TicketCategory: 
+		○ BASIC: Troca de texto, imagem, criação de e-mail corporativo (SLA: 24h).
+		○ INTERMEDIATE: Ajustes de layout, cores, ordem de seções, carrossel (SLA: 72h).
+		○ ADVANCED: Novas rotas, refatoração de blocos, integrações (SLA: 168h / 7 dias).
+	• TicketStatus: OPEN | IN_PROGRESS | WAITING_CLIENT | RESOLVED | CANCELLED
+	• ContractType: 
+		○ SUSTAINABILITY: Planos mensais recorrentes (Essential R$ 100, Development R$ 300, Advanced R$ 700, Custom).
+		○ PROJECT_DEV: Setup / Implantação parcelada.
+		○ HYBRID: Contrato consolidado.
+	• ContractStatus: ACTIVE | COMPLETED | SUSPENDED | CANCELLED
+	• InstallmentStatus: 
+		○ SCHEDULED: Parcela futura acordada no cronograma (ainda sem fatura gerada).
+		○ BILLED: Parcela já vinculada a um InvoiceItem de uma fatura emitida.
+		○ PAID: Parcela liquidada.
+		○ CANCELLED: Parcela cancelada.
+	• InvoiceStatus: DRAFT | PENDING | PAID | OVERDUE | CANCELLED
+	• PaymentMethod: PIX | BOLETO | CREDIT_CARD | MANUAL_TRANSFER
+	• ExpenseCategory: INFRASTRUCTURE | SAAS_TOOLS | MARKETING_ADS | LEGAL_TAXES | OPERATIONAL | OTHER
+	• ExpenseFrequency: RECURRENT_MONTHLY | RECURRENT_ANNUAL | SPORADIC
+	• Currency: BRL | USD
+3.2 Tabelas do Banco de Dados
+	1. users (User): id (UUID, PK sincronizada com auth.users), email (Unique), secondaryEmail, fullName, companyName, phone, document (CPF/CNPJ), address, avatarUrl, autentiqueDocId, role (UserRole), createdAt, updatedAt.
+	2. projects (Project): id (UUID), name, slug (Unique), domain, stagingUrl, description, isActive (Boolean), userId (FK users Cascade).
+	3. tickets (Ticket): id (UUID), ticketNumber (Int Autoincrement — ex.: #104), title, description (Text), category (TicketCategory), status (TicketStatus), slaHours (24, 72 ou 168), slaDueAt (DateTime), resolvedAt, slaPausedAt, slaTotalPausedSeconds (Int default 0), reopenReason (Text), userId, projectId.
+	4. ticket_attachments (TicketAttachment): id (UUID), fileName, fileUrl (caminho relativo no bucket privado ticket-attachments), fileSize, mimeType, ticketId.
+	5. ticket_comments (TicketComment): id (UUID), message (Text), authorName, isAdmin (Boolean), attachments (String[] com caminhos no bucket), ticketId, createdAt.
+	6. contracts (Contract): id (UUID), contractNumber, title, contractType (ContractType), status (ContractStatus), totalAmount (Decimal(12,2)), paidAmount (Decimal(12,2)), startDate, endDate, autentiqueDocId, notes, userId, projectId.
+	7. contract_installments (ContractInstallment): id (UUID), installmentNumber (Int), amount (Decimal(12,2)), scheduledDate (DateTime), status (InstallmentStatus), description, contractId, invoiceItemId (Unique FK opcional para invoice_items).
+	8. invoices (Invoice): 
+		○ id (UUID), invoiceNumber (Unique — enviado como order_nsu para a InfinitePay), dueDate, totalAmount (Decimal(12,2)), status (InvoiceStatus), paymentMethod, gatewayPaymentId (Unique), gatewayInvoiceUrl, receiptUrl, pixQrCode, pixCopyPaste, paidAt.
+		○ Flags e Timestamps da Régua de Cobrança: reminder5DaysSent, dueDaySent, overdue1DaySent, critical2DaysSent, reminderSentAt, dueTodaySentAt, overdueSentAt, criticalOverdueSentAt, adminAlertSentAt.
+	9. invoice_items (InvoiceItem): id (UUID), description, amount (Decimal(12,2)), invoiceId. Possui relação 1:1 inversa com ContractInstallment.
+	10. company_expenses (CompanyExpense): id (UUID), name, category (ExpenseCategory), frequency (ExpenseFrequency), currency (BRL/USD), estimatedAmount, actualAmountPaid, exchangeRateUsed (Decimal(8,4) para PTAX do Dólar), dueDate, paymentDate, isPaid, receiptUrl (caminho no bucket expense-receipts), notes.
+	11. audit_logs (AuditLog): id (UUID), action (PROFILE_EDIT, PASSWORD_CHANGE, etc.), ipAddress, userAgent, details (Json), userId, createdAt.
+
+
+4. Infraestrutura de Conexão & Performance (Supavisor Pooler)
+	1. Singleton Estrito (lib/prisma.ts e src/lib/prisma.ts): 
+		○ Uma única instância de PrismaClient é anexada a globalThis.prisma, impedindo exaustão de conexões (P2024) em hot-reloads ou chamadas concorrentes de Server Actions.
+	2. Configuração de Pooler (.env / .env.local): 
+		○ DATABASE_URL: Porta 6543 (Supavisor Transaction Mode) com ?pgbouncer=true&connection_limit=10&pool_timeout=20.
+		○ DIRECT_URL: Porta 5432 (Session Mode direto) para migrações do Prisma.
+	3. Consultas Concorrentes Cirúrgicas (Promise.all + select estrito): 
+		○ Tanto getClientDashboardData() quanto getAdminDashboardData() executam exatamente 4 queries concorrentes (1 por tabela principal), com select estrito, paginação (take: 20 / take: 50 / take: 100) e isolamento .catch() individual por promessa.
+		○ Em getClientDashboardData(), caso ocorra falha transitória na leitura do usuário, o sistema utiliza um fallback seguro em memória e jamais chama prisma.user.create(), prevenindo erros P2002 (Unique constraint failed on id).
+
+
+5. Engenharia Temporal, Fuso Horário Oficial de Brasília & Vencimentos (Regra D+1)
+Todo o motor financeiro e visual da MindSite opera estritamente sob o Horário Oficial de Brasília (America/Sao_Paulo), imune ao fuso horário do servidor (UTC na Vercel) ou do dispositivo do usuário.
+5.1 Prevenção de UTC Drift no Cadastro (parseLocalDate em lib/utils.ts)
+	• A função parseLocalDate(dateString) extrai [year, month, day] e instancia new Date(Date.UTC(year, month - 1, day, 12, 0, 0)) (meio-dia UTC), impedindo que o fuso UTC-3 recue a data de vencimento para o dia anterior.
+5.2 Comparação Canônica de Calendário e Regra Estrita de Atraso (D+1)
+Funções em lib/utils.ts (e espelhadas em src/lib/utils.ts):
+	• getBrasiliaTodayMidnight(): Extrai a data civil de hoje em America/Sao_Paulo via Intl.DateTimeFormat("en-CA", { timeZone: "America/Sao_Paulo" }) e retorna um Date zerado em 00:00:00.000.
+	• toBrasiliaDateMidnight(dateInput): Converte qualquer Date ou string ISO para a meia-noite civil de Brasília correspondente.
+	• isDateDueToday(dueDateInput): Retorna true se dueMidnight.getTime() === todayMidnight.getTime().
+	• isDateStrictlyOverdue(dueDateInput): Retorna true exclusivamente se dueMidnight.getTime() < todayMidnight.getTime(). 
+		○ Regra D+1: Uma fatura ou parcela que vence hoje (ex.: 28/10/2026) NUNCA é considerada em atraso durante o próprio dia 28/10/2026. Até às 23:59:59 (horário de Brasília) do dia do vencimento, seu status é "VENCE HOJE" (PENDING / SCHEDULED). Ela só passa a ser considerada "EM ATRASO" (OVERDUE / VENCIDA) a partir de 00:00:00 do dia seguinte (D+1).
+
+
+6. Motor Financeiro: Contratos, Parcelas, Faturas & InfinitePay
+6.1 Estrutura de Contratos
+	1. Contrato de Setup & Implantação (ContractType.PROJECT_DEV): 
+		○ Valor total acordado (totalAmount), saldo pago acumulado (paidAmount) e cronograma de parcelas (ContractInstallment). Na criação do projeto, o backend valida matematicamente que a soma das parcelas seja igual ao setupAmount.
+	2. Contrato de Sustentação Mensal (ContractType.SUSTAINABILITY): 
+		○ Compõe o MRR e define a franquia mensal de chamados e caixas de e-mail: 
+			§ Essential (R$ 100/mês): 5 caixas de e-mail, 5 chamados básicos/mês (SLA 24h).
+			§ Development (R$ 300/mês): 15 caixas de e-mail, 12 chamados/mês (10 básicos + 2 intermediários, SLA 24h a 72h).
+			§ Advanced (R$ 700/mês): 30+ caixas de e-mail, 30 chamados/mês (25 básicos + 5 intermediários + 1 landing page, SLA até 7 dias).
+			§ Personalizado (Custom): Valor e franquia customizados.
+6.2 Modos de Emissão e Liquidação de Faturas (Invoice)
+	1. Auto-Faturamento pelo Cliente (clientSelfIssueInvoiceAction): 
+		○ Na aba Faturas & Pix do Portal do Cliente, o cliente seleciona via checkboxes quais parcelas SCHEDULED e/ou mensalidade de sustentação do mês vigente deseja pagar e clica em "GERAR FATURA E PAGAR AGORA →".
+		○ A Invoice gerada herda obrigatoriamente a scheduledDate da parcela mais antiga selecionada, gera o link de checkout na InfinitePay (createInfinitePayCheckoutLink) e persiste Invoice + InvoiceItems + atualização das parcelas para BILLED em prisma.$transaction(..., { maxWait: 10000, timeout: 20000 }).
+	2. Emissão Imediata pelo Administrador (issueImmediateInvoiceAction): 
+		○ Gera link oficial na InfinitePay, persiste a Invoice com identificador #INV-XXXXXX, vincula as parcelas como BILLED e dispara automaticamente o e-mail de Fatura Emitida (renderInvoiceEmailHtml) via Resend.
+	3. Baixa Manual de Parcela (settleInstallmentManuallyAction): 
+		○ Em prisma.$transaction, marca a ContractInstallment como PAID, incrementa paidAmount no Contract e, se houver Invoice vinculada, marca-a como PAID.
+
+
+7. Webhooks & Crons Automatizados (Vercel Cron)
+7.1 Webhook InfinitePay (POST /api/webhooks/infinitepay)
+	• Segurança: Valida INFINITE_WEBHOOK_SECRET via header (x-webhook-secret, x-infinite-secret ou Authorization: Bearer).
+	• Idempotência: Se invoice.status === "PAID", encerra com 200 OK sem duplicar saldos ou e-mails.
+	• Baixa Atômica (prisma.$transaction): 
+		1. Atualiza Invoice para status: "PAID", paidAt: new Date(), receiptUrl e paymentMethod (CREDIT_CARD ou PIX).
+		2. Atualiza todas as ContractInstallment vinculadas aos InvoiceItems para status: "PAID".
+		3. Incrementa paidAmount em cada Contract correspondente.
+	• Recibo Automático: Envia e-mail de confirmação de pagamento ao cliente com cópia oculta (bcc) para contato@mindsite.com.br e financeiro@mindsite.com.br.
+7.2 Cron 1: Régua Automatizada de Faturas (GET /api/cron/invoices-lifecycle)
+	• Schedule (vercel.json): "0 11 * * *" (Diariamente às 08:00 BRT / 11:00 UTC), protegido por CRON_SECRET.
+	• 4 Estágios de Cobrança: 
+		1. UPCOMING_5D (D-5): Faturas PENDING que vencem em 5 dias (reminderSentAt == null) → Envia lembrete preventivo.
+		2. DUE_TODAY (D0): Faturas PENDING que vencem hoje (dueTodaySentAt == null) → Envia aviso "Sua Fatura Vence Hoje".
+		3. OVERDUE_1D (D+1): Faturas vencidas ontem (overdueSentAt == null) → Atualiza status = "OVERDUE", envia aviso de atraso ao cliente e dispara Alerta Dark de Inadimplência para a Diretoria (contato@mindsite.com.br) com botão direto de cobrança via WhatsApp (wa.me).
+		4. OVERDUE_3D (D+3): Faturas com 3+ dias de atraso (criticalOverdueSentAt == null) → Envia aviso urgente de Risco de Suspensão de Serviços.
+7.3 Cron 2: Auto-Fechamento de Chamados em 72h (GET /api/cron/tickets-autoclose)
+	• Schedule (vercel.json): "0 * * * *" (A cada hora).
+	• Busca chamados em WAITING_CLIENT sem manifestação há >= 72 horas (slaPausedAt <= now - 72h), muda o status para RESOLVED e adiciona comentário automático do "Sistema MindSite (SLA Bot)".
+
+
+8. Mecânica de E-mails Transacionais (lib/mail/* e src/lib/mail/*)
+Todos os 8 templates utilizam o ativo único https://mindsite.com.br/img/logo-email.png (72x72px) e cabeçalho responsivo .header-table que empilha logo e badge em telas <= 480px:
+	1. welcomeTemplate.ts (Dark): Boas-vindas com URL de login, e-mail, senha provisória e benefícios do plano.
+	2. newProjectTemplate.ts (Claro): Confirmação de novo projeto com cronograma de parcelas de setup e plano de sustentação.
+	3. invoiceTemplate.ts (Claro): Fatura emitida com itens discriminados, total, link InfinitePay e Pix Copia e Cola.
+	4. invoiceReminderTemplate.ts (Claro): Régua de cobrança (UPCOMING_5D, DUE_TODAY, OVERDUE_1D, OVERDUE_3D).
+	5. adminInvoiceOverdueTemplate.ts (Dark): Alerta interno para diretoria com botão verde de cobrança via WhatsApp.
+	6. ticketCreatedTemplate.ts (Claro): Abertura de chamado técnico pelo Admin em nome do cliente.
+	7. ticketNotificationTemplate.ts (Dark): Notificação de NOVA_MENSAGEM ou AGUARDANDO_CLIENTE (com anexos de resolução em buffer e aviso de 72h).
+	8. leadTemplate.ts (Dark): Alerta comercial de novo lead captado no site institucional.
+
+
+9. Sistema de Chamados, Filas, SLA & Storage Privado
+	• SLAs Contratuais: BASIC = 24h, INTERMEDIATE = 72h, ADVANCED = 168h (7 dias).
+	• Pausa e Retomada Exata de SLA (app/actions/tickets.ts): 
+		○ Quando o Admin envia para validação (setTicketAwaitingClientAction), slaPausedAt registra o timestamp exato e a UI exibe ⏸️ SLA Pausado.
+		○ Se o cliente reabre (reopenTicketAction) ou responde (addTicketReplyAction), o tempo pausado (pausedSeconds) é somado ao slaDueAt original, preservando o SLA contratual sem penalizar a equipe pelo tempo de resposta do cliente.
+	• Isolamento de Filas na UI: Chamados ativos (OPEN, IN_PROGRESS, WAITING_CLIENT) ficam na fila principal de atendimento, enquanto chamados RESOLVED e CANCELLED são movidos automaticamente para a seção "Histórico de Chamados Concluídos".
+	• Storage Privado & Upload Postergado: Todos os anexos de chamados (ticket-attachments) e comprovantes de despesas (expense-receipts) permanecem em memória no formulário até o clique em Salvar/Enviar e são lidos exclusivamente por Signed URLs temporárias de 60 minutos (3600s).

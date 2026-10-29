@@ -47,3 +47,62 @@ export function formatCurrencyBRL(value: number | string | null | undefined): st
   const num = Number(value) || 0;
   return `R$ ${num.toFixed(2).replace(".", ",")}`;
 }
+
+/**
+ * Retorna a data civil atual (ano, mês, dia) no Horário Oficial de Brasília (America/Sao_Paulo)
+ * zerada em 00:00:00.000 local para comparações de calendário.
+ */
+export function getBrasiliaTodayMidnight(): Date {
+  const now = new Date();
+  const brasiliaDateStr = new Intl.DateTimeFormat("en-CA", {
+    timeZone: "America/Sao_Paulo",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  }).format(now); // Retorna formato 'YYYY-MM-DD'
+
+  const [year, month, day] = brasiliaDateStr.split("-").map(Number);
+  // Meia-noite do dia civil de Brasília
+  return new Date(year, month - 1, day, 0, 0, 0, 0);
+}
+
+/**
+ * Converte qualquer data (Date ou string ISO/YYYY-MM-DD) para a data civil correspondente
+ * no fuso de Brasília zerada na meia-noite.
+ */
+export function toBrasiliaDateMidnight(dateInput: Date | string): Date {
+  if (!dateInput) return new Date();
+  if (typeof dateInput !== "string" || dateInput.includes("T")) {
+    const formatted = new Intl.DateTimeFormat("en-CA", {
+      timeZone: "America/Sao_Paulo",
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
+    }).format(typeof dateInput === "string" ? new Date(dateInput) : dateInput);
+    const [y, m, d] = formatted.split("-").map(Number);
+    return new Date(y, m - 1, d, 0, 0, 0, 0);
+  }
+  const clean = dateInput.split("T")[0].trim();
+  const [year, month, day] = clean.split("-").map(Number);
+  return new Date(year, month - 1, day, 0, 0, 0, 0);
+}
+
+/**
+ * Verifica se uma data de vencimento está rigorosamente em atraso.
+ * Só é considerada atrasada se a data de vencimento for ANTERIOR ao dia de hoje em Brasília.
+ * Se o vencimento for HOJE, retorna false.
+ */
+export function isDateStrictlyOverdue(dueDateInput: Date | string): boolean {
+  const todayMidnight = getBrasiliaTodayMidnight();
+  const dueMidnight = toBrasiliaDateMidnight(dueDateInput);
+  return dueMidnight.getTime() < todayMidnight.getTime();
+}
+
+/**
+ * Verifica se a data vence exatamente no dia de hoje em Brasília.
+ */
+export function isDateDueToday(dueDateInput: Date | string): boolean {
+  const todayMidnight = getBrasiliaTodayMidnight();
+  const dueMidnight = toBrasiliaDateMidnight(dueDateInput);
+  return dueMidnight.getTime() === todayMidnight.getTime();
+}
