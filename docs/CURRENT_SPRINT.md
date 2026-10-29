@@ -60,6 +60,12 @@
     - Isolamento individual de `.catch()` com logs padronizados (`[Portal Error]`) nas 4 queries concorrentes de `getClientDashboardData`.
     - Blindagem da action `clientSelfIssueInvoiceAction` (`app/actions/portal.ts`) com `prisma.$transaction(..., { maxWait: 10000, timeout: 20000 })`, conversão explícita de `Decimal` para `Number` e retorno imediato completo (`invoiceId`, `invoiceNumber`, `orderNsu`, `checkoutUrl`, `pixQrCode`, `pixCopyPaste`).
 - [x] Documentação Técnica Exaustiva da Área Logada (`docs/LOGGED_AREA_COMPLETE_DOCS.md`) cobrindo autenticação, banco de dados, fuso de Brasília (Regra D+1), InfinitePay, webhooks, crons, templates de e-mail, SLA de chamados, storage privado e UI/UX.
+- [x] Integração Definitiva da API InfinitePay (`POST /links`), Webhook Idempotente (`/api/webhooks/infinitepay`) e Reconciliação Síncrona no Retorno (`/portal/dashboard`):
+  - **Arquivos modificados:** `lib/payment/infinitepay.ts`, `app/api/webhooks/infinitepay/route.ts`, `app/portal/dashboard/page.tsx`, `docs/CURRENT_SPRINT.md`.
+  - **Melhorias implementadas:**
+    - Padronização de `createInfinitePayCheckoutLink` (`lib/payment/infinitepay.ts`) com remoção de `$` no `handle`, resolução dinâmica de `baseUrl` (`NEXT_PUBLIC_APP_URL` / `VERCEL_URL`), propagação de `order_nsu` na `redirect_url` (`/portal/dashboard?payment=success&order_nsu=...`), `webhook_url` oficial (`/api/webhooks/infinitepay`) e normalização de itens em centavos.
+    - Webhook idempotente e atômico em `app/api/webhooks/infinitepay/route.ts` utilizando `prisma.$transaction([prisma.invoice.update, prisma.contractInstallment.updateMany])` e incremento de `paidAmount` em `prisma.contract.update`.
+    - Reconciliação síncrona imediata em `app/portal/dashboard/page.tsx` via `searchParams` (`payment=success&order_nsu=...`), liquidando a fatura e parcelas atreladas antes de `getClientDashboardData()` caso o redirecionamento do cliente ocorra antes da entrega do webhook.
 - [x] Linter e Typecheck auditados: `0 errors / 0 warnings`.
 
 ## 4. Próximas Implementações Planejadas

@@ -72,7 +72,7 @@ export function renderWelcomeEmailHtml(params: WelcomeEmailProps): string {
                 AMBIENTE ATIVADO
               </span>
               <div style="font-family: 'JetBrains Mono', monospace, sans-serif; font-size: 11px; color: #71717a; margin-top: 6px; letter-spacing: 0.02em;">
-                MINDSITE // SAAS
+                MINDSITE // SAAS 
               </div>
             </td>
           </tr>

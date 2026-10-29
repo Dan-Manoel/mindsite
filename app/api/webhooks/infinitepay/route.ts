@@ -67,16 +67,13 @@ export async function POST(req: NextRequest) {
     }
 
     // Telemetria estruturada no console para auditoria nos Runtime Logs da Vercel
-    console.log(`[InfinitePay Webhook] [${timestamp}] Payload decodificado:`, JSON.stringify(body, null, 2));
+    console.info("[InfinitePay Webhook] Payload:", JSON.stringify(body));
 
-    // 2. Extração unificada de campos (compatível com múltiplos esquemas InfinitePay v1/v2/Pix/Cartão)
+    // 2. Extração unificada de campos conforme documentação oficial da InfinitePay
     const eventName = (body.event || body.event_type || body.type || "").toLowerCase();
-    const statusField = (body.status || body.data?.status || "").toLowerCase();
-
-    // Verificação de eventos informativos que não demandam liquidação imediata
     const ignoredEvents = ["payment.created", "charge.pending", "order.created", "invoice.created"];
     if (ignoredEvents.includes(eventName)) {
-      console.log(`[InfinitePay Webhook] [${timestamp}] Evento preliminar ignorado: ${eventName}`);
+      console.info(`[InfinitePay Webhook] [${timestamp}] Evento preliminar ignorado: ${eventName}`);
       return NextResponse.json({ received: true, ignored: true }, { status: 200 });
     }
 
@@ -107,117 +104,75 @@ export async function POST(req: NextRequest) {
       body.data?.amount ??
       0;
 
-    const captureMethod = (
+    const captureMethod =
       body.capture_method ||
       body.payment_method ||
-      body.data?.capture_method ||
-      "pix"
-    ).toLowerCase();
+      body.data?.capture_method;
 
-    console.log(`[InfinitePay Webhook] [${timestamp}] Identificadores extraídos:`, {
-      orderNsu,
-      transactionNsu,
-      eventName,
-      statusField,
-      rawAmount,
-      captureMethod,
-    });
-
-    if (!orderNsu && !transactionNsu) {
-      console.warn(`[InfinitePay Webhook] [${timestamp}] Requisição sem identificador (order_nsu ou transaction_nsu).`);
-      return NextResponse.json({ error: "Identificador da fatura não informado" }, { status: 400 });
+    if (!orderNsu) {
+      return NextResponse.json({ error: "Missing order_nsu" }, { status: 400 });
     }
 
     // 3. Localização da fatura no banco via Prisma
-    let invoice = null;
-
-    if (orderNsu) {
-      invoice = await prisma.invoice.findFirst({
-        where: {
-          OR: [
-            { invoiceNumber: orderNsu },
-            { gatewayPaymentId: orderNsu },
-            { id: orderNsu },
-          ],
-        },
-        include: {
-          user: true,
-          items: {
-            include: {
-              installment: true,
-            },
-          },
-        },
-      });
-    }
-
-    if (!invoice && transactionNsu) {
-      invoice = await prisma.invoice.findFirst({
-        where: {
-          OR: [
-            { gatewayPaymentId: transactionNsu },
-            { invoiceNumber: transactionNsu },
-          ],
-        },
-        include: {
-          user: true,
-          items: {
-            include: {
-              installment: true,
-            },
-          },
-        },
-      });
-    }
+    const invoice = await prisma.invoice.findFirst({
+      where: {
+        OR: [
+          { invoiceNumber: orderNsu },
+          { id: orderNsu },
+          { gatewayPaymentId: orderNsu },
+        ],
+      },
+      include: {
+        user: true,
+        items: { include: { installment: true } },
+      },
+    });
 
     if (!invoice) {
-      console.warn(`[InfinitePay Webhook] [${timestamp}] Fatura não localizada para orderNsu="${orderNsu}" e transactionNsu="${transactionNsu}".`);
-      return NextResponse.json({ error: "Fatura não localizada", received: true }, { status: 404 });
+      console.warn(`[InfinitePay Webhook] Fatura não localizada para order_nsu: ${orderNsu}`);
+      return NextResponse.json({ error: "Invoice not found" }, { status: 404 });
     }
-
-    console.log(`[InfinitePay Webhook] [${timestamp}] Fatura encontrada: #${invoice.invoiceNumber} (ID: ${invoice.id}, Status Atual: ${invoice.status})`);
 
     // Idempotência: se já foi baixada anteriormente, encerra com sucesso
     if (invoice.status === "PAID") {
-      console.log(`[InfinitePay Webhook] [${timestamp}] Fatura #${invoice.invoiceNumber} já estava com status PAID. Operação idempotente concluída.`);
-      return NextResponse.json({ received: true, message: "Fatura já liquidada" }, { status: 200 });
+      return NextResponse.json({ received: true, alreadyPaid: true }, { status: 200 });
     }
 
-    // 4. Execução de Baixa Atômica no Banco de Dados
-    await prisma.$transaction(async (tx) => {
-      // Atualiza a Fatura
-      await tx.invoice.update({
+    const isPixPayment = String(captureMethod || "pix").toLowerCase() === "pix";
+
+    // 4. Transação Atômica e Idempotente no Prisma
+    await prisma.$transaction([
+      // 1. Atualiza a fatura para PAID
+      prisma.invoice.update({
         where: { id: invoice.id },
         data: {
           status: "PAID",
           paidAt: new Date(),
           receiptUrl: receiptUrl || invoice.receiptUrl,
+          paymentMethod: isPixPayment ? "PIX" : "CREDIT_CARD",
           gatewayPaymentId: transactionNsu || invoice.gatewayPaymentId,
-          paymentMethod: captureMethod.includes("credit") ? "CREDIT_CARD" : "PIX",
         },
-      });
+      }),
+      // 2. Atualiza parcelas vinculadas para PAID
+      prisma.contractInstallment.updateMany({
+        where: {
+          invoiceItemId: { in: invoice.items.map((it) => it.id) },
+        },
+        data: { status: "PAID" },
+      }),
+    ]);
 
-      // Atualiza as parcelas de contrato atreladas a cada item da fatura
-      for (const item of invoice.items) {
-        if (item.installment) {
-          console.log(`[InfinitePay Webhook] [${timestamp}] Liquidando parcela #${item.installment.installmentNumber} do contrato ${item.installment.contractId}...`);
-          
-          await tx.contractInstallment.update({
-            where: { id: item.installment.id },
-            data: { status: "PAID" },
-          });
-
-          await tx.contract.update({
-            where: { id: item.installment.contractId },
-            data: {
-              paidAmount: { increment: item.installment.amount },
-            },
-          });
-        }
+    // 3. Atualiza valor pago nos contratos
+    for (const item of invoice.items) {
+      if (item.installment?.contractId) {
+        await prisma.contract.update({
+          where: { id: item.installment.contractId },
+          data: { paidAmount: { increment: item.amount } },
+        });
       }
-    });
+    }
 
-    console.log(`[InfinitePay Webhook] [${timestamp}] Baixa atômica realizada com sucesso para a fatura #${invoice.invoiceNumber}.`);
+    console.info(`[InfinitePay Webhook] [${timestamp}] Baixa atômica realizada com sucesso para a fatura #${invoice.invoiceNumber}.`);
 
     try {
       revalidatePath("/admin");
@@ -250,7 +205,7 @@ export async function POST(req: NextRequest) {
             <p style="color: #4b5563; line-height: 1.6;">Confirmamos o recebimento e a liquidação da sua fatura <strong>#${invoice.invoiceNumber}</strong>.</p>
             <div style="background-color: #f9f7f7; border: 1px solid #e5e5e5; border-radius: 4px; padding: 16px; margin: 20px 0;">
               <p style="margin: 0 0 8px 0; font-size: 14px; color: #0f0f0f;"><strong>Valor Pago:</strong> R$ ${valorExibicao}</p>
-              <p style="margin: 0 0 8px 0; font-size: 14px; color: #0f0f0f;"><strong>Método de Pagamento:</strong> ${captureMethod.includes("credit") ? "Cartão de Crédito" : "Pix"}</p>
+              <p style="margin: 0 0 8px 0; font-size: 14px; color: #0f0f0f;"><strong>Método de Pagamento:</strong> ${isPixPayment ? "Pix" : "Cartão de Crédito"}</p>
               <p style="margin: 0; font-size: 14px; color: #0f0f0f;"><strong>Data da Baixa:</strong> ${new Date().toLocaleDateString("pt-BR", { timeZone: "America/Sao_Paulo" })} às ${new Date().toLocaleTimeString("pt-BR", { timeZone: "America/Sao_Paulo" })}</p>
             </div>
             ${receiptUrl ? `<p style="margin: 24px 0;"><a href="${receiptUrl}" target="_blank" style="background:#002bba; color:#ffffff; padding:12px 20px; text-decoration:none; border-radius:4px; font-weight: 700; display:inline-block;">Acessar Comprovante Oficial</a></p>` : ""}
@@ -259,7 +214,7 @@ export async function POST(req: NextRequest) {
           </div>
         `,
       });
-      console.log(`[InfinitePay Webhook] [${timestamp}] Recibo enviado para ${invoice.user.email}.`);
+      console.info(`[InfinitePay Webhook] [${timestamp}] Recibo enviado para ${invoice.user.email}.`);
     } catch (mailErr: unknown) {
       console.error(`[InfinitePay Webhook] [${timestamp}] Falha no envio do e-mail de recibo:`, mailErr);
     }
@@ -271,7 +226,7 @@ export async function POST(req: NextRequest) {
     revalidatePath("/admin/dashboard");
     revalidatePath("/admin/clients");
 
-    console.log(`[InfinitePay Webhook] [${timestamp}] Processamento finalizado com sucesso.`);
+    console.info(`[InfinitePay Webhook] [${timestamp}] Processamento finalizado com sucesso.`);
     return NextResponse.json({ received: true }, { status: 200 });
   } catch (error: unknown) {
     const message = error instanceof Error ? error.message : "Erro desconhecido";

@@ -1,12 +1,13 @@
 export interface CreateCheckoutLinkParams {
   orderNsu: string;
-  amountInCents: number;
+  amountInCents?: number;
   items: Array<{
     description: string;
-    price: number; // Em centavos
-    quantity: number;
+    price?: number; // Em centavos
+    amount?: number; // Em reais (convertido para centavos caso price não seja informado)
+    quantity?: number;
   }>;
-  customer: {
+  customer?: {
     name: string;
     email: string;
     phone?: string;
@@ -17,23 +18,41 @@ export interface CreateCheckoutLinkParams {
 
 export async function createInfinitePayCheckoutLink(params: CreateCheckoutLinkParams) {
   const apiKey = process.env.INFINITEPAY_API_KEY;
-  const handle = process.env.INFINITEPAY_HANDLE || "mindsite";
-  const appUrl = process.env.NEXT_PUBLIC_APP_URL || "https://mindsite.com.br";
+  const handle = (process.env.INFINITEPAY_HANDLE || "mindsite").replace(/^\$/, "");
 
-  const redirectUrl = params.redirectUrl || `${appUrl}/portal/dashboard?payment=success`;
-  const webhookUrl = params.webhookUrl || `${appUrl}/api/webhooks/infinitepay`;
+  const rawBaseUrl =
+    process.env.NEXT_PUBLIC_APP_URL ||
+    (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : "https://mindsite.com.br");
+  const baseUrl = rawBaseUrl.replace(/\/$/, "");
+
+  const redirectUrl =
+    params.redirectUrl ||
+    `${baseUrl}/portal/dashboard?payment=success&order_nsu=${encodeURIComponent(params.orderNsu)}`;
+  const webhookUrl = params.webhookUrl || `${baseUrl}/api/webhooks/infinitepay`;
+
+  const formattedItems = params.items.map((item) => ({
+    quantity: item.quantity || 1,
+    price:
+      typeof item.price === "number"
+        ? Math.round(Number(item.price))
+        : Math.round(Number(item.amount || 0) * 100),
+    description: item.description,
+  }));
 
   const payload: Record<string, unknown> = {
-    handle: handle,
+    handle,
     order_nsu: params.orderNsu,
-    items: params.items,
+    items: formattedItems,
+    itens: formattedItems,
     redirect_url: redirectUrl,
     webhook_url: webhookUrl,
-    customer: {
-      name: params.customer.name,
-      email: params.customer.email,
-      phone_number: params.customer.phone || undefined,
-    },
+    customer: params.customer
+      ? {
+          name: params.customer.name,
+          email: params.customer.email,
+          phone_number: params.customer.phone || undefined,
+        }
+      : undefined,
   };
 
   try {
