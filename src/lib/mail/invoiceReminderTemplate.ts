@@ -1,4 +1,5 @@
 export type InvoiceReminderStage =
+  | "ABANDONED_3H"
   | "UPCOMING_5D"
   | "DUE_TODAY"
   | "OVERDUE_1D"
@@ -38,6 +39,17 @@ function getStageMetadata(
   invoiceNumber: string
 ): StageMetadata {
   switch (stage) {
+    case "ABANDONED_3H":
+      return {
+        badgeText: "FATURA DISPONÍVEL",
+        badgeColor: "#002bba",
+        badgeBg: "rgba(0, 43, 186, 0.08)",
+        badgeBorder: "rgba(0, 43, 186, 0.25)",
+        heading: "Fatura Disponível para Pagamento",
+        messageText: `Olá, <strong style="color: #0f0f0f;">${clientName}</strong>. Identificamos que a sua fatura #${invoiceNumber} foi gerada para liquidação e aguarda confirmação de pagamento. Para sua comodidade e continuidade dos serviços, você pode liquidá-la diretamente via Pix Copia e Cola ou Cartão de Crédito pelo link seguro abaixo.`,
+        dueBoxAccent: "#002bba",
+        subjectPrefix: "Lembrete: Fatura Disponível",
+      };
     case "UPCOMING_5D":
       return {
         badgeText: "LEMBRETE DE VENCIMENTO",
@@ -338,6 +350,8 @@ export function getInvoiceReminderSubject(
 ): string {
   const valorFormatado = `R$ ${totalAmount.toFixed(2).replace(".", ",")}`;
   switch (stage) {
+    case "ABANDONED_3H":
+      return `Lembrete: Fatura #${invoiceNumber} disponível para pagamento — MindSite`;
     case "UPCOMING_5D":
       return `Lembrete de Vencimento: Fatura #${invoiceNumber} vence em 5 dias (${valorFormatado})`;
     case "DUE_TODAY":

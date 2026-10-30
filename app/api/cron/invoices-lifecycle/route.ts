@@ -128,6 +128,7 @@ export async function GET(req: NextRequest) {
 
   const now = new Date();
   const results = {
+    abandoned3H: 0,
     upcoming5D: 0,
     dueToday: 0,
     overdue1D: 0,
@@ -137,6 +138,73 @@ export async function GET(req: NextRequest) {
   };
 
   try {
+    // =========================================================================
+    // BUSCA 0 (Abandono recente de checkout 3h - 24h):
+    // status PENDING, createdAt <= now - 3h e createdAt >= now - 24h, reminderSentAt == null
+    // =========================================================================
+    const threeHoursAgo = new Date(now.getTime() - 3 * 60 * 60 * 1000);
+    const twentyFourHoursAgo = new Date(now.getTime() - 24 * 60 * 60 * 1000);
+
+    const abandoned3HInvoices = await prisma.invoice.findMany({
+      where: {
+        status: "PENDING",
+        createdAt: {
+          gte: twentyFourHoursAgo,
+          lte: threeHoursAgo,
+        },
+        reminderSentAt: null,
+      },
+      include: {
+        user: { include: { projects: true } },
+        items: true,
+      },
+    });
+
+    for (const inv of abandoned3HInvoices) {
+      try {
+        const checkoutUrl = await ensureInvoiceCheckoutUrl(inv);
+        const clientName = inv.user.fullName || inv.user.companyName || "Cliente";
+        const totalAmount = Number(inv.totalAmount);
+        const dueDateFormatted = formatBrDate(inv.dueDate);
+
+        const emailHtml = renderInvoiceReminderEmailHtml({
+          clientName,
+          invoiceNumber: inv.invoiceNumber,
+          dueDate: dueDateFormatted,
+          totalAmount,
+          items: inv.items.map((i) => ({ description: i.description, amount: Number(i.amount) })),
+          paymentUrl: checkoutUrl,
+          pixCopyPaste: inv.pixCopyPaste,
+          stage: "ABANDONED_3H",
+        });
+
+        const recipients = [inv.user.email];
+        if (inv.user.secondaryEmail && inv.user.secondaryEmail !== inv.user.email) {
+          recipients.push(inv.user.secondaryEmail);
+        }
+
+        await resend.emails.send({
+          from: EMAIL_FROM,
+          replyTo: REPLY_TO,
+          to: recipients,
+          subject: getInvoiceReminderSubject("ABANDONED_3H", inv.invoiceNumber, totalAmount),
+          html: emailHtml,
+        });
+
+        await prisma.invoice.update({
+          where: { id: inv.id },
+          data: {
+            reminderSentAt: new Date(),
+          },
+        });
+
+        results.abandoned3H++;
+      } catch (err) {
+        const msg = err instanceof Error ? err.message : String(err);
+        results.errors.push(`Erro ABANDONED_3H fatura #${inv.invoiceNumber}: ${msg}`);
+      }
+    }
+
     // Janelas de datas com timezone America/Sao_Paulo
     const range5D = getBrasiliaDayRange(5, now);
     const rangeToday = getBrasiliaDayRange(0, now);

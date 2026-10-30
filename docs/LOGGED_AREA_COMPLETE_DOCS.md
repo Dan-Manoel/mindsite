@@ -223,10 +223,12 @@ As faturas podem ser emitidas de **3 formas**:
 
 1. **Auto-Faturamento pelo Próprio Cliente (`clientSelfIssueInvoiceAction` em `app/actions/portal.ts`)**:
    - No Portal do Cliente (`/portal/dashboard` $\rightarrow$ aba **Faturas & Pix**), caso o administrador ainda não tenha emitido a fatura, o cliente visualiza todas as suas parcelas `SCHEDULED` e a mensalidade de sustentação do mês vigente (`unbilledSustainability`).
-   - O cliente seleciona via checkboxes quais parcelas/mensalidades deseja pagar agora e clica em **"GERAR FATURA E PAGAR AGORA →"**.
+   - O cliente seleciona via checkboxes quais parcelas/mensalidades deseja pagar e clica no botão de ação: **"PAGAR AGORA (PIX / CARTÃO) →"**.
+   - Durante a solicitação, o botão exibe o estado de carregamento **"Gerando checkout seguro..."** desabilitando múltiplos cliques.
    - **Herança Obrigatória de Vencimento**: A `Invoice` gerada herda obrigatoriamente a `scheduledDate` da parcela mais antiga selecionada (ou a data de hoje caso seja apenas sustentação avulsa).
    - O backend chama `createInfinitePayCheckoutLink()`, grava a `Invoice` + `InvoiceItem`s e atualiza todas as parcelas selecionadas para `status: "BILLED"` vinculadas a `invoiceItemId` dentro de uma transação `prisma.$transaction(..., { maxWait: 10000, timeout: 20000 })`.
-   - O frontend redireciona imediatamente o cliente para a URL de checkout da InfinitePay (`checkoutUrl`).
+   - **Redirecionamento Automático Imediato**: O client component redireciona instantaneamente o navegador para a URL oficial de checkout da InfinitePay via `window.location.href = res.checkoutUrl;`.
+   - **Modal de Detalhamento da Fatura Ativa ("Visualizar Fatura")**: No card superior de destaque da fatura em aberto (`data.activeInvoice`), além do botão de pagamento InfinitePay, há um botão outline secundário **"Visualizar Fatura"**. Ao clicar, abre um modal acessível (com suporte a tecla `Esc` e clique no backdrop) exibindo o número da fatura, data de vencimento, tabela discriminada de itens e serviços com valores unitários, total consolidado e botão direto de liquidação.
 
 2. **Emissão Imediata pelo Administrador (`issueImmediateInvoiceAction` em `app/actions/admin.ts`)**:
    - No Painel Admin (ou na tela de edição do cliente), o dono pode emitir uma fatura avulsa ou faturar parcelas específicas (`SCHEDULED`) com 1 clique.
@@ -292,9 +294,10 @@ sequenceDiagram
 - **Garantia de Link Ativo**: Antes de enviar qualquer lembrete, a função `ensureInvoiceCheckoutUrl(inv)` verifica se a fatura já possui `gatewayInvoiceUrl`; se não possuir, gera o link na InfinitePay e atualiza a fatura.
 - **Destinatários**: Envia sempre para `user.email` e, se cadastrado, também para `user.secondaryEmail`.
 
-#### As 4 Etapas da Régua de Cobrança:
+#### As 5 Etapas da Régua de Cobrança:
 | Etapa | Condição de Disparo (Brasília) | Flag de Controle | Ações Executadas pelo Cron |
 | :--- | :--- | :--- | :--- |
+| **0. `ABANDONED_3H` (3h - 24h)** | `status == PENDING`, `createdAt <= now - 3h` e `>= now - 24h`, `reminderSentAt == null` | `reminderSentAt` | Envia e-mail **Fatura Disponível para Pagamento** com Pix Copia e Cola e link direto InfinitePay. |
 | **1. `UPCOMING_5D` (D-5)** | `status == PENDING`, `dueDate == Hoje + 5 dias`, `reminderSentAt == null` | `reminderSentAt` / `reminder5DaysSent` | Envia e-mail claro **Lembrete de Vencimento (5 dias)** (`UPCOMING_5D`). |
 | **2. `DUE_TODAY` (D0)** | `status == PENDING`, `dueDate == Hoje`, `dueTodaySentAt == null` | `dueTodaySentAt` / `dueDaySent` | Envia e-mail claro **Sua Fatura Vence Hoje** (`DUE_TODAY` — badge âmbar). |
 | **3. `OVERDUE_1D` (D+1)** | `status IN [PENDING, OVERDUE]`, `dueDate == Ontem (Hoje - 1)`, `overdueSentAt == null` | `overdueSentAt` / `overdue1DaySent` / `adminAlertSentAt` | 1. Atualiza `Invoice.status = "OVERDUE"`.<br/>2. Envia e-mail claro **Aviso de Fatura Vencida** ao cliente.<br/>3. Dispara **Alerta Dark de Inadimplência para a Diretoria** (`contato@mindsite.com.br`) com botão direto de cobrança via WhatsApp (`wa.me`). |

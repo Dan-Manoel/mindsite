@@ -67,6 +67,17 @@
     - Suporte unificado aos identificadores `order_nsu`, `transaction_nsu`, `id` ou `invoice_number` no webhook com execução de `prisma.$transaction` atômica (`Invoice` -> `PAID`, `ContractInstallment` -> `PAID` e `Contract.paidAmount` incrementado).
     - Conciliação síncrona garantida no Server Component (`app/portal/dashboard/page.tsx`) aceitando `order_nsu` ou `transaction_nsu` quando `payment=success`, liquidando faturas e parcelas vinculadas antes da renderização do painel do cliente.
     - Padronização de `createInfinitePayCheckoutLink` (`lib/payment/infinitepay.ts`) com remoção de `$` no `handle`, resolução de `cleanBaseUrl` e links canônicos de redirect e webhook.
+- [x] UI/UX do Portal do Cliente e Automação de Abandono de Checkout (3 Horas):
+  - **Arquivos modificados:** `app/portal/dashboard/PortalDashboardView.tsx`, `app/api/cron/invoices-lifecycle/route.ts`, `src/lib/mail/invoiceReminderTemplate.ts`, `docs/CURRENT_SPRINT.md`, `docs/LOGGED_AREA_COMPLETE_DOCS.md`.
+  - **Melhorias implementadas:**
+    - **Checkout Direto e Redirecionamento Automático:** Atualização do label do botão de pagamento em lote para `"PAGAR AGORA (PIX / CARTÃO) →"` com feedback em tempo real `"Gerando checkout seguro..."` e redirecionamento instantâneo via `window.location.href = res.checkoutUrl;`.
+    - **Modal "Visualizar Fatura":** Adição de botão outline secundário no card de destaque `data.activeInvoice`, exibindo modal responsivo e acessível (fechamento por `Esc` e backdrop) discriminando itens contidos na fatura, data de vencimento, total consolidado e atalhos diretos para pagamento InfinitePay.
+    - **Régua de 3 Horas para Faturas Não Pagas (`ABANDONED_3H`):** No Cron `/api/cron/invoices-lifecycle`, inclusão do estágio de abandono para faturas `PENDING` criadas há mais de 3h e menos de 24h com `reminderSentAt == null`, disparando e-mail transacional via Resend com Pix e link de pagamento, persistindo `reminderSentAt = new Date()` no Prisma para garantir idempotência.
+- [x] Padronização e Formatação do Template de E-mail de Boas-Vindas (`lib/mail/welcomeTemplate.ts`):
+  - **Arquivos modificados:** `lib/mail/welcomeTemplate.ts`, `app/actions/adminClients.ts`, `docs/CURRENT_SPRINT.md`.
+  - **Melhorias implementadas:**
+    - Reestruturação do HTML do template de boas-vindas com base no novo design system transacional (fundo `#EEEAE8`, container branco de 600px, borda arredondada de 12px, logo oficial 56x56 e badge `[ AMBIENTE ATIVADO ]`).
+    - Aplicação estrita da copy oficial: assunto `Bem-vindo(a) à MindSite // Acesso ao seu painel do cliente`, mensagem personalizada, bloco de credenciais (`// DADOS DE ACESSO AO PORTAL`), listagem dos 3 recursos do painel com bullets verdes `✓`, CTA `ACESSAR PAINEL DO CLIENTE →`, nota contratual e rodapé institucional.
 - [x] Linter e Typecheck auditados: `0 errors / 0 warnings`.
 
 ## 4. Próximas Implementações Planejadas

@@ -176,7 +176,7 @@ export async function createClientWithProjectsAction(data: ClientDTO) {
       const emailResult = await resend.emails.send({
         from: "MindSite <contato@mindsite.com.br>",
         to: data.primaryEmail,
-        subject: "Bem-vindo à MindSite — Acesso ao Portal & Projeto",
+        subject: "Bem-vindo(a) à MindSite // Acesso ao seu painel do cliente",
         html: htmlContent,
       });
 

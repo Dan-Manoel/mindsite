@@ -25,8 +25,8 @@ export function renderTicketNotificationEmailHtml(params: TicketNotificationEmai
     : "Nova Interação no seu Chamado";
 
   const introText = isAwaiting
-    ? `Olá, <strong>${params.clientName}</strong>. A equipe técnica da MindSite concluiu os ajustes do seu chamado <strong>#${params.ticketNumber}</strong> e disponibilizou para sua homologação.`
-    : `Olá, <strong>${params.clientName}</strong>. A equipe técnica da MindSite enviou uma nova resposta na timeline do seu chamado <strong>#${params.ticketNumber}</strong>.`;
+    ? `Olá, <strong>${params.clientName}</strong>. Concluimos os ajustes do seu chamado <strong>#${params.ticketNumber}</strong> e disponibilizou para sua homologação.`
+    : `Olá, <strong>${params.clientName}</strong>. Enviamos uma nova resposta no seu chamado <strong>#${params.ticketNumber}</strong>.`;
 
   const safeMessage = params.messageSnippet.replace(/\n/g, "<br />");
 

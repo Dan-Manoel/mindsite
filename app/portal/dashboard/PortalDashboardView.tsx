@@ -309,6 +309,21 @@ export default function PortalDashboardView({ data, isFirstLogin }: PortalProps)
     Boolean(data.unbilledSustainability)
   );
   const [isConsolidating, setIsConsolidating] = useState(false);
+  const [isInvoiceDetailsModalOpen, setIsInvoiceDetailsModalOpen] = useState(false);
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        setIsInvoiceDetailsModalOpen(false);
+      }
+    };
+    if (isInvoiceDetailsModalOpen) {
+      window.addEventListener("keydown", handleKeyDown);
+    }
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [isInvoiceDetailsModalOpen]);
 
   const toggleInstallment = (id: string) => {
     setSelectedInstallments((prev) =>
@@ -330,17 +345,17 @@ export default function PortalDashboardView({ data, isFirstLogin }: PortalProps)
         paymentMethod: "PIX",
       });
       if (res.success && res.checkoutUrl) {
-        window.open(res.checkoutUrl, "_blank", "noopener,noreferrer");
         setSelectedInstallments([]);
         setIncludeSustainability(false);
-        router.refresh();
+        // Redirecionamento automático imediato para o checkout seguro da InfinitePay
+        window.location.href = res.checkoutUrl;
       } else {
         alert(res.error || "Erro ao gerar fatura e link de pagamento.");
+        setIsConsolidating(false);
       }
     } catch (err: unknown) {
       const message = err instanceof Error ? err.message : "Erro de conexão ao emitir fatura.";
       alert(message);
-    } finally {
       setIsConsolidating(false);
     }
   };
@@ -548,8 +563,7 @@ export default function PortalDashboardView({ data, isFirstLogin }: PortalProps)
   const handleRequestUpgradePlan = (targetPlan: string) => {
     setTitle(`Solicitação de Upgrade para Plano ${targetPlan}`);
     setDescription(
-      `Solicito o upgrade do meu plano de sustentação atual (${
-        data.sustainability?.planName || "Atual"
+      `Solicito o upgrade do meu plano de sustentação atual (${data.sustainability?.planName || "Atual"
       }) para o plano ${targetPlan}.\nFavor aplicar as novas cotas e atualizar a recorrência.`
     );
     setCategory("ADVANCED");
@@ -636,7 +650,7 @@ export default function PortalDashboardView({ data, isFirstLogin }: PortalProps)
                   margin: 0,
                 }}
               >
-                Painel do Projeto & Chamados
+                Seu Painel MindSite
               </h1>
               <p
                 style={{
@@ -1132,19 +1146,19 @@ export default function PortalDashboardView({ data, isFirstLogin }: PortalProps)
                     color: data.billingSummary?.isOverdue
                       ? "#ef4444"
                       : data.activeInvoice
-                      ? "var(--accent)"
-                      : data.billingSummary?.allPaid
-                      ? "#10b981"
-                      : "var(--t-muted)",
+                        ? "var(--accent)"
+                        : data.billingSummary?.allPaid
+                          ? "#10b981"
+                          : "var(--t-muted)",
                   }}
                 >
                   {data.billingSummary?.isOverdue
                     ? `R$ ${data.billingSummary.totalOverdueAmount.toFixed(2).replace(".", ",")}`
                     : data.activeInvoice
-                    ? `R$ ${data.activeInvoice.totalAmount.toFixed(2).replace(".", ",")}`
-                    : data.billingSummary?.allPaid
-                    ? "Quitada"
-                    : "Sem Faturas"}
+                      ? `R$ ${data.activeInvoice.totalAmount.toFixed(2).replace(".", ",")}`
+                      : data.billingSummary?.allPaid
+                        ? "Quitada"
+                        : "Sem Faturas"}
                 </div>
                 <button
                   type="button"
@@ -1336,540 +1350,540 @@ export default function PortalDashboardView({ data, isFirstLogin }: PortalProps)
                       </div>
                     ) : (
                       displayedTickets.map((t) => {
-                  const slaDate = new Date(t.slaDueAt);
-                  const isExpanded = expandedTicketId === t.id;
+                        const slaDate = new Date(t.slaDueAt);
+                        const isExpanded = expandedTicketId === t.id;
 
-                  return (
-                    <div
-                      key={t.id}
-                      style={{
-                        backgroundColor: "var(--base-tint)",
-                        border: `1px solid ${isExpanded ? "var(--accent)" : "var(--st-medium)"}`,
-                        padding: "2.5rem",
-                        borderRadius: "0.4rem",
-                        transition: "border-color 0.2s ease",
-                      }}
-                    >
-                      {/* Header do Card (sem expansão acidental ao clicar) */}
-                      <div
-                        style={{
-                          display: "flex",
-                          flexWrap: "wrap",
-                          justifyContent: "space-between",
-                          alignItems: "flex-start",
-                          gap: "1.5rem",
-                          marginBottom: "1.2rem",
-                        }}
-                      >
-                        <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", gap: "1rem" }}>
-                          <span
+                        return (
+                          <div
+                            key={t.id}
                             style={{
-                              fontFamily: "var(--_font-accent)",
-                              fontSize: "1.4rem",
-                              fontWeight: 700,
-                              color: "var(--accent)",
+                              backgroundColor: "var(--base-tint)",
+                              border: `1px solid ${isExpanded ? "var(--accent)" : "var(--st-medium)"}`,
+                              padding: "2.5rem",
+                              borderRadius: "0.4rem",
+                              transition: "border-color 0.2s ease",
                             }}
                           >
-                            #{t.ticketNumber}
-                          </span>
-                          <strong
-                            style={{
-                              fontSize: "1.6rem",
-                              color: "var(--t-bright)",
-                              fontFamily: "var(--_font-default)",
-                            }}
-                          >
-                            {t.title}
-                          </strong>
-
-                          {/* Status do Chamado */}
-                          <span
-                            style={{
-                              padding: "0.2rem 0.8rem",
-                              fontSize: "1rem",
-                              fontFamily: "var(--_font-accent)",
-                              textTransform: "uppercase",
-                              borderRadius: "0.2rem",
-                              backgroundColor:
-                                t.status === "RESOLVED"
-                                  ? "rgba(16, 185, 129, 0.1)"
-                                  : t.status === "IN_PROGRESS"
-                                  ? "rgba(245, 158, 11, 0.1)"
-                                  : t.status === "WAITING_CLIENT"
-                                  ? "rgba(168, 85, 247, 0.1)"
-                                  : "rgba(59, 130, 246, 0.1)",
-                              color:
-                                t.status === "RESOLVED"
-                                  ? "#10b981"
-                                  : t.status === "IN_PROGRESS"
-                                  ? "#f59e0b"
-                                  : t.status === "WAITING_CLIENT"
-                                  ? "#a855f7"
-                                  : "#3b82f6",
-                              border: "1px solid currentColor",
-                            }}
-                          >
-                            {t.status === "OPEN" && "Aberto"}
-                            {t.status === "IN_PROGRESS" && "Em Andamento"}
-                            {t.status === "WAITING_CLIENT" && "AGUARDANDO SEU ACEITE"}
-                            {t.status === "RESOLVED" && "Concluído"}
-                            {t.status === "CANCELLED" && "Cancelado"}
-                          </span>
-
-                          {/* Categoria do SLA */}
-                          <span
-                            style={{
-                              padding: "0.2rem 0.8rem",
-                              fontSize: "1rem",
-                              fontFamily: "var(--_font-accent)",
-                              textTransform: "uppercase",
-                              borderRadius: "0.2rem",
-                              backgroundColor: "var(--base)",
-                              color: "var(--t-medium)",
-                              border: "1px solid var(--st-medium)",
-                            }}
-                          >
-                            {t.category === "BASIC" && "Básico (24h)"}
-                            {t.category === "INTERMEDIATE" && "Intermediário (72h)"}
-                            {t.category === "ADVANCED" && "Avançado (7 dias)"}
-                          </span>
-                        </div>
-
-                        {/* Coluna Direita: SLA Regressivo e Prazo Final */}
-                        <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", gap: "1.2rem" }}>
-                          <SLACountdownBadge slaDueAt={t.slaDueAt} status={t.status} isOverdue={t.isOverdue} />
-                          <span style={{ fontFamily: "var(--_font-accent)", fontSize: "1.2rem", color: "var(--t-muted)" }}>
-                            Prazo:{" "}
-                            <strong
+                            {/* Header do Card (sem expansão acidental ao clicar) */}
+                            <div
                               style={{
-                                color: t.isOverdue && t.status !== "RESOLVED" ? "#ef4444" : "var(--t-bright)",
+                                display: "flex",
+                                flexWrap: "wrap",
+                                justifyContent: "space-between",
+                                alignItems: "flex-start",
+                                gap: "1.5rem",
+                                marginBottom: "1.2rem",
                               }}
                             >
-                              {slaDate.toLocaleDateString("pt-BR")}{" "}
-                              {slaDate.toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" })}
-                            </strong>
-                          </span>
-                        </div>
-                      </div>
-
-                      {/* Barra de Homologação (Quando Status = WAITING_CLIENT / AGUARDANDO_CLIENTE) */}
-                      {t.status === "WAITING_CLIENT" && (
-                        <div
-                          style={{
-                            margin: "1.5rem 0",
-                            padding: "1.8rem 2rem",
-                            backgroundColor: "rgba(245, 158, 11, 0.08)",
-                            border: "1px solid rgba(245, 158, 11, 0.35)",
-                            borderRadius: "0.4rem",
-                            display: "flex",
-                            flexWrap: "wrap",
-                            alignItems: "center",
-                            justifyContent: "space-between",
-                            gap: "1.5rem",
-                          }}
-                        >
-                          <div style={{ display: "flex", alignItems: "center", gap: "1.2rem", flex: "1 1 320px" }}>
-                            <span style={{ fontSize: "2.4rem" }}>⏳</span>
-                            <div>
-                              <strong
-                                style={{
-                                  display: "block",
-                                  fontSize: "1.3rem",
-                                  color: "#f59e0b",
-                                  fontFamily: "var(--_font-accent)",
-                                  textTransform: "uppercase",
-                                  marginBottom: "0.3rem",
-                                }}
-                              >
-                                Validação de Entrega Solicitada
-                              </strong>
-                              <p
-                                style={{
-                                  margin: 0,
-                                  fontSize: "1.3rem",
-                                  color: "var(--t-bright)",
-                                  fontFamily: "var(--_font-default)",
-                                  lineHeight: 1.5,
-                                }}
-                              >
-                                A equipe concluiu o atendimento. Por favor, valide a solução. Caso não haja manifestação, o chamado será finalizado automaticamente em 72h.
-                              </p>
-                            </div>
-                          </div>
-
-                          <div style={{ display: "flex", flexWrap: "wrap", gap: "1rem", alignItems: "center" }}>
-                            <button
-                              type="button"
-                              onClick={() => {
-                                setAcceptingTicket({ id: t.id, ticketNumber: t.ticketNumber, title: t.title });
-                                setAcceptFeedbackText("");
-                              }}
-                              className="btn btn-default-icon"
-                              style={{
-                                height: "3.8rem",
-                                padding: "0 2rem",
-                                fontSize: "1.2rem",
-                                fontFamily: "var(--_font-accent)",
-                                backgroundColor: "#10b981",
-                                borderColor: "#10b981",
-                                color: "#ffffff",
-                                fontWeight: 700,
-                                cursor: "pointer",
-                                borderRadius: "0.2rem",
-                              }}
-                            >
-                              ✓ Aceitar Resolução
-                            </button>
-
-                            <button
-                              type="button"
-                              onClick={() => {
-                                setReopeningTicket({ id: t.id, ticketNumber: t.ticketNumber, title: t.title });
-                                setReopenReasonText("");
-                                setReopenFiles([]);
-                              }}
-                              className="btn btn-default-icon btn-default-outline"
-                              style={{
-                                height: "3.8rem",
-                                padding: "0 1.8rem",
-                                fontSize: "1.2rem",
-                                fontFamily: "var(--_font-accent)",
-                                borderColor: "#ef4444",
-                                color: "#ef4444",
-                                fontWeight: 700,
-                                cursor: "pointer",
-                                borderRadius: "0.2rem",
-                              }}
-                            >
-                              ↺ Recusar / Reabrir Chamado
-                            </button>
-                          </div>
-                        </div>
-                      )}
-
-                      {/* Descrição e Timeline de Comentários */}
-                      <p
-                        style={{
-                          color: "var(--t-medium)",
-                          fontSize: "1.3rem",
-                          lineHeight: 1.6,
-                          whiteSpace: "pre-line",
-                          margin: 0,
-                          fontFamily: "var(--_font-default)",
-                        }}
-                      >
-                        {t.description}
-                      </p>
-
-                      {/* Barra Inferior: Anexos à esquerda e Botão de Ação à direita (alinhado embaixo e azul) */}
-                      <div
-                        style={{
-                          marginTop: "1.6rem",
-                          display: "flex",
-                          flexWrap: "wrap",
-                          alignItems: "center",
-                          justifyContent: "space-between",
-                          gap: "1.2rem",
-                        }}
-                      >
-                        {/* Anexos com Acesso Seguro via Signed URL */}
-                        <div style={{ display: "flex", flexWrap: "wrap", gap: "1rem", alignItems: "center" }}>
-                          {t.attachments && t.attachments.length > 0 &&
-                            t.attachments.map((att) => {
-                              const isOpening = openingAttachmentId === att.id;
-                              return (
-                                <button
-                                  key={att.id}
-                                  type="button"
-                                  onClick={() => handleOpenAttachment(att.id, att.fileName)}
-                                  disabled={isOpening}
-                                  className="btn btn-line-icon btn-line-icon-small btn-line-default"
+                              <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", gap: "1rem" }}>
+                                <span
                                   style={{
-                                    fontSize: "1.1rem",
                                     fontFamily: "var(--_font-accent)",
-                                    padding: "0.4rem 1rem",
-                                    backgroundColor: "var(--base)",
-                                    border: "1px solid var(--st-medium)",
+                                    fontSize: "1.4rem",
+                                    fontWeight: 700,
+                                    color: "var(--accent)",
+                                  }}
+                                >
+                                  #{t.ticketNumber}
+                                </span>
+                                <strong
+                                  style={{
+                                    fontSize: "1.6rem",
                                     color: "var(--t-bright)",
-                                    cursor: "pointer",
+                                    fontFamily: "var(--_font-default)",
+                                  }}
+                                >
+                                  {t.title}
+                                </strong>
+
+                                {/* Status do Chamado */}
+                                <span
+                                  style={{
+                                    padding: "0.2rem 0.8rem",
+                                    fontSize: "1rem",
+                                    fontFamily: "var(--_font-accent)",
+                                    textTransform: "uppercase",
                                     borderRadius: "0.2rem",
+                                    backgroundColor:
+                                      t.status === "RESOLVED"
+                                        ? "rgba(16, 185, 129, 0.1)"
+                                        : t.status === "IN_PROGRESS"
+                                          ? "rgba(245, 158, 11, 0.1)"
+                                          : t.status === "WAITING_CLIENT"
+                                            ? "rgba(168, 85, 247, 0.1)"
+                                            : "rgba(59, 130, 246, 0.1)",
+                                    color:
+                                      t.status === "RESOLVED"
+                                        ? "#10b981"
+                                        : t.status === "IN_PROGRESS"
+                                          ? "#f59e0b"
+                                          : t.status === "WAITING_CLIENT"
+                                            ? "#a855f7"
+                                            : "#3b82f6",
+                                    border: "1px solid currentColor",
+                                  }}
+                                >
+                                  {t.status === "OPEN" && "Aberto"}
+                                  {t.status === "IN_PROGRESS" && "Em Andamento"}
+                                  {t.status === "WAITING_CLIENT" && "AGUARDANDO SEU ACEITE"}
+                                  {t.status === "RESOLVED" && "Concluído"}
+                                  {t.status === "CANCELLED" && "Cancelado"}
+                                </span>
+
+                                {/* Categoria do SLA */}
+                                <span
+                                  style={{
+                                    padding: "0.2rem 0.8rem",
+                                    fontSize: "1rem",
+                                    fontFamily: "var(--_font-accent)",
+                                    textTransform: "uppercase",
+                                    borderRadius: "0.2rem",
+                                    backgroundColor: "var(--base)",
+                                    color: "var(--t-medium)",
+                                    border: "1px solid var(--st-medium)",
+                                  }}
+                                >
+                                  {t.category === "BASIC" && "Básico (24h)"}
+                                  {t.category === "INTERMEDIATE" && "Intermediário (72h)"}
+                                  {t.category === "ADVANCED" && "Avançado (7 dias)"}
+                                </span>
+                              </div>
+
+                              {/* Coluna Direita: SLA Regressivo e Prazo Final */}
+                              <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", gap: "1.2rem" }}>
+                                <SLACountdownBadge slaDueAt={t.slaDueAt} status={t.status} isOverdue={t.isOverdue} />
+                                <span style={{ fontFamily: "var(--_font-accent)", fontSize: "1.2rem", color: "var(--t-muted)" }}>
+                                  Prazo:{" "}
+                                  <strong
+                                    style={{
+                                      color: t.isOverdue && t.status !== "RESOLVED" ? "#ef4444" : "var(--t-bright)",
+                                    }}
+                                  >
+                                    {slaDate.toLocaleDateString("pt-BR")}{" "}
+                                    {slaDate.toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" })}
+                                  </strong>
+                                </span>
+                              </div>
+                            </div>
+
+                            {/* Barra de Homologação (Quando Status = WAITING_CLIENT / AGUARDANDO_CLIENTE) */}
+                            {t.status === "WAITING_CLIENT" && (
+                              <div
+                                style={{
+                                  margin: "1.5rem 0",
+                                  padding: "1.8rem 2rem",
+                                  backgroundColor: "rgba(245, 158, 11, 0.08)",
+                                  border: "1px solid rgba(245, 158, 11, 0.35)",
+                                  borderRadius: "0.4rem",
+                                  display: "flex",
+                                  flexWrap: "wrap",
+                                  alignItems: "center",
+                                  justifyContent: "space-between",
+                                  gap: "1.5rem",
+                                }}
+                              >
+                                <div style={{ display: "flex", alignItems: "center", gap: "1.2rem", flex: "1 1 320px" }}>
+                                  <span style={{ fontSize: "2.4rem" }}>⏳</span>
+                                  <div>
+                                    <strong
+                                      style={{
+                                        display: "block",
+                                        fontSize: "1.3rem",
+                                        color: "#f59e0b",
+                                        fontFamily: "var(--_font-accent)",
+                                        textTransform: "uppercase",
+                                        marginBottom: "0.3rem",
+                                      }}
+                                    >
+                                      Validação de Entrega Solicitada
+                                    </strong>
+                                    <p
+                                      style={{
+                                        margin: 0,
+                                        fontSize: "1.3rem",
+                                        color: "var(--t-bright)",
+                                        fontFamily: "var(--_font-default)",
+                                        lineHeight: 1.5,
+                                      }}
+                                    >
+                                      A equipe concluiu o atendimento. Por favor, valide a solução. Caso não haja manifestação, o chamado será finalizado automaticamente em 72h.
+                                    </p>
+                                  </div>
+                                </div>
+
+                                <div style={{ display: "flex", flexWrap: "wrap", gap: "1rem", alignItems: "center" }}>
+                                  <button
+                                    type="button"
+                                    onClick={() => {
+                                      setAcceptingTicket({ id: t.id, ticketNumber: t.ticketNumber, title: t.title });
+                                      setAcceptFeedbackText("");
+                                    }}
+                                    className="btn btn-default-icon"
+                                    style={{
+                                      height: "3.8rem",
+                                      padding: "0 2rem",
+                                      fontSize: "1.2rem",
+                                      fontFamily: "var(--_font-accent)",
+                                      backgroundColor: "#10b981",
+                                      borderColor: "#10b981",
+                                      color: "#ffffff",
+                                      fontWeight: 700,
+                                      cursor: "pointer",
+                                      borderRadius: "0.2rem",
+                                    }}
+                                  >
+                                    ✓ Aceitar Resolução
+                                  </button>
+
+                                  <button
+                                    type="button"
+                                    onClick={() => {
+                                      setReopeningTicket({ id: t.id, ticketNumber: t.ticketNumber, title: t.title });
+                                      setReopenReasonText("");
+                                      setReopenFiles([]);
+                                    }}
+                                    className="btn btn-default-icon btn-default-outline"
+                                    style={{
+                                      height: "3.8rem",
+                                      padding: "0 1.8rem",
+                                      fontSize: "1.2rem",
+                                      fontFamily: "var(--_font-accent)",
+                                      borderColor: "#ef4444",
+                                      color: "#ef4444",
+                                      fontWeight: 700,
+                                      cursor: "pointer",
+                                      borderRadius: "0.2rem",
+                                    }}
+                                  >
+                                    ↺ Recusar / Reabrir Chamado
+                                  </button>
+                                </div>
+                              </div>
+                            )}
+
+                            {/* Descrição e Timeline de Comentários */}
+                            <p
+                              style={{
+                                color: "var(--t-medium)",
+                                fontSize: "1.3rem",
+                                lineHeight: 1.6,
+                                whiteSpace: "pre-line",
+                                margin: 0,
+                                fontFamily: "var(--_font-default)",
+                              }}
+                            >
+                              {t.description}
+                            </p>
+
+                            {/* Barra Inferior: Anexos à esquerda e Botão de Ação à direita (alinhado embaixo e azul) */}
+                            <div
+                              style={{
+                                marginTop: "1.6rem",
+                                display: "flex",
+                                flexWrap: "wrap",
+                                alignItems: "center",
+                                justifyContent: "space-between",
+                                gap: "1.2rem",
+                              }}
+                            >
+                              {/* Anexos com Acesso Seguro via Signed URL */}
+                              <div style={{ display: "flex", flexWrap: "wrap", gap: "1rem", alignItems: "center" }}>
+                                {t.attachments && t.attachments.length > 0 &&
+                                  t.attachments.map((att) => {
+                                    const isOpening = openingAttachmentId === att.id;
+                                    return (
+                                      <button
+                                        key={att.id}
+                                        type="button"
+                                        onClick={() => handleOpenAttachment(att.id, att.fileName)}
+                                        disabled={isOpening}
+                                        className="btn btn-line-icon btn-line-icon-small btn-line-default"
+                                        style={{
+                                          fontSize: "1.1rem",
+                                          fontFamily: "var(--_font-accent)",
+                                          padding: "0.4rem 1rem",
+                                          backgroundColor: "var(--base)",
+                                          border: "1px solid var(--st-medium)",
+                                          color: "var(--t-bright)",
+                                          cursor: "pointer",
+                                          borderRadius: "0.2rem",
+                                          display: "inline-flex",
+                                          alignItems: "center",
+                                          gap: "0.6rem",
+                                          opacity: isOpening ? 0.6 : 1,
+                                        }}
+                                      >
+                                        📥 {isOpening ? "Gerando link seguro..." : att.fileName}
+                                      </button>
+                                    );
+                                  })}
+                              </div>
+
+                              {/* Botão Enviar nova mensagem / Ocultar mensagens */}
+                              <div style={{ marginLeft: "auto" }}>
+                                <button
+                                  type="button"
+                                  onClick={() => {
+                                    const willExpand = !isExpanded;
+                                    setExpandedTicketId(willExpand ? t.id : null);
+                                    if (willExpand) {
+                                      setTimeout(() => {
+                                        document.getElementById(`ticket-comment-input-${t.id}`)?.focus();
+                                      }, 120);
+                                    }
+                                  }}
+                                  className="btn btn-default-icon"
+                                  style={{
+                                    height: "3.4rem",
+                                    padding: "0.4rem 1.8rem",
+                                    fontSize: "1.2rem",
+                                    fontFamily: "var(--_font-accent)",
+                                    fontWeight: 700,
+                                    backgroundColor: isExpanded ? "var(--base)" : "#002bba",
+                                    border: isExpanded ? "1px solid #ef4444" : "1px solid #002bba",
+                                    color: isExpanded ? "#ef4444" : "#ffffff",
+                                    cursor: "pointer",
                                     display: "inline-flex",
                                     alignItems: "center",
                                     gap: "0.6rem",
-                                    opacity: isOpening ? 0.6 : 1,
+                                    borderRadius: "0.2rem",
+                                    boxShadow: isExpanded ? "none" : "0 2px 10px rgba(0, 43, 186, 0.28)",
+                                    transition: "all 0.2s ease",
                                   }}
                                 >
-                                  📥 {isOpening ? "Gerando link seguro..." : att.fileName}
+                                  <span>{isExpanded ? "OCULTAR MENSAGENS" : "Enviar nova Mensagem"}</span>
+                                  <span style={{ fontSize: "1rem" }}>{isExpanded ? "▲" : "▼"}</span>
                                 </button>
-                              );
-                            })}
-                        </div>
+                              </div>
+                            </div>
 
-                        {/* Botão Enviar nova mensagem / Ocultar mensagens */}
-                        <div style={{ marginLeft: "auto" }}>
-                          <button
-                            type="button"
-                            onClick={() => {
-                              const willExpand = !isExpanded;
-                              setExpandedTicketId(willExpand ? t.id : null);
-                              if (willExpand) {
-                                setTimeout(() => {
-                                  document.getElementById(`ticket-comment-input-${t.id}`)?.focus();
-                                }, 120);
-                              }
-                            }}
-                            className="btn btn-default-icon"
-                            style={{
-                              height: "3.4rem",
-                              padding: "0.4rem 1.8rem",
-                              fontSize: "1.2rem",
-                              fontFamily: "var(--_font-accent)",
-                              fontWeight: 700,
-                              backgroundColor: isExpanded ? "var(--base)" : "#002bba",
-                              border: isExpanded ? "1px solid #ef4444" : "1px solid #002bba",
-                              color: isExpanded ? "#ef4444" : "#ffffff",
-                              cursor: "pointer",
-                              display: "inline-flex",
-                              alignItems: "center",
-                              gap: "0.6rem",
-                              borderRadius: "0.2rem",
-                              boxShadow: isExpanded ? "none" : "0 2px 10px rgba(0, 43, 186, 0.28)",
-                              transition: "all 0.2s ease",
-                            }}
-                          >
-                            <span>{isExpanded ? "OCULTAR MENSAGENS" : "Enviar nova Mensagem"}</span>
-                            <span style={{ fontSize: "1rem" }}>{isExpanded ? "▲" : "▼"}</span>
-                          </button>
-                        </div>
-                      </div>
-
-                      {/* Thread Expandida: Timeline e Envio de Novo Comentário */}
-                      {isExpanded && (
-                        <div
-                          style={{
-                            marginTop: "2.5rem",
-                            paddingTop: "2rem",
-                            borderTop: "1px solid var(--st-medium)",
-                          }}
-                        >
-                          {/* Timeline de Comentários Anteriores */}
-                          {t.comments && t.comments.length > 0 && (
-                            <div style={{ display: "flex", flexDirection: "column", gap: "1.2rem", marginBottom: "2rem" }}>
-                              <span
+                            {/* Thread Expandida: Timeline e Envio de Novo Comentário */}
+                            {isExpanded && (
+                              <div
                                 style={{
-                                  display: "block",
-                                  fontFamily: "var(--_font-accent)",
-                                  fontSize: "1.1rem",
-                                  textTransform: "uppercase",
-                                  color: "var(--accent)",
-                                  fontWeight: 700,
+                                  marginTop: "2.5rem",
+                                  paddingTop: "2rem",
+                                  borderTop: "1px solid var(--st-medium)",
                                 }}
                               >
-                                Timeline de Interações ({t.comments.length}):
-                              </span>
-                              {t.comments.map((comm) => (
-                                <div
-                                  key={comm.id}
+                                {/* Timeline de Comentários Anteriores */}
+                                {t.comments && t.comments.length > 0 && (
+                                  <div style={{ display: "flex", flexDirection: "column", gap: "1.2rem", marginBottom: "2rem" }}>
+                                    <span
+                                      style={{
+                                        display: "block",
+                                        fontFamily: "var(--_font-accent)",
+                                        fontSize: "1.1rem",
+                                        textTransform: "uppercase",
+                                        color: "var(--accent)",
+                                        fontWeight: 700,
+                                      }}
+                                    >
+                                      Timeline de Interações ({t.comments.length}):
+                                    </span>
+                                    {t.comments.map((comm) => (
+                                      <div
+                                        key={comm.id}
+                                        style={{
+                                          padding: "1.2rem 1.4rem",
+                                          backgroundColor: comm.isAdmin ? "rgba(0, 43, 186, 0.08)" : "var(--base)",
+                                          border: `1px solid ${comm.isAdmin ? "var(--accent)" : "var(--st-medium)"}`,
+                                          borderRadius: "0.3rem",
+                                        }}
+                                      >
+                                        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "0.4rem" }}>
+                                          <strong style={{ fontSize: "1.2rem", color: comm.isAdmin ? "var(--accent)" : "var(--t-bright)", fontFamily: "var(--_font-accent)" }}>
+                                            {comm.authorName} {comm.isAdmin ? "(Equipe MindSite)" : "(Você)"}
+                                          </strong>
+                                          <span style={{ fontSize: "1.1rem", color: "var(--t-muted)", fontFamily: "var(--_font-accent)" }}>
+                                            {new Date(comm.createdAt).toLocaleString("pt-BR")}
+                                          </span>
+                                        </div>
+                                        <p style={{ fontSize: "1.3rem", color: "var(--t-medium)", margin: 0, whiteSpace: "pre-line", fontFamily: "var(--_font-default)" }}>
+                                          {comm.message}
+                                        </p>
+
+                                        {/* Anexos do Comentário */}
+                                        {comm.attachments && comm.attachments.length > 0 && (
+                                          <div style={{ marginTop: "0.8rem", display: "flex", flexWrap: "wrap", gap: "0.8rem" }}>
+                                            {comm.attachments.map((attPath, attIdx) => {
+                                              const cleanFileName =
+                                                attPath.split("/").pop()?.split("_").slice(2).join("_") ||
+                                                attPath.split("/").pop() ||
+                                                `Anexo_${attIdx + 1}`;
+                                              const isOpeningThis = openingAttachmentId === attPath;
+                                              return (
+                                                <button
+                                                  key={attIdx}
+                                                  type="button"
+                                                  onClick={() => handleOpenAttachment(attPath, cleanFileName)}
+                                                  disabled={isOpeningThis}
+                                                  style={{
+                                                    fontSize: "1.1rem",
+                                                    fontFamily: "var(--_font-accent)",
+                                                    padding: "0.3rem 0.9rem",
+                                                    backgroundColor: "var(--base-tint)",
+                                                    border: "1px solid var(--st-medium)",
+                                                    borderRadius: "0.2rem",
+                                                    color: "var(--t-bright)",
+                                                    cursor: "pointer",
+                                                    display: "inline-flex",
+                                                    alignItems: "center",
+                                                    gap: "0.6rem",
+                                                    opacity: isOpeningThis ? 0.6 : 1,
+                                                  }}
+                                                >
+                                                  📎 {isOpeningThis ? "Abrindo..." : cleanFileName} ↗
+                                                </button>
+                                              );
+                                            })}
+                                          </div>
+                                        )}
+                                      </div>
+                                    ))}
+                                  </div>
+                                )}
+
+                                <label
                                   style={{
-                                    padding: "1.2rem 1.4rem",
-                                    backgroundColor: comm.isAdmin ? "rgba(0, 43, 186, 0.08)" : "var(--base)",
-                                    border: `1px solid ${comm.isAdmin ? "var(--accent)" : "var(--st-medium)"}`,
-                                    borderRadius: "0.3rem",
+                                    display: "block",
+                                    fontFamily: "var(--_font-accent)",
+                                    fontSize: "1.1rem",
+                                    textTransform: "uppercase",
+                                    color: "var(--t-muted)",
+                                    marginBottom: "0.8rem",
                                   }}
                                 >
-                                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "0.4rem" }}>
-                                    <strong style={{ fontSize: "1.2rem", color: comm.isAdmin ? "var(--accent)" : "var(--t-bright)", fontFamily: "var(--_font-accent)" }}>
-                                      {comm.authorName} {comm.isAdmin ? "(Equipe MindSite)" : "(Você)"}
-                                    </strong>
-                                    <span style={{ fontSize: "1.1rem", color: "var(--t-muted)", fontFamily: "var(--_font-accent)" }}>
-                                      {new Date(comm.createdAt).toLocaleString("pt-BR")}
-                                    </span>
-                                  </div>
-                                  <p style={{ fontSize: "1.3rem", color: "var(--t-medium)", margin: 0, whiteSpace: "pre-line", fontFamily: "var(--_font-default)" }}>
-                                    {comm.message}
-                                  </p>
+                                  Adicionar Resposta / Dúvida ao Chamado #{t.ticketNumber}:
+                                </label>
+                                <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
+                                  <textarea
+                                    id={`ticket-comment-input-${t.id}`}
+                                    rows={3}
+                                    value={commentInputs[t.id] || ""}
+                                    onChange={(e) =>
+                                      setCommentInputs({ ...commentInputs, [t.id]: e.target.value })
+                                    }
+                                    placeholder="Digite sua mensagem para a MindSite..."
+                                    style={{
+                                      width: "100%",
+                                      padding: "1.2rem",
+                                      backgroundColor: "var(--base)",
+                                      border: "1px solid var(--st-medium)",
+                                      color: "var(--t-bright)",
+                                      fontFamily: "var(--_font-default)",
+                                      fontSize: "1.3rem",
+                                      borderRadius: "0.2rem",
+                                      outline: "none",
+                                    }}
+                                  />
 
-                                  {/* Anexos do Comentário */}
-                                  {comm.attachments && comm.attachments.length > 0 && (
-                                    <div style={{ marginTop: "0.8rem", display: "flex", flexWrap: "wrap", gap: "0.8rem" }}>
-                                      {comm.attachments.map((attPath, attIdx) => {
-                                        const cleanFileName =
-                                          attPath.split("/").pop()?.split("_").slice(2).join("_") ||
-                                          attPath.split("/").pop() ||
-                                          `Anexo_${attIdx + 1}`;
-                                        const isOpeningThis = openingAttachmentId === attPath;
-                                        return (
+                                  {/* Seletor Estilizado de Anexos (Múltiplos arquivos) */}
+                                  <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", justifyContent: "space-between", gap: "1rem" }}>
+                                    <label
+                                      style={{
+                                        display: "inline-flex",
+                                        alignItems: "center",
+                                        gap: "0.6rem",
+                                        cursor: "pointer",
+                                        fontFamily: "var(--_font-accent)",
+                                        fontSize: "1.2rem",
+                                        color: "var(--accent)",
+                                        padding: "0.6rem 1.4rem",
+                                        border: "1px dashed var(--st-medium)",
+                                        borderRadius: "0.2rem",
+                                        backgroundColor: "var(--base-tint)",
+                                        transition: "border-color 0.2s ease",
+                                      }}
+                                    >
+                                      <span>📎 Anexar arquivos (PNG, JPG, PDF, WEBP)</span>
+                                      <input
+                                        type="file"
+                                        multiple
+                                        style={{ display: "none" }}
+                                        disabled={sendingCommentId === t.id}
+                                        onChange={(e) => {
+                                          if (!e.target.files) return;
+                                          const newFiles = Array.from(e.target.files);
+                                          setCommentFiles((prev) => ({
+                                            ...prev,
+                                            [t.id]: [...(prev[t.id] || []), ...newFiles],
+                                          }));
+                                        }}
+                                      />
+                                    </label>
+
+                                    <button
+                                      type="button"
+                                      disabled={
+                                        sendingCommentId === t.id ||
+                                        (!commentInputs[t.id]?.trim() && (!commentFiles[t.id] || commentFiles[t.id].length === 0))
+                                      }
+                                      onClick={() => handleAddComment(t.id)}
+                                      className="btn btn-default-icon btn-default-accent"
+                                      style={{
+                                        height: "4rem",
+                                        padding: "0 2.2rem",
+                                        fontSize: "1.2rem",
+                                        fontFamily: "var(--_font-accent)",
+                                      }}
+                                    >
+                                      {sendingCommentId === t.id ? "ENVIANDO..." : "ENVIAR MENSAGEM →"}
+                                    </button>
+                                  </div>
+
+                                  {/* Chips de arquivos selecionados para a resposta (Deferred upload) */}
+                                  {commentFiles[t.id] && commentFiles[t.id].length > 0 && (
+                                    <div style={{ display: "flex", flexWrap: "wrap", gap: "0.8rem", marginTop: "0.4rem" }}>
+                                      {commentFiles[t.id].map((f, fIdx) => (
+                                        <span
+                                          key={fIdx}
+                                          style={{
+                                            fontSize: "1.1rem",
+                                            fontFamily: "var(--_font-accent)",
+                                            backgroundColor: "var(--base)",
+                                            border: "1px solid var(--st-medium)",
+                                            padding: "0.3rem 0.8rem",
+                                            borderRadius: "0.2rem",
+                                            color: "var(--t-bright)",
+                                            display: "inline-flex",
+                                            alignItems: "center",
+                                            gap: "0.6rem",
+                                          }}
+                                        >
+                                          📎 {f.name} ({(f.size / 1024).toFixed(0)} KB)
                                           <button
-                                            key={attIdx}
                                             type="button"
-                                            onClick={() => handleOpenAttachment(attPath, cleanFileName)}
-                                            disabled={isOpeningThis}
+                                            onClick={() =>
+                                              setCommentFiles((prev) => ({
+                                                ...prev,
+                                                [t.id]: prev[t.id].filter((_, idx) => idx !== fIdx),
+                                              }))
+                                            }
                                             style={{
-                                              fontSize: "1.1rem",
-                                              fontFamily: "var(--_font-accent)",
-                                              padding: "0.3rem 0.9rem",
-                                              backgroundColor: "var(--base-tint)",
-                                              border: "1px solid var(--st-medium)",
-                                              borderRadius: "0.2rem",
-                                              color: "var(--t-bright)",
+                                              background: "none",
+                                              border: "none",
+                                              color: "var(--t-muted)",
                                               cursor: "pointer",
-                                              display: "inline-flex",
-                                              alignItems: "center",
-                                              gap: "0.6rem",
-                                              opacity: isOpeningThis ? 0.6 : 1,
+                                              fontSize: "1.2rem",
+                                              lineHeight: 1,
+                                              padding: "0 0.2rem",
                                             }}
+                                            title="Remover anexo"
                                           >
-                                            📎 {isOpeningThis ? "Abrindo..." : cleanFileName} ↗
+                                            ✕
                                           </button>
-                                        );
-                                      })}
+                                        </span>
+                                      ))}
                                     </div>
                                   )}
                                 </div>
-                              ))}
-                            </div>
-                          )}
-
-                          <label
-                            style={{
-                              display: "block",
-                              fontFamily: "var(--_font-accent)",
-                              fontSize: "1.1rem",
-                              textTransform: "uppercase",
-                              color: "var(--t-muted)",
-                              marginBottom: "0.8rem",
-                            }}
-                          >
-                            Adicionar Resposta / Dúvida ao Chamado #{t.ticketNumber}:
-                          </label>
-                          <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
-                            <textarea
-                              id={`ticket-comment-input-${t.id}`}
-                              rows={3}
-                              value={commentInputs[t.id] || ""}
-                              onChange={(e) =>
-                                setCommentInputs({ ...commentInputs, [t.id]: e.target.value })
-                              }
-                              placeholder="Digite sua mensagem para a equipe técnica da MindSite..."
-                              style={{
-                                width: "100%",
-                                padding: "1.2rem",
-                                backgroundColor: "var(--base)",
-                                border: "1px solid var(--st-medium)",
-                                color: "var(--t-bright)",
-                                fontFamily: "var(--_font-default)",
-                                fontSize: "1.3rem",
-                                borderRadius: "0.2rem",
-                                outline: "none",
-                              }}
-                            />
-
-                            {/* Seletor Estilizado de Anexos (Múltiplos arquivos) */}
-                            <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", justifyContent: "space-between", gap: "1rem" }}>
-                              <label
-                                style={{
-                                  display: "inline-flex",
-                                  alignItems: "center",
-                                  gap: "0.6rem",
-                                  cursor: "pointer",
-                                  fontFamily: "var(--_font-accent)",
-                                  fontSize: "1.2rem",
-                                  color: "var(--accent)",
-                                  padding: "0.6rem 1.4rem",
-                                  border: "1px dashed var(--st-medium)",
-                                  borderRadius: "0.2rem",
-                                  backgroundColor: "var(--base-tint)",
-                                  transition: "border-color 0.2s ease",
-                                }}
-                              >
-                                <span>📎 Anexar arquivos (PNG, JPG, PDF, WEBP)</span>
-                                <input
-                                  type="file"
-                                  multiple
-                                  style={{ display: "none" }}
-                                  disabled={sendingCommentId === t.id}
-                                  onChange={(e) => {
-                                    if (!e.target.files) return;
-                                    const newFiles = Array.from(e.target.files);
-                                    setCommentFiles((prev) => ({
-                                      ...prev,
-                                      [t.id]: [...(prev[t.id] || []), ...newFiles],
-                                    }));
-                                  }}
-                                />
-                              </label>
-
-                              <button
-                                type="button"
-                                disabled={
-                                  sendingCommentId === t.id ||
-                                  (!commentInputs[t.id]?.trim() && (!commentFiles[t.id] || commentFiles[t.id].length === 0))
-                                }
-                                onClick={() => handleAddComment(t.id)}
-                                className="btn btn-default-icon btn-default-accent"
-                                style={{
-                                  height: "4rem",
-                                  padding: "0 2.2rem",
-                                  fontSize: "1.2rem",
-                                  fontFamily: "var(--_font-accent)",
-                                }}
-                              >
-                                {sendingCommentId === t.id ? "ENVIANDO..." : "ENVIAR MENSAGEM →"}
-                              </button>
-                            </div>
-
-                            {/* Chips de arquivos selecionados para a resposta (Deferred upload) */}
-                            {commentFiles[t.id] && commentFiles[t.id].length > 0 && (
-                              <div style={{ display: "flex", flexWrap: "wrap", gap: "0.8rem", marginTop: "0.4rem" }}>
-                                {commentFiles[t.id].map((f, fIdx) => (
-                                  <span
-                                    key={fIdx}
-                                    style={{
-                                      fontSize: "1.1rem",
-                                      fontFamily: "var(--_font-accent)",
-                                      backgroundColor: "var(--base)",
-                                      border: "1px solid var(--st-medium)",
-                                      padding: "0.3rem 0.8rem",
-                                      borderRadius: "0.2rem",
-                                      color: "var(--t-bright)",
-                                      display: "inline-flex",
-                                      alignItems: "center",
-                                      gap: "0.6rem",
-                                    }}
-                                  >
-                                    📎 {f.name} ({(f.size / 1024).toFixed(0)} KB)
-                                    <button
-                                      type="button"
-                                      onClick={() =>
-                                        setCommentFiles((prev) => ({
-                                          ...prev,
-                                          [t.id]: prev[t.id].filter((_, idx) => idx !== fIdx),
-                                        }))
-                                      }
-                                      style={{
-                                        background: "none",
-                                        border: "none",
-                                        color: "var(--t-muted)",
-                                        cursor: "pointer",
-                                        fontSize: "1.2rem",
-                                        lineHeight: 1,
-                                        padding: "0 0.2rem",
-                                      }}
-                                      title="Remover anexo"
-                                    >
-                                      ✕
-                                    </button>
-                                  </span>
-                                ))}
                               </div>
                             )}
                           </div>
-                        </div>
-                      )}
-                    </div>
-                  );
-                })
-              )}
+                        );
+                      })
+                    )}
                   </>
                 );
               })()}
@@ -2002,8 +2016,8 @@ export default function PortalDashboardView({ data, isFirstLogin }: PortalProps)
                       border: isInvoiceOverdue
                         ? "1px solid rgba(239, 68, 68, 0.4)"
                         : isInvoiceDueToday
-                        ? "1px solid rgba(245, 158, 11, 0.5)"
-                        : "1px solid var(--accent)",
+                          ? "1px solid rgba(245, 158, 11, 0.5)"
+                          : "1px solid var(--accent)",
                       padding: "3.5rem",
                       borderRadius: "0.4rem",
                     }}
@@ -2014,18 +2028,18 @@ export default function PortalDashboardView({ data, isFirstLogin }: PortalProps)
                         backgroundColor: isInvoiceOverdue
                           ? "rgba(239, 68, 68, 0.15)"
                           : isInvoiceDueToday
-                          ? "rgba(245, 158, 11, 0.15)"
-                          : undefined,
+                            ? "rgba(245, 158, 11, 0.15)"
+                            : undefined,
                         color: isInvoiceOverdue
                           ? "#ef4444"
                           : isInvoiceDueToday
-                          ? "#f59e0b"
-                          : "var(--accent)",
+                            ? "#f59e0b"
+                            : "var(--accent)",
                         border: isInvoiceOverdue
                           ? "1px solid rgba(239, 68, 68, 0.3)"
                           : isInvoiceDueToday
-                          ? "1px solid rgba(245, 158, 11, 0.4)"
-                          : undefined,
+                            ? "1px solid rgba(245, 158, 11, 0.4)"
+                            : undefined,
                         marginBottom: "1rem",
                         display: "inline-block",
                         fontFamily: "var(--_font-accent)",
@@ -2035,8 +2049,8 @@ export default function PortalDashboardView({ data, isFirstLogin }: PortalProps)
                       {isInvoiceOverdue
                         ? "EM ATRASO"
                         : isInvoiceDueToday
-                        ? "VENCE HOJE"
-                        : "Fatura em Aberto"}
+                          ? "VENCE HOJE"
+                          : "Fatura em Aberto"}
                     </span>
                     <h3
                       style={{
@@ -2148,8 +2162,16 @@ export default function PortalDashboardView({ data, isFirstLogin }: PortalProps)
                       </div>
                     )}
 
-                    {data.activeInvoice.gatewayInvoiceUrl && (
-                      <div style={{ marginTop: "2.5rem" }}>
+                    <div
+                      style={{
+                        marginTop: "2.5rem",
+                        display: "flex",
+                        flexWrap: "wrap",
+                        alignItems: "center",
+                        gap: "1.2rem",
+                      }}
+                    >
+                      {data.activeInvoice.gatewayInvoiceUrl && (
                         <a
                           href={data.activeInvoice.gatewayInvoiceUrl}
                           target="_blank"
@@ -2169,8 +2191,29 @@ export default function PortalDashboardView({ data, isFirstLogin }: PortalProps)
                         >
                           💳 Pagar no Checkout InfinitePay (Pix ou Cartão) ➔
                         </a>
-                      </div>
-                    )}
+                      )}
+                      <button
+                        type="button"
+                        onClick={() => setIsInvoiceDetailsModalOpen(true)}
+                        className="btn btn-default-icon btn-default-outline"
+                        style={{
+                          height: "4.8rem",
+                          padding: "0 2.2rem",
+                          fontSize: "1.3rem",
+                          fontFamily: "var(--_font-accent)",
+                          fontWeight: 700,
+                          borderColor: "var(--accent)",
+                          color: "var(--accent)",
+                          cursor: "pointer",
+                          display: "inline-flex",
+                          alignItems: "center",
+                          gap: "0.8rem",
+                          borderRadius: "0.2rem",
+                        }}
+                      >
+                        📄 Visualizar Fatura
+                      </button>
+                    </div>
                   </div>
                 );
               })()
@@ -2284,7 +2327,7 @@ export default function PortalDashboardView({ data, isFirstLogin }: PortalProps)
               </div>
 
               {(!data.upcomingInstallments || data.upcomingInstallments.length === 0) &&
-              !data.unbilledSustainability ? (
+                !data.unbilledSustainability ? (
                 <div
                   style={{
                     padding: "3rem",
@@ -2337,7 +2380,7 @@ export default function PortalDashboardView({ data, isFirstLogin }: PortalProps)
                             <input
                               type="checkbox"
                               checked={includeSustainability}
-                              onChange={() => {}}
+                              onChange={() => { }}
                               style={{ width: "1.6rem", height: "1.6rem", cursor: "pointer" }}
                             />
                           </td>
@@ -2396,7 +2439,7 @@ export default function PortalDashboardView({ data, isFirstLogin }: PortalProps)
                               <input
                                 type="checkbox"
                                 checked={isSelected}
-                                onChange={() => {}}
+                                onChange={() => { }}
                                 style={{ width: "1.6rem", height: "1.6rem", cursor: "pointer" }}
                               />
                             </td>
@@ -2428,20 +2471,19 @@ export default function PortalDashboardView({ data, isFirstLogin }: PortalProps)
                                   backgroundColor: isPast
                                     ? "rgba(239, 68, 68, 0.1)"
                                     : isDueToday
-                                    ? "rgba(245, 158, 11, 0.15)"
-                                    : "rgba(59, 130, 246, 0.1)",
+                                      ? "rgba(245, 158, 11, 0.15)"
+                                      : "rgba(59, 130, 246, 0.1)",
                                   color: isPast
                                     ? "#ef4444"
                                     : isDueToday
-                                    ? "#f59e0b"
-                                    : "#3b82f6",
-                                  border: `1px solid ${
-                                    isPast
+                                      ? "#f59e0b"
+                                      : "#3b82f6",
+                                  border: `1px solid ${isPast
                                       ? "rgba(239, 68, 68, 0.3)"
                                       : isDueToday
-                                      ? "rgba(245, 158, 11, 0.4)"
-                                      : "rgba(59, 130, 246, 0.3)"
-                                  }`,
+                                        ? "rgba(245, 158, 11, 0.4)"
+                                        : "rgba(59, 130, 246, 0.3)"
+                                    }`,
                                 }}
                               >
                                 {isPast ? "VENCIDA (NÃO FATURADA)" : isDueToday ? "VENCE HOJE" : "AGENDADO"}
@@ -2479,8 +2521,8 @@ export default function PortalDashboardView({ data, isFirstLogin }: PortalProps)
                       }}
                     >
                       {isConsolidating
-                        ? "GERANDO FATURA & CHECKOUT..."
-                        : "GERAR FATURA & PAGAR AGORA (PIX / CARTÃO) →"}
+                        ? "Gerando checkout seguro..."
+                        : "PAGAR AGORA (PIX / CARTÃO) →"}
                     </button>
                   </div>
                 </div>
@@ -2572,28 +2614,27 @@ export default function PortalDashboardView({ data, isFirstLogin }: PortalProps)
                                 inv.status === "PAID"
                                   ? "rgba(16, 185, 129, 0.1)"
                                   : inv.status === "OVERDUE"
-                                  ? "rgba(239, 68, 68, 0.15)"
-                                  : "rgba(245, 158, 11, 0.1)",
+                                    ? "rgba(239, 68, 68, 0.15)"
+                                    : "rgba(245, 158, 11, 0.1)",
                               color:
                                 inv.status === "PAID"
                                   ? "#10b981"
                                   : inv.status === "OVERDUE"
-                                  ? "#ef4444"
-                                  : "#f59e0b",
-                              border: `1px solid ${
-                                inv.status === "PAID"
+                                    ? "#ef4444"
+                                    : "#f59e0b",
+                              border: `1px solid ${inv.status === "PAID"
                                   ? "rgba(16, 185, 129, 0.3)"
                                   : inv.status === "OVERDUE"
-                                  ? "rgba(239, 68, 68, 0.3)"
-                                  : "rgba(245, 158, 11, 0.3)"
-                              }`,
+                                    ? "rgba(239, 68, 68, 0.3)"
+                                    : "rgba(245, 158, 11, 0.3)"
+                                }`,
                             }}
                           >
                             {inv.status === "PAID"
                               ? "PAGO"
                               : inv.status === "OVERDUE"
-                              ? "EM ATRASO"
-                              : "PENDENTE"}
+                                ? "EM ATRASO"
+                                : "PENDENTE"}
                           </span>
                         </td>
                         <td style={{ padding: "1.2rem 1rem", textAlign: "right" }}>
@@ -3594,6 +3635,195 @@ export default function PortalDashboardView({ data, isFirstLogin }: PortalProps)
                   </button>
                 </div>
               ))}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* MODAL: DETALHAMENTO DA FATURA ATIVA ("VISUALIZAR FATURA") */}
+      {isInvoiceDetailsModalOpen && data.activeInvoice && (
+        <div
+          role="dialog"
+          aria-modal="true"
+          onClick={(e) => {
+            if (e.target === e.currentTarget) setIsInvoiceDetailsModalOpen(false);
+          }}
+          style={{
+            position: "fixed",
+            inset: 0,
+            zIndex: 10000,
+            backgroundColor: "rgba(0,0,0,0.85)",
+            backdropFilter: "blur(4px)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            padding: "2rem",
+          }}
+        >
+          <div
+            style={{
+              backgroundColor: "var(--base-tint)",
+              border: "1px solid var(--st-medium)",
+              maxWidth: "640px",
+              width: "100%",
+              padding: "3.5rem",
+              borderRadius: "0.4rem",
+              maxHeight: "90vh",
+              overflowY: "auto",
+              position: "relative",
+            }}
+          >
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "2rem" }}>
+              <div>
+                <span
+                  style={{
+                    fontFamily: "var(--_font-accent)",
+                    fontSize: "1.1rem",
+                    textTransform: "uppercase",
+                    color: "var(--accent)",
+                    fontWeight: 700,
+                    display: "block",
+                    marginBottom: "0.4rem",
+                  }}
+                >
+                  Detalhamento de Cobrança
+                </span>
+                <h3
+                  style={{
+                    fontSize: "2.4rem",
+                    fontFamily: "var(--_font-default)",
+                    fontWeight: 700,
+                    color: "var(--t-bright)",
+                    margin: "0 0 0.6rem 0",
+                  }}
+                >
+                  Fatura #{data.activeInvoice.invoiceNumber}
+                </h3>
+                <p style={{ fontSize: "1.3rem", color: "var(--t-medium)", margin: 0, fontFamily: "var(--_font-accent)" }}>
+                  Data de Vencimento:{" "}
+                  <strong style={{ color: "var(--t-bright)" }}>
+                    {new Date(data.activeInvoice.dueDate).toLocaleDateString("pt-BR", { timeZone: "America/Sao_Paulo" })}
+                  </strong>
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={() => setIsInvoiceDetailsModalOpen(false)}
+                style={{
+                  background: "none",
+                  border: "none",
+                  color: "var(--t-muted)",
+                  cursor: "pointer",
+                  fontSize: "1.8rem",
+                  lineHeight: 1,
+                  padding: "0.4rem",
+                }}
+                aria-label="Fechar modal"
+              >
+                ✕
+              </button>
+            </div>
+
+            <div
+              style={{
+                borderTop: "1px solid var(--st-medium)",
+                borderBottom: "1px solid var(--st-medium)",
+                padding: "2rem 0",
+                margin: "2rem 0",
+              }}
+            >
+              <h4
+                style={{
+                  fontSize: "1.2rem",
+                  textTransform: "uppercase",
+                  fontFamily: "var(--_font-accent)",
+                  color: "var(--t-muted)",
+                  margin: "0 0 1.5rem 0",
+                  letterSpacing: "0.05em",
+                }}
+              >
+                Itens e Serviços Discriminados
+              </h4>
+              <div style={{ display: "flex", flexDirection: "column", gap: "1.2rem" }}>
+                {data.activeInvoice.items.map((item) => (
+                  <div
+                    key={item.id}
+                    style={{
+                      display: "flex",
+                      justifyContent: "space-between",
+                      alignItems: "center",
+                      fontFamily: "var(--_font-accent)",
+                      fontSize: "1.3rem",
+                      padding: "1.2rem 1.4rem",
+                      backgroundColor: "var(--base)",
+                      borderRadius: "0.2rem",
+                      border: "1px solid var(--st-medium)",
+                    }}
+                  >
+                    <span style={{ color: "var(--t-bright)" }}>{item.description}</span>
+                    <strong style={{ color: "var(--t-bright)", whiteSpace: "nowrap" }}>
+                      R$ {item.amount.toFixed(2).replace(".", ",")}
+                    </strong>
+                  </div>
+                ))}
+              </div>
+
+              <div
+                style={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                  fontFamily: "var(--_font-accent)",
+                  fontSize: "1.6rem",
+                  marginTop: "2rem",
+                  paddingTop: "1.5rem",
+                  borderTop: "1px dashed var(--st-medium)",
+                }}
+              >
+                <span style={{ color: "var(--t-bright)", fontWeight: 700 }}>Total Consolidado:</span>
+                <strong style={{ color: "var(--accent)", fontSize: "1.8rem" }}>
+                  R$ {data.activeInvoice.totalAmount.toFixed(2).replace(".", ",")}
+                </strong>
+              </div>
+            </div>
+
+            <div style={{ display: "flex", justifyContent: "flex-end", alignItems: "center", gap: "1.5rem", flexWrap: "wrap", marginTop: "2rem" }}>
+              <button
+                type="button"
+                onClick={() => setIsInvoiceDetailsModalOpen(false)}
+                className="btn btn-default-icon btn-default-outline"
+                style={{
+                  height: "4.4rem",
+                  padding: "0 2rem",
+                  fontSize: "1.2rem",
+                  fontFamily: "var(--_font-accent)",
+                  fontWeight: 700,
+                  cursor: "pointer",
+                }}
+              >
+                Fechar
+              </button>
+              {data.activeInvoice.gatewayInvoiceUrl && (
+                <a
+                  href={data.activeInvoice.gatewayInvoiceUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="btn btn-default-icon btn-default-accent"
+                  style={{
+                    height: "4.4rem",
+                    padding: "0 2.2rem",
+                    fontSize: "1.2rem",
+                    fontFamily: "var(--_font-accent)",
+                    fontWeight: 700,
+                    textDecoration: "none",
+                    display: "inline-flex",
+                    alignItems: "center",
+                    gap: "0.8rem",
+                  }}
+                >
+                  💳 Pagar no Checkout InfinitePay (Pix ou Cartão) ➔
+                </a>
+              )}
             </div>
           </div>
         </div>
