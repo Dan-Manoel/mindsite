@@ -95,7 +95,6 @@ export default function Footer1() {
                     <TextScramble className="btn-caption mxd-scramble">
                       Agende uma consultoria
                     </TextScramble>
-                    {/* <i class="btn-icon ph-bold ph-arrow-right"></i> */}
                     <i className="btn-icon">
                       <svg
                         xmlns="http://www.w3.org/2000/svg"
@@ -113,7 +112,6 @@ export default function Footer1() {
                     <TextScramble className="btn-caption mxd-scramble">
                       Escale seu produto
                     </TextScramble>
-                    {/* <i class="btn-icon ph-bold ph-arrow-right"></i> */}
                     <i className="btn-icon">
                       <svg
                         xmlns="http://www.w3.org/2000/svg"
@@ -172,16 +170,15 @@ export default function Footer1() {
                   </div>
                 </nav>
               </div>
-
             </div>
           </div>
         </div>
         {/* Footer Block - Navigation End */}
+
         {/* Footer Block - Controls Start */}
         <div className="mxd-block">
           <div className="container-fluid p-0">
             <div className="row g-0">
-              {/* <div class="col-12 col-xl-6 mxd-footer__item"></div> */}
               <div className="col-12 mxd-footer__item mxd-grid-item">
                 <div className="mxd-footer__controls-middle controls-landing caption-small">
                   <CommonScrollAnimated
@@ -197,9 +194,13 @@ export default function Footer1() {
           </div>
         </div>
         {/* Footer Block - Controls End */}
+
         {/* Footer Block - Fullwidth Text Start */}
-        <div className="mxd-block">
-          <div className="mxd-footer__fw-mark mxd-grid-item">
+        <div className="mxd-block" style={{ paddingTop: "2.5rem" }}>
+          <div 
+            className="mxd-footer__fw-mark mxd-grid-item"
+            style={{ overflow: "visible", paddingTop: "1.5rem" }}
+          >
             <CommonScrollAnimated
               className="mxd-footer__planet01 anim-uni-in-up"
               as="div"
@@ -213,13 +214,14 @@ export default function Footer1() {
                 height={404}
               />
             </CommonScrollAnimated>
-            <div className="fw-mark__wrap">
+            <div className="fw-mark__wrap" style={{ overflow: "visible" }}>
               <a
                 className="fw-mark__content justify-content-center"
                 href="https://mindsite.com.br/works-default"
                 aria-label="MINDSITE Portfolio"
                 target="_blank"
                 rel="noopener noreferrer"
+                style={{ lineHeight: "1.15", paddingTop: "0.5rem", display: "inline-block" }}
               >
                 <CommonAnimatedText
                   as="span"
@@ -247,6 +249,7 @@ export default function Footer1() {
         </div>
         {/* Footer Block - Fullwidth Text End */}
       </div>
+
       {/* Footer Block - Foreground Start */}
       <div className="mxd-demo-footer__foreground">
         {footer1ForegroundImages.map((layer) => (
@@ -261,6 +264,7 @@ export default function Footer1() {
         ))}
       </div>
       {/* Footer Block - Foreground End */}
+
       <div className="mxd-container grid-l-container">
         {/* Footer Block - Data Start */}
         <div className="mxd-block">
@@ -286,9 +290,7 @@ export default function Footer1() {
                           className="mxd-footer__data-item anim-uni-fade-in"
                           as="div"
                           animation="fadeIn"
-                        >
-
-                        </CommonScrollAnimated>
+                        />
                       </div>
                       <div className="col-12 col-xl-6 mxd-grid-item">
                         <CommonScrollAnimated

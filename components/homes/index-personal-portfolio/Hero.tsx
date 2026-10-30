@@ -20,19 +20,32 @@ export default function Hero() {
             <div className="mxd-hero-10">
               <div className="mxd-hero-10__wrap">
                 {/* top group */}
-                <div className="mxd-hero-10__top">
-                  <div className="mxd-hero-10__headline mxd-grid-item">
-                    <div className="hero-10-headline__wrap">
-                      <h1>
+                <div className="mxd-hero-10__top w-full max-w-full overflow-hidden">
+                  <div className="mxd-hero-10__headline mxd-grid-item w-full max-w-full overflow-hidden">
+                    <div className="hero-10-headline__wrap w-full max-w-full overflow-hidden">
+                      <h1 
+                        className="!normal-case w-full overflow-hidden"
+                        style={{ textTransform: "none" }}
+                      >
                         <Link
-                          className="hero-10-headline__content active-cursor-accent"
+                          className="hero-10-headline__content active-cursor-accent !normal-case"
                           data-cursor-text="Fale Comigo"
                           href={`/contact`}
+                          style={{
+                            textTransform: "none",
+                            fontSize: "clamp(3rem, 12vw, 24rem)",
+                            lineHeight: "0.95",
+                            letterSpacing: "-0.03em",
+                            whiteSpace: "nowrap",
+                            display: "inline-block",
+                            maxWidth: "100%",
+                          }}
                         >
                           <CommonAnimatedText
                             as="span"
-                            className="loading-chars"
+                            className="loading-chars !normal-case"
                             animation="animCharsLoad"
+                            style={{ textTransform: "none" }}
                           >
                             Danilo Oliveira
                           </CommonAnimatedText>
@@ -41,6 +54,7 @@ export default function Hero() {
                     </div>
                   </div>
                 </div>
+
                 {/* center group */}
                 <div className="mxd-hero-10__center">
                   <div className="mxd-hero-10__divider" />
@@ -49,7 +63,7 @@ export default function Hero() {
                       <div className="mxd-hero__mark loading-fade">
                         <span className="mark-icon" />
                         <span className="mark-text">
-                          Disponível para freelance
+                          Conheça o idealizador do projeto
                         </span>
                       </div>
                     </CommonLoadFade>
@@ -69,7 +83,6 @@ export default function Hero() {
                   </div>
                   <CommonLoadFade index={1}>
                     <div className="mxd-hero-10__media mxd-grid-item loading-fade">
-                      {/* <Image class="mxd-hero-10__image"  alt="Hero Placeholder"    src="/img/hero/1000x750_h02.webp" width="1000" height="750" /> */}
                       <AutoplayLoopVideo
                         className="mxd-hero-10__video"
                         poster="video/400x225_hero-10.webp"
@@ -92,7 +105,6 @@ export default function Hero() {
                           <TextScramble className="btn-caption mxd-scramble">
                             Novo Projeto
                           </TextScramble>
-                          {/* <i class="btn-icon ph-bold ph-arrow-right"></i> */}
                           <i className="btn-icon">
                             <svg
                               xmlns="http://www.w3.org/2000/svg"
@@ -124,6 +136,7 @@ export default function Hero() {
                   </CommonLoadFade>
                   <div className="mxd-hero-10__divider divider-bottom" />
                 </div>
+
                 {/* bottom group */}
                 <div className="mxd-hero-10__bottom">
                   <div className="mxd-hero-10__dataline">
@@ -135,6 +148,7 @@ export default function Hero() {
                               className="mxd-socials-line__link"
                               href="https://dribbble.com/"
                               target="_blank"
+                              rel="noopener noreferrer"
                             >
                               <TextScramble className="mxd-scramble">
                                 Dribbble
@@ -148,6 +162,7 @@ export default function Hero() {
                               className="mxd-socials-line__link"
                               href="https://www.behance.net/"
                               target="_blank"
+                              rel="noopener noreferrer"
                             >
                               <TextScramble className="mxd-scramble">
                                 Behance
@@ -161,6 +176,7 @@ export default function Hero() {
                               className="mxd-socials-line__link"
                               href="https://github.com/"
                               target="_blank"
+                              rel="noopener noreferrer"
                             >
                               <TextScramble className="mxd-scramble">
                                 Github
@@ -174,6 +190,7 @@ export default function Hero() {
                               className="mxd-socials-line__link"
                               href="https://codepen.io/"
                               target="_blank"
+                              rel="noopener noreferrer"
                             >
                               <TextScramble className="mxd-scramble">
                                 Codepen
@@ -187,6 +204,7 @@ export default function Hero() {
                               className="mxd-socials-line__link"
                               href="https://www.figma.com/community"
                               target="_blank"
+                              rel="noopener noreferrer"
                             >
                               <TextScramble className="mxd-scramble">
                                 Figma Community

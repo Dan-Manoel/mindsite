@@ -6,6 +6,7 @@ import {
 } from "@/components/animations/CommonScrollAnimated";
 import TextScramble from "@/components/animations/TextScramble";
 import FooterBackToTop from "@/components/footers/FooterBackToTop";
+
 export default function Footer3({ name = "MINDSITE" }: { name?: string }) {
   return (
     <BlurSection as="footer" className="mxd-footer">
@@ -22,7 +23,7 @@ export default function Footer3({ name = "MINDSITE" }: { name?: string }) {
                     animation="slideDownLine"
                   >
                     <TextScramble className="mxd-scramble mxd-slide-down">
-                      Home
+                      Início
                     </TextScramble>
                   </CommonScrollAnimatedLink>
                 </li>
@@ -33,7 +34,7 @@ export default function Footer3({ name = "MINDSITE" }: { name?: string }) {
                     animation="slideDownLine"
                   >
                     <TextScramble className="mxd-scramble mxd-slide-down">
-                      Works
+                      Projetos
                     </TextScramble>
                   </CommonScrollAnimatedLink>
                 </li>
@@ -44,7 +45,7 @@ export default function Footer3({ name = "MINDSITE" }: { name?: string }) {
                     animation="slideDownLine"
                   >
                     <TextScramble className="mxd-scramble mxd-slide-down">
-                      Studio
+                      Estúdio
                     </TextScramble>
                   </CommonScrollAnimatedLink>
                 </li>
@@ -55,7 +56,7 @@ export default function Footer3({ name = "MINDSITE" }: { name?: string }) {
                     animation="slideDownLine"
                   >
                     <TextScramble className="mxd-scramble mxd-slide-down">
-                      Services
+                      Serviços
                     </TextScramble>
                   </CommonScrollAnimatedLink>
                 </li>
@@ -66,7 +67,7 @@ export default function Footer3({ name = "MINDSITE" }: { name?: string }) {
                     animation="slideDownLine"
                   >
                     <TextScramble className="mxd-scramble mxd-slide-down">
-                      Contact
+                      Contato
                     </TextScramble>
                   </CommonScrollAnimatedLink>
                 </li>
@@ -75,6 +76,7 @@ export default function Footer3({ name = "MINDSITE" }: { name?: string }) {
           </div>
         </div>
         {/* Footer Block - Navigation v1 End */}
+
         {/* Footer Block - Info Columns Start */}
         <div className="mxd-block">
           <div className="mxd-footer__footer-blocks">
@@ -95,7 +97,7 @@ export default function Footer3({ name = "MINDSITE" }: { name?: string }) {
                 <p className="footer-data">
                   <CommonScrollAnimated
                     className="anim-uni-slide-down"
-                    href="tel:+12127089400"
+                    href="tel:+5511947675814"
                     as="a"
                     animation="slideDownLine"
                   >
@@ -109,7 +111,7 @@ export default function Footer3({ name = "MINDSITE" }: { name?: string }) {
                   as="p"
                   animation="slideDownLine"
                 >
-                  <span>11 West 53 Street, New York, NY 10019</span>
+                  <span>Avenida Paulista, 2537 - São Paulo-SP</span>
                 </CommonScrollAnimated>
               </div>
             </div>
@@ -130,25 +132,31 @@ export default function Footer3({ name = "MINDSITE" }: { name?: string }) {
                   animation="slideDownLine"
                 >
                   <span className="mxd-slide-down">
-                    Copyright MINDSITE. All rights reserved
+                    Copyright MINDSITE. Todos os direitos reservados
                   </span>
                 </CommonScrollAnimated>
                 <CommonScrollAnimated
                   className="footer-data anim-uni-slide-down"
                   as="p"
                   animation="slideDownLine"
-                >
-                </CommonScrollAnimated>
+                />
               </div>
             </div>
           </div>
         </div>
         {/* Footer Block - Info Columns End */}
+
         {/* Footer Block - Fullwidth Text Start */}
-        <div className="mxd-block">
-          <div className="mxd-footer__fw-mark mxd-grid-item">
-            <div className="fw-mark__wrap">
-              <div className="fw-mark__content">
+        <div className="mxd-block" style={{ paddingTop: "2.5rem" }}>
+          <div 
+            className="mxd-footer__fw-mark mxd-grid-item"
+            style={{ overflow: "visible", paddingTop: "1.5rem" }}
+          >
+            <div className="fw-mark__wrap" style={{ overflow: "visible" }}>
+              <div 
+                className="fw-mark__content"
+                style={{ lineHeight: "1.15", paddingTop: "0.5rem" }}
+              >
                 <CommonAnimatedText
                   as="span"
                   className="anim-uni-chars"
@@ -161,6 +169,7 @@ export default function Footer3({ name = "MINDSITE" }: { name?: string }) {
           </div>
         </div>
         {/* Footer Block - Fullwidth Text End */}
+
         {/* Footer Block - Links Start */}
         <div className="mxd-block">
           <div className="mxd-footer__footer-blocks bottom-blocks">
@@ -176,6 +185,7 @@ export default function Footer3({ name = "MINDSITE" }: { name?: string }) {
                       className="mxd-socials-line__link"
                       href="https://dribbble.com/"
                       target="_blank"
+                      rel="noopener noreferrer"
                     >
                       <TextScramble className="mxd-scramble">
                         Dribbble
@@ -187,6 +197,7 @@ export default function Footer3({ name = "MINDSITE" }: { name?: string }) {
                       className="mxd-socials-line__link"
                       href="https://www.behance.net/"
                       target="_blank"
+                      rel="noopener noreferrer"
                     >
                       <TextScramble className="mxd-scramble">
                         Behance
@@ -198,6 +209,7 @@ export default function Footer3({ name = "MINDSITE" }: { name?: string }) {
                       className="mxd-socials-line__link"
                       href="https://github.com/"
                       target="_blank"
+                      rel="noopener noreferrer"
                     >
                       <TextScramble className="mxd-scramble">
                         Github
@@ -209,6 +221,7 @@ export default function Footer3({ name = "MINDSITE" }: { name?: string }) {
                       className="mxd-socials-line__link"
                       href="https://codepen.io/"
                       target="_blank"
+                      rel="noopener noreferrer"
                     >
                       <TextScramble className="mxd-scramble">
                         Codepen
@@ -220,6 +233,7 @@ export default function Footer3({ name = "MINDSITE" }: { name?: string }) {
                       className="mxd-socials-line__link"
                       href="https://www.figma.com/community"
                       target="_blank"
+                      rel="noopener noreferrer"
                     >
                       <TextScramble className="mxd-scramble">
                         Figma Community

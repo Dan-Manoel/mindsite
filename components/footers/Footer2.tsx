@@ -6,6 +6,7 @@ import {
   CommonScrollAnimated,
   CommonScrollAnimatedLink,
 } from "@/components/animations/CommonScrollAnimated";
+
 export default function Footer2({ name = "MINDSITE" }: { name?: string }) {
   return (
     <BlurSection as="footer" className="mxd-footer">
@@ -26,7 +27,7 @@ export default function Footer2({ name = "MINDSITE" }: { name?: string }) {
                               as="p"
                               animation="slideDownLine"
                             >
-                              <span>/ Discover</span>
+                              <span>/ Navegação</span>
                             </CommonScrollAnimated>
                           </div>
                           <div className="mxd-footer-nav02__list">
@@ -37,7 +38,7 @@ export default function Footer2({ name = "MINDSITE" }: { name?: string }) {
                                   href={`/index-creative-agency`}
                                   animation="slideDownLine"
                                 >
-                                  <span>Home</span>
+                                  <span>Início</span>
                                 </CommonScrollAnimatedLink>
                               </li>
                               <li>
@@ -46,7 +47,7 @@ export default function Footer2({ name = "MINDSITE" }: { name?: string }) {
                                   href={`/about-us`}
                                   animation="slideDownLine"
                                 >
-                                  <span>About us</span>
+                                  <span>Sobre nós</span>
                                 </CommonScrollAnimatedLink>
                               </li>
                               <li>
@@ -55,7 +56,7 @@ export default function Footer2({ name = "MINDSITE" }: { name?: string }) {
                                   href={`/works-default`}
                                   animation="slideDownLine"
                                 >
-                                  <span>Case studies</span>
+                                  <span>Projetos</span>
                                 </CommonScrollAnimatedLink>
                               </li>
                               <li>
@@ -64,7 +65,7 @@ export default function Footer2({ name = "MINDSITE" }: { name?: string }) {
                                   href={`/services`}
                                   animation="slideDownLine"
                                 >
-                                  <span>Services</span>
+                                  <span>Serviços</span>
                                 </CommonScrollAnimatedLink>
                               </li>
                               <li>
@@ -73,7 +74,7 @@ export default function Footer2({ name = "MINDSITE" }: { name?: string }) {
                                   href={`/team`}
                                   animation="slideDownLine"
                                 >
-                                  <span>Our team</span>
+                                  <span>Equipe</span>
                                 </CommonScrollAnimatedLink>
                               </li>
                               <li>
@@ -91,7 +92,7 @@ export default function Footer2({ name = "MINDSITE" }: { name?: string }) {
                                   href={`/contact`}
                                   animation="slideDownLine"
                                 >
-                                  <span>Contact</span>
+                                  <span>Contato</span>
                                 </CommonScrollAnimatedLink>
                               </li>
                             </ul>
@@ -106,7 +107,7 @@ export default function Footer2({ name = "MINDSITE" }: { name?: string }) {
                               as="p"
                               animation="slideDownLine"
                             >
-                              <span>/ Contact</span>
+                              <span>/ Contato</span>
                             </CommonScrollAnimated>
                           </div>
                           <div className="mxd-footer-nav02__list">
@@ -124,7 +125,7 @@ export default function Footer2({ name = "MINDSITE" }: { name?: string }) {
                               <li>
                                 <CommonScrollAnimated
                                   className="anim-uni-slide-down"
-                                  href="tel:+12127089400"
+                                  href="tel:+5511947675814"
                                   as="a"
                                   animation="slideDownLine"
                                 >
@@ -141,7 +142,7 @@ export default function Footer2({ name = "MINDSITE" }: { name?: string }) {
                               as="p"
                               animation="slideDownLine"
                             >
-                              <span>/ Info</span>
+                              <span>/ Informações</span>
                             </CommonScrollAnimated>
                           </div>
                           <div className="mxd-footer-nav02__list">
@@ -152,7 +153,7 @@ export default function Footer2({ name = "MINDSITE" }: { name?: string }) {
                                   href={`/pricing`}
                                   animation="slideDownLine"
                                 >
-                                  <span>Pricing</span>
+                                  <span>Planos</span>
                                 </CommonScrollAnimatedLink>
                               </li>
                               <li>
@@ -161,7 +162,7 @@ export default function Footer2({ name = "MINDSITE" }: { name?: string }) {
                                   href={`/faq`}
                                   animation="slideDownLine"
                                 >
-                                  <span>FAQ</span>
+                                  <span>Perguntas Frequentes</span>
                                 </CommonScrollAnimatedLink>
                               </li>
                             </ul>
@@ -184,7 +185,7 @@ export default function Footer2({ name = "MINDSITE" }: { name?: string }) {
                               as="p"
                               animation="slideDownLine"
                             >
-                              <span>/ Ecosystem</span>
+                              <span>/ Ecossistema</span>
                             </CommonScrollAnimated>
                           </div>
                           <div className="mxd-footer-nav02__list">
@@ -192,6 +193,7 @@ export default function Footer2({ name = "MINDSITE" }: { name?: string }) {
                               className="socials-list__item slide-right-up"
                               href="https://vercel.com/"
                               target="_blank"
+                              rel="noopener noreferrer"
                             >
                               <CommonScrollAnimated
                                 className="socials-list__divider divider-top anim-uni-clip-in"
@@ -223,17 +225,9 @@ export default function Footer2({ name = "MINDSITE" }: { name?: string }) {
                                   <svg
                                     version="1.1"
                                     xmlns="http://www.w3.org/2000/svg"
-                                    xmlnsXlink="http://www.w3.org/1999/xlink"
-                                    x="0px"
-                                    y="0px"
                                     viewBox="0 0 18 18"
-                                    enableBackground="new 0 0 18 18"
-                                    xmlSpace="preserve"
                                   >
-                                    <path
-                                      d="M18,0v14.4h-3.6V7.2h-3.6V3.6H3.6V0H18z M7.2,10.8h3.6V7.2H7.2C7.2,7.2,7.2,10.8,7.2,10.8z M3.6,14.4h3.6v-3.6H3.6V14.4z
-                                M0,18h3.6v-3.6H0V18z"
-                                    />
+                                    <path d="M18,0v14.4h-3.6V7.2h-3.6V3.6H3.6V0H18z M7.2,10.8h3.6V7.2H7.2C7.2,7.2,7.2,10.8,7.2,10.8z M3.6,14.4h3.6v-3.6H3.6V14.4z M0,18h3.6v-3.6H0V18z" />
                                   </svg>
                                 </i>
                               </CommonScrollAnimated>
@@ -247,6 +241,7 @@ export default function Footer2({ name = "MINDSITE" }: { name?: string }) {
                               className="socials-list__item slide-right-up"
                               href="https://supabase.com/"
                               target="_blank"
+                              rel="noopener noreferrer"
                             >
                               <CommonScrollAnimated
                                 className="socials-list__divider divider-top anim-uni-clip-in"
@@ -278,17 +273,9 @@ export default function Footer2({ name = "MINDSITE" }: { name?: string }) {
                                   <svg
                                     version="1.1"
                                     xmlns="http://www.w3.org/2000/svg"
-                                    xmlnsXlink="http://www.w3.org/1999/xlink"
-                                    x="0px"
-                                    y="0px"
                                     viewBox="0 0 18 18"
-                                    enableBackground="new 0 0 18 18"
-                                    xmlSpace="preserve"
                                   >
-                                    <path
-                                      d="M18,0v14.4h-3.6V7.2h-3.6V3.6H3.6V0H18z M7.2,10.8h3.6V7.2H7.2C7.2,7.2,7.2,10.8,7.2,10.8z M3.6,14.4h3.6v-3.6H3.6V14.4z
-                                M0,18h3.6v-3.6H0V18z"
-                                    />
+                                    <path d="M18,0v14.4h-3.6V7.2h-3.6V3.6H3.6V0H18z M7.2,10.8h3.6V7.2H7.2C7.2,7.2,7.2,10.8,7.2,10.8z M3.6,14.4h3.6v-3.6H3.6V14.4z M0,18h3.6v-3.6H0V18z" />
                                   </svg>
                                 </i>
                               </CommonScrollAnimated>
@@ -302,6 +289,7 @@ export default function Footer2({ name = "MINDSITE" }: { name?: string }) {
                               className="socials-list__item slide-right-up"
                               href="https://github.com/"
                               target="_blank"
+                              rel="noopener noreferrer"
                             >
                               <CommonScrollAnimated
                                 className="socials-list__divider divider-top anim-uni-clip-in"
@@ -333,17 +321,9 @@ export default function Footer2({ name = "MINDSITE" }: { name?: string }) {
                                   <svg
                                     version="1.1"
                                     xmlns="http://www.w3.org/2000/svg"
-                                    xmlnsXlink="http://www.w3.org/1999/xlink"
-                                    x="0px"
-                                    y="0px"
                                     viewBox="0 0 18 18"
-                                    enableBackground="new 0 0 18 18"
-                                    xmlSpace="preserve"
                                   >
-                                    <path
-                                      d="M18,0v14.4h-3.6V7.2h-3.6V3.6H3.6V0H18z M7.2,10.8h3.6V7.2H7.2C7.2,7.2,7.2,10.8,7.2,10.8z M3.6,14.4h3.6v-3.6H3.6V14.4z
-                                M0,18h3.6v-3.6H0V18z"
-                                    />
+                                    <path d="M18,0v14.4h-3.6V7.2h-3.6V3.6H3.6V0H18z M7.2,10.8h3.6V7.2H7.2C7.2,7.2,7.2,10.8,7.2,10.8z M3.6,14.4h3.6v-3.6H3.6V14.4z M0,18h3.6v-3.6H0V18z" />
                                   </svg>
                                 </i>
                               </CommonScrollAnimated>
@@ -357,6 +337,7 @@ export default function Footer2({ name = "MINDSITE" }: { name?: string }) {
                               className="socials-list__item slide-right-up"
                               href="https://www.figma.com/community"
                               target="_blank"
+                              rel="noopener noreferrer"
                             >
                               <CommonScrollAnimated
                                 className="socials-list__divider divider-top anim-uni-clip-in"
@@ -388,17 +369,9 @@ export default function Footer2({ name = "MINDSITE" }: { name?: string }) {
                                   <svg
                                     version="1.1"
                                     xmlns="http://www.w3.org/2000/svg"
-                                    xmlnsXlink="http://www.w3.org/1999/xlink"
-                                    x="0px"
-                                    y="0px"
                                     viewBox="0 0 18 18"
-                                    enableBackground="new 0 0 18 18"
-                                    xmlSpace="preserve"
                                   >
-                                    <path
-                                      d="M18,0v14.4h-3.6V7.2h-3.6V3.6H3.6V0H18z M7.2,10.8h3.6V7.2H7.2C7.2,7.2,7.2,10.8,7.2,10.8z M3.6,14.4h3.6v-3.6H3.6V14.4z
-                                M0,18h3.6v-3.6H0V18z"
-                                    />
+                                    <path d="M18,0v14.4h-3.6V7.2h-3.6V3.6H3.6V0H18z M7.2,10.8h3.6V7.2H7.2C7.2,7.2,7.2,10.8,7.2,10.8z M3.6,14.4h3.6v-3.6H3.6V14.4z M0,18h3.6v-3.6H0V18z" />
                                   </svg>
                                 </i>
                               </CommonScrollAnimated>
@@ -412,6 +385,7 @@ export default function Footer2({ name = "MINDSITE" }: { name?: string }) {
                               className="socials-list__item slide-right-up"
                               href="https://react.dev/"
                               target="_blank"
+                              rel="noopener noreferrer"
                             >
                               <CommonScrollAnimated
                                 className="socials-list__divider divider-top anim-uni-clip-in"
@@ -443,17 +417,9 @@ export default function Footer2({ name = "MINDSITE" }: { name?: string }) {
                                   <svg
                                     version="1.1"
                                     xmlns="http://www.w3.org/2000/svg"
-                                    xmlnsXlink="http://www.w3.org/1999/xlink"
-                                    x="0px"
-                                    y="0px"
                                     viewBox="0 0 18 18"
-                                    enableBackground="new 0 0 18 18"
-                                    xmlSpace="preserve"
                                   >
-                                    <path
-                                      d="M18,0v14.4h-3.6V7.2h-3.6V3.6H3.6V0H18z M7.2,10.8h3.6V7.2H7.2C7.2,7.2,7.2,10.8,7.2,10.8z M3.6,14.4h3.6v-3.6H3.6V14.4z
-                                M0,18h3.6v-3.6H0V18z"
-                                    />
+                                    <path d="M18,0v14.4h-3.6V7.2h-3.6V3.6H3.6V0H18z M7.2,10.8h3.6V7.2H7.2C7.2,7.2,7.2,10.8,7.2,10.8z M3.6,14.4h3.6v-3.6H3.6V14.4z M0,18h3.6v-3.6H0V18z" />
                                   </svg>
                                 </i>
                               </CommonScrollAnimated>
@@ -474,6 +440,7 @@ export default function Footer2({ name = "MINDSITE" }: { name?: string }) {
           </div>
         </div>
         {/* Footer Block - Navigation v2 End */}
+
         {/* Footer Block - Controls Start */}
         <div className="mxd-block">
           <div className="container-fluid p-0">
@@ -494,11 +461,18 @@ export default function Footer2({ name = "MINDSITE" }: { name?: string }) {
           </div>
         </div>
         {/* Footer Block - Controls End */}
+
         {/* Footer Block - Fullwidth Text Start */}
-        <div className="mxd-block">
-          <div className="mxd-footer__fw-mark mxd-grid-item">
-            <div className="fw-mark__wrap">
-              <div className="fw-mark__content">
+        <div className="mxd-block" style={{ paddingTop: "2.5rem" }}>
+          <div 
+            className="mxd-footer__fw-mark mxd-grid-item"
+            style={{ overflow: "visible", paddingTop: "1.5rem" }}
+          >
+            <div className="fw-mark__wrap" style={{ overflow: "visible" }}>
+              <div 
+                className="fw-mark__content"
+                style={{ lineHeight: "1.15", paddingTop: "0.5rem" }}
+              >
                 <CommonAnimatedText
                   as="span"
                   className="anim-uni-chars"
@@ -511,6 +485,7 @@ export default function Footer2({ name = "MINDSITE" }: { name?: string }) {
           </div>
         </div>
         {/* Footer Block - Fullwidth Text End */}
+
         {/* Footer Block - Data Start */}
         <div className="mxd-block">
           <div className="mxd-footer__data">
@@ -523,7 +498,7 @@ export default function Footer2({ name = "MINDSITE" }: { name?: string }) {
                     animation="fadeIn"
                   >
                     <p className="footer-data">
-                      <span>Copyright MINDSITE. All rights reserved</span>
+                      <span>Copyright MINDSITE. Todos os direitos reservados</span>
                     </p>
                   </CommonScrollAnimated>
                 </div>
@@ -535,8 +510,7 @@ export default function Footer2({ name = "MINDSITE" }: { name?: string }) {
                           className="mxd-footer__data-item anim-uni-fade-in"
                           as="div"
                           animation="fadeIn"
-                        >
-                        </CommonScrollAnimated>
+                        />
                       </div>
                       <div className="col-12 col-xl-6 mxd-grid-item">
                         <CommonScrollAnimated

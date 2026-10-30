@@ -193,6 +193,14 @@ export default function Hero() {
                           className="fullwidth-text__content permanent active-cursor-accent"
                           data-cursor-text="Vamos Conversar"
                           href={`/contact`}
+                          style={{
+                            fontSize: "clamp(3rem, 20vw, 28rem)",
+                            lineHeight: "0.9",
+                            letterSpacing: "-0.04em",
+                            whiteSpace: "nowrap",
+                            display: "inline-block",
+                            maxWidth: "100%",
+                          }}
                         >
                           <CommonAnimatedText
                             as="span"

@@ -21,10 +21,13 @@
 /* Fallback CSS: se o GSAP não completar a animação no mobile,
    esta keyframe garante que o overlay saia da tela após 1.5s. */
 @keyframes mxd-transition-fallback {
-  0%, 70% {
+
+  0%,
+  70% {
     transform: translateY(0%);
     display: flex;
   }
+
   100% {
     transform: translateY(-110%);
     display: none;

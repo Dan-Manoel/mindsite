@@ -50,7 +50,7 @@ export default function SectionTitle() {
                               as="p"
                               animation="inUp"
                             >
-                              Nova York
+                              São Paulo
                             </CommonScrollAnimated>
                           </div>
                           <ul>
@@ -64,11 +64,11 @@ export default function SectionTitle() {
                                 href="https://goo.gl/maps/nWXKpGaDPuyH6gxRA"
                                 target="_blank"
                               >
-                                11 West 53 Street,
+                                Avenida Paulista, 2537
                                 <br />
-                                New York, NY
+                                Bela Vista, São Paulo
                                 <br />
-                                10019
+                                01310-100
                               </a>
                             </CommonScrollAnimated>
                           </ul>
@@ -84,67 +84,6 @@ export default function SectionTitle() {
                               >
                                 <TextScramble className="mxd-scramble">
                                   +55 11 947675814
-                                </TextScramble>
-                              </a>
-                            </CommonScrollAnimated>
-                            <CommonScrollAnimated
-                              className="anim-uni-in-up"
-                              as="li"
-                              animation="inUp"
-                            >
-                              <a
-                                href="mailto:contato@mindsite.com.br?subject=Mensagem%20do%20site"
-                                className="tag tag-s-mobile"
-                              >
-                                <TextScramble className="mxd-scramble">
-                                  contato@mindsite.com.br
-                                </TextScramble>
-                              </a>
-                            </CommonScrollAnimated>
-                          </ul>
-                        </div>
-                        {/* contact data item */}
-                        <div className="col-12 col-md-6 col-xl-5 datalist__item">
-                          <div className="datalist__title">
-                            <CommonScrollAnimated
-                              className="t-bold t-large t-caption anim-uni-in-up"
-                              as="p"
-                              animation="inUp"
-                            >
-                              Oakland
-                            </CommonScrollAnimated>
-                          </div>
-                          <ul>
-                            <CommonScrollAnimated
-                              className="anim-uni-in-up"
-                              as="li"
-                              animation="inUp"
-                            >
-                              <a
-                                className="tag tag-s-mobile"
-                                href="https://goo.gl/maps/xap5o3MZBuC6DFHz8"
-                                target="_blank"
-                              >
-                                3400 Broadway,
-                                <br />
-                                Oakland, CA
-                                <br />
-                                94611
-                              </a>
-                            </CommonScrollAnimated>
-                          </ul>
-                          <ul>
-                            <CommonScrollAnimated
-                              className="anim-uni-in-up"
-                              as="li"
-                              animation="inUp"
-                            >
-                              <a
-                                href="tel:+15104570211"
-                                className="tag tag-s-mobile"
-                              >
-                                <TextScramble className="mxd-scramble">
-                                  +1 510-457-0211
                                 </TextScramble>
                               </a>
                             </CommonScrollAnimated>
