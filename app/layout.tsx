@@ -5,6 +5,7 @@ import TemplateRuntimeProvider from "@/components/common/TemplateRuntimeProvider
 import MenuRuntimeShell from "@/components/headers/MenuRuntimeShell";
 import { Metadata } from "next";
 import { cookies } from "next/headers";
+import { Analytics } from "@vercel/analytics/next";
 
 const manrope = Manrope({
   subsets: ["latin"],
@@ -77,6 +78,8 @@ export default async function RootLayout({
           <MenuRuntimeShell />
           {children}
         </TemplateRuntimeProvider>
+        {/* Coletor de métricas do Vercel Web Analytics */}
+        <Analytics />
       </body>
     </html>
   );
