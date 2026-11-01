@@ -3,9 +3,25 @@ export interface Template {
   title: string;
   category: 'Biotech & Organic' | 'E-commerce' | 'Criadores & Portfólio' | 'Essencial' | 'Corporate & Hubs';
   hostedUrl: string;
+  coverImage?: string;
+  tags?: string[];
+  description?: string;
+  featured?: boolean;
+  createdAt?: string;
 }
 
 export const templatesData: Template[] = [
+  {
+    slug: 'cosmic',
+    title: 'Cosmic',
+    category: 'Biotech & Organic',
+    hostedUrl: 'https://cosmic.mindsite.com.br',
+    coverImage: '/img/demo/screens/cosmic1.webp',
+    tags: ['Holístico', 'Área de Membros', 'Comunidade', 'Next.js 16', 'Design Arquetípico'],
+    description: 'Arquitetura digital imersiva com área de membros, fórum e design arquetípico para marcas de alto padrão.',
+    featured: true,
+    createdAt: '2026-11-01',
+  },
   {
     slug: 'dottoressa',
     title: 'Dottoressa',
