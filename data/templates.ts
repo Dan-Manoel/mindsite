@@ -12,6 +12,21 @@ export interface Template {
 
 export const templatesData: Template[] = [
   {
+    slug: 'web-clinic',
+    title: 'Web Clinic',
+    category: 'Essencial',
+    hostedUrl: 'https://webclinic.mindsite.com.br',
+    coverImage: '/img/demo/screens/web-clinic.webp',
+    tags: [
+      'Clínicas & Saúde',
+      'Tailwind CSS v4',
+      'High-Conversion'
+    ],
+    description: 'Arquitetura premium para clínicas médicas e centros de saúde integrados, com triagem humanizada, integração Supabase/Resend e funil de conversão via WhatsApp.',
+    featured: true,
+    createdAt: '2026-11-01',
+  },
+  {
     slug: 'cosmic',
     title: 'Cosmic',
     category: 'Biotech & Organic',

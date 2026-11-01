@@ -333,7 +333,7 @@ export default async function TemplatePreview({ params }: PreviewProps) {
             title={`Preview de ${template.title}`}
             className="w-full h-full border-none block preview-iframe-element"
             loading="eager"
-            sandbox="allow-scripts allow-same-origin allow-forms allow-popups"
+            sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-modals"
             style={{
               width: "100%",
               height: "100%",

@@ -24,6 +24,17 @@ const PORTFOLIO_CATEGORIES: PortfolioCategory[] = [
     name: "Essencial",
     templates: [
       {
+        name: "Web Clinic",
+        image: "/img/demo/screens/web-clinic.webp",
+        href: "/preview/web-clinic",
+        tags: [
+          "Clínicas & Saúde",
+          "Tailwind CSS v4",
+          "High-Conversion"
+        ],
+      },
+
+      {
         name: "Dottoressa",
         image: "/img/demo/screens/dottoressa.webp",
         href: "/preview/dottoressa",
