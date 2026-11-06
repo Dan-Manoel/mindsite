@@ -23,48 +23,6 @@ export interface PortfolioCategory {
 
 const PORTFOLIO_CATEGORIES: PortfolioCategory[] = [
   {
-    name: "Essencial",
-    templates: [
-      {
-        name: "Dottoressa",
-        image: "/img/demo/screens/dottoressa.webp",
-        href: "/preview/dottoressa",
-        tags: ["Clínica & Saúde", "Agendamento", "Design Editorial", "Clean UI"],
-      },
-      {
-        name: "Web Clinic",
-        image: "/img/demo/screens/web-clinic.webp",
-        href: "/preview/web-clinic",
-        tags: [
-          "Clínicas & Saúde",
-          "Tailwind CSS v4",
-          "High-Conversion"
-        ],
-      },
-    ],
-  },
-  {
-    name: "Biotech & Organic",
-    templates: [
-      {
-        name: "Cosmic",
-        image: "/img/demo/screens/cosmic1.webp",
-        href: "/preview/cosmic",
-        tags: ["Holístico", "Área de Membros", "Comunidade", "Next.js 16", "Design Arquetípico"],
-      },
-      {
-        name: "AuraVita",
-        image: "/img/demo/screens/auravita.webp",
-        href: "/preview/auravita",
-        tags: ["Saúde Integrativa", "Cursos & Retiros", "Design Orgânico", "Clean UI"],
-      },
-    ],
-  },
-  {
-    name: "Deep-Tech",
-    templates: [],
-  },
-  {
     name: "Corporate & Hubs",
     templates: [
       {
@@ -132,6 +90,48 @@ const PORTFOLIO_CATEGORIES: PortfolioCategory[] = [
         tags: ["Imagens com Inércia", "Vitrine em Tela Cheia", "Revelação de Imagens"],
       },
     ],
+  },
+  {
+    name: "Essencial",
+    templates: [
+      {
+        name: "Dottoressa",
+        image: "/img/demo/screens/dottoressa.webp",
+        href: "/preview/dottoressa",
+        tags: ["Clínica & Saúde", "Agendamento", "Design Editorial", "Clean UI"],
+      },
+      {
+        name: "Web Clinic",
+        image: "/img/demo/screens/web-clinic.webp",
+        href: "/preview/web-clinic",
+        tags: [
+          "Clínicas & Saúde",
+          "Tailwind CSS v4",
+          "High-Conversion"
+        ],
+      },
+    ],
+  },
+  {
+    name: "Biotech & Organic",
+    templates: [
+      {
+        name: "Cosmic",
+        image: "/img/demo/screens/cosmic1.webp",
+        href: "/preview/cosmic",
+        tags: ["Holístico", "Área de Membros", "Comunidade", "Next.js 16", "Design Arquetípico"],
+      },
+      {
+        name: "AuraVita",
+        image: "/img/demo/screens/auravita.webp",
+        href: "/preview/auravita",
+        tags: ["Saúde Integrativa", "Cursos & Retiros", "Design Orgânico", "Clean UI"],
+      },
+    ],
+  },
+  {
+    name: "Deep-Tech",
+    templates: [],
   },
   {
     name: "E-commerce",
