@@ -73,13 +73,29 @@ export default function AboutMission() {
             <div className="fullwidth-text about-mission-text bottom-text mxd-grid-item">
               <div className="fullwidth-text__wrap">
                 <div className="fullwidth-text__content base">
-                  <CommonAnimatedText
-                    as="span"
-                    className="anim-uni-chars"
-                    animation="animChars"
+                  <Link
+                    className="hero-10-headline__content active-cursor-accent !normal-case"
+                    data-cursor-text="Fale Comigo"
+                    href={`/contact`}
+                    style={{
+                      textTransform: "none",
+                      fontSize: "clamp(3.5rem, 18vw, 28rem)",
+                      lineHeight: "0.95",
+                      letterSpacing: "-0.03em",
+                      whiteSpace: "nowrap",
+                      display: "inline-block",
+                      maxWidth: "100%",
+                    }}
                   >
-                    MINDSITE
-                  </CommonAnimatedText>
+                    <CommonAnimatedText
+                      as="span"
+                      className="loading-chars !normal-case"
+                      animation="animCharsLoad"
+                      style={{ textTransform: "none" }}
+                    >
+                      MINDSITE
+                    </CommonAnimatedText>
+                  </Link>
                 </div>
               </div>
             </div>

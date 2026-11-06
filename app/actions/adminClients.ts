@@ -3,16 +3,42 @@
 import { createClient } from "@/lib/supabase/server";
 import { supabaseAdmin, createAdminClient } from "@/lib/supabase/admin";
 import { prisma } from "@/lib/prisma";
-import { ContractType, ContractStatus, UserRole } from "@prisma/client";
+import { ContractType, ContractStatus, InvoiceStatus, UserRole } from "@prisma/client";
 import { revalidatePath } from "next/cache";
 import { Resend } from "resend";
 import { renderWelcomeEmailHtml } from "@/lib/mail/welcomeTemplate";
 import { renderNewProjectNotificationEmailHtml } from "@/lib/mail/newProjectTemplate";
-import { parseLocalDate } from "@/lib/utils";
+import { parseLocalDate, isDateStrictlyOverdue } from "@/lib/utils";
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
 import type { ProjectInputDTO, ClientDTO } from "./adminClients.types";
+
+async function assertAdminUser() {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    throw new Error("Não autenticado.");
+  }
+
+  const role = user.app_metadata?.role || user.user_metadata?.role;
+  const isDanilo = user.email === "contato@mindsite.com.br";
+
+  if (!isDanilo && role !== "ADMIN") {
+    const dbUser = await prisma.user.findUnique({
+      where: { id: user.id },
+      select: { role: true },
+    });
+    if (!dbUser || dbUser.role !== "ADMIN") {
+      throw new Error("Acesso não autorizado.");
+    }
+  }
+
+  return user;
+}
 
 // 1. Criar Cliente com Rollback Seguro, Telemetria Ativa e Remetente Oficial Resend
 export async function createClientWithProjectsAction(data: ClientDTO) {
@@ -282,6 +308,8 @@ export async function getClientsListAction(query?: string) {
         status: con.status,
         totalAmount: Number(con.totalAmount),
         paidAmount: Number(con.paidAmount),
+        startDate: con.startDate ? con.startDate.toISOString() : null,
+        endDate: con.endDate ? con.endDate.toISOString() : null,
         autentiqueDocId: con.autentiqueDocId,
         installments: con.installments.map((ins) => ({
           id: ins.id,
@@ -380,6 +408,8 @@ export async function getClientByIdAction(clientId: string) {
         status: con.status,
         totalAmount: Number(con.totalAmount),
         paidAmount: Number(con.paidAmount),
+        startDate: con.startDate ? con.startDate.toISOString() : null,
+        endDate: con.endDate ? con.endDate.toISOString() : null,
         autentiqueDocId: con.autentiqueDocId,
         installments: con.installments.map((ins) => ({
           id: ins.id,
@@ -838,6 +868,244 @@ export async function updateContractStatusAction(contractId: string, status: Con
     };
   } catch (err: unknown) {
     const message = err instanceof Error ? err.message : "Erro ao atualizar status do contrato.";
+    return { success: false, error: message };
+  }
+}
+
+// 11. Atualizar Data de Vencimento de Parcela (ContractInstallment.scheduledDate)
+export async function updateInstallmentDueDateAction(
+  installmentId: string,
+  newDateString: string
+): Promise<{ success: boolean; message?: string; error?: string }> {
+  try {
+    await assertAdminUser();
+
+    if (!installmentId || !newDateString) {
+      return { success: false, error: "Identificador da parcela e nova data de vencimento são obrigatórios." };
+    }
+
+    const installment = await prisma.contractInstallment.findUnique({
+      where: { id: installmentId },
+      include: {
+        contract: { select: { userId: true } },
+        invoiceItem: {
+          include: {
+            invoice: {
+              include: {
+                items: {
+                  include: {
+                    installment: {
+                      select: {
+                        id: true,
+                        scheduledDate: true,
+                      },
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
+    });
+
+    if (!installment) {
+      return { success: false, error: "Parcela não encontrada." };
+    }
+
+    if (installment.status === "PAID") {
+      return {
+        success: false,
+        error: "Não é permitido alterar o vencimento de uma parcela já liquidada.",
+      };
+    }
+
+    const parsedDate = parseLocalDate(newDateString);
+
+    await prisma.$transaction(async (tx) => {
+      await tx.contractInstallment.update({
+        where: { id: installmentId },
+        data: { scheduledDate: parsedDate },
+      });
+
+      const linkedInvoice = installment.invoiceItem?.invoice;
+      if (linkedInvoice && linkedInvoice.status !== "PAID") {
+        const linkedInstallments = linkedInvoice.items
+          .map((item) => item.installment)
+          .filter((inst): inst is { id: string; scheduledDate: Date } => Boolean(inst));
+
+        const isOnlyInstallment = linkedInstallments.length <= 1;
+
+        const earliestBefore =
+          linkedInstallments.length > 0
+            ? linkedInstallments.reduce((min, curr) =>
+                curr.scheduledDate.getTime() < min.scheduledDate.getTime() ? curr : min
+              )
+            : null;
+
+        const isReferenceInstallment = earliestBefore?.id === installment.id;
+
+        if (isOnlyInstallment || isReferenceInstallment) {
+          const updatedDates = linkedInstallments.map((inst) =>
+            inst.id === installment.id ? parsedDate : inst.scheduledDate
+          );
+          const nextInvoiceDueDate =
+            updatedDates.length > 0
+              ? updatedDates.reduce((min, curr) => (curr.getTime() < min.getTime() ? curr : min))
+              : parsedDate;
+
+          const isOverdue = isDateStrictlyOverdue(nextInvoiceDueDate);
+          const nextInvoiceStatus: InvoiceStatus = isOverdue
+            ? "OVERDUE"
+            : linkedInvoice.status === "OVERDUE"
+            ? "PENDING"
+            : linkedInvoice.status;
+
+          await tx.invoice.update({
+            where: { id: linkedInvoice.id },
+            data: {
+              dueDate: nextInvoiceDueDate,
+              status: nextInvoiceStatus,
+            },
+          });
+        }
+      }
+    });
+
+    revalidatePath("/admin/clients/[id]/edit", "page");
+    revalidatePath(`/admin/clients/${installment.contract.userId}/edit`);
+    revalidatePath("/admin/clients");
+    revalidatePath("/admin/dashboard");
+    revalidatePath("/portal/dashboard");
+
+    return {
+      success: true,
+      message: "Vencimento da parcela atualizado com sucesso!",
+    };
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : "Erro ao atualizar vencimento da parcela.";
+    return { success: false, error: message };
+  }
+}
+
+// 12. Atualizar Data de Vencimento de Fatura Emitida (Invoice.dueDate)
+export async function updateInvoiceDueDateAction(
+  invoiceId: string,
+  newDateString: string
+): Promise<{ success: boolean; message?: string; error?: string }> {
+  try {
+    await assertAdminUser();
+
+    if (!invoiceId || !newDateString) {
+      return { success: false, error: "Identificador da fatura e nova data de vencimento são obrigatórios." };
+    }
+
+    const invoice = await prisma.invoice.findUnique({
+      where: { id: invoiceId },
+      select: {
+        id: true,
+        userId: true,
+        status: true,
+      },
+    });
+
+    if (!invoice) {
+      return { success: false, error: "Fatura não encontrada." };
+    }
+
+    if (invoice.status === "PAID") {
+      return {
+        success: false,
+        error: "Não é permitido alterar o vencimento de uma fatura já paga.",
+      };
+    }
+
+    const parsedDate = parseLocalDate(newDateString);
+    const overdue = isDateStrictlyOverdue(parsedDate);
+
+    const nextStatus: InvoiceStatus = overdue
+      ? "OVERDUE"
+      : invoice.status === "OVERDUE"
+      ? "PENDING"
+      : invoice.status;
+
+    await prisma.invoice.update({
+      where: { id: invoiceId },
+      data: {
+        dueDate: parsedDate,
+        status: nextStatus,
+      },
+    });
+
+    revalidatePath("/admin/clients/[id]/edit", "page");
+    revalidatePath(`/admin/clients/${invoice.userId}/edit`);
+    revalidatePath("/admin/clients");
+    revalidatePath("/admin/dashboard");
+    revalidatePath("/portal/dashboard");
+
+    return {
+      success: true,
+      message: "Vencimento da fatura atualizado com sucesso!",
+    };
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : "Erro ao atualizar vencimento da fatura.";
+    return { success: false, error: message };
+  }
+}
+
+// 13. Atualizar Data de Início/Vigência da Sustentação (Contract.startDate)
+export async function updateSustainabilityStartDateAction(
+  contractId: string,
+  newDateString: string
+): Promise<{ success: boolean; message?: string; error?: string }> {
+  try {
+    await assertAdminUser();
+
+    if (!contractId || !newDateString) {
+      return { success: false, error: "Identificador do contrato e nova data de início são obrigatórios." };
+    }
+
+    const contract = await prisma.contract.findUnique({
+      where: { id: contractId },
+      select: {
+        id: true,
+        userId: true,
+        contractType: true,
+      },
+    });
+
+    if (!contract) {
+      return { success: false, error: "Contrato não encontrado." };
+    }
+
+    if (contract.contractType !== ContractType.SUSTAINABILITY) {
+      return {
+        success: false,
+        error: "Apenas contratos do tipo SUSTAINABILITY permitem alterar a data de início/vigência.",
+      };
+    }
+
+    const parsedDate = parseLocalDate(newDateString);
+
+    await prisma.contract.update({
+      where: { id: contractId },
+      data: {
+        startDate: parsedDate,
+      },
+    });
+
+    revalidatePath("/admin/clients/[id]/edit", "page");
+    revalidatePath(`/admin/clients/${contract.userId}/edit`);
+    revalidatePath("/admin/clients");
+    revalidatePath("/admin/dashboard");
+    revalidatePath("/portal/dashboard");
+
+    return {
+      success: true,
+      message: "Data de início da sustentação atualizada com sucesso!",
+    };
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : "Erro ao atualizar data de início da sustentação.";
     return { success: false, error: message };
   }
 }

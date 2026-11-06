@@ -78,6 +78,15 @@
   - **Melhorias implementadas:**
     - Reestruturação do HTML do template de boas-vindas com base no novo design system transacional (fundo `#EEEAE8`, container branco de 600px, borda arredondada de 12px, logo oficial 56x56 e badge `[ AMBIENTE ATIVADO ]`).
     - Aplicação estrita da copy oficial: assunto `Bem-vindo(a) à MindSite // Acesso ao seu painel do cliente`, mensagem personalizada, bloco de credenciais (`// DADOS DE ACESSO AO PORTAL`), listagem dos 3 recursos do painel com bullets verdes `✓`, CTA `ACESSAR PAINEL DO CLIENTE →`, nota contratual e rodapé institucional.
+- [x] Edição de Vencimentos em Parcelas, Faturas Emitidas e Vigência de Sustentação (`/admin/clients/[id]/edit`):
+  - **Arquivos modificados:** `app/actions/adminClients.ts`, `app/admin/clients/[id]/edit/page.tsx`, `docs/CURRENT_SPRINT.md`, `docs/LOGGED_AREA_COMPLETE_DOCS.md`.
+  - **Novas Server Actions implementadas (`app/actions/adminClients.ts`):**
+    - `updateInstallmentDueDateAction(installmentId, newDateString)`: Atualiza `ContractInstallment.scheduledDate` via `parseLocalDate` (bloqueando parcelas `PAID`) e sincroniza `Invoice.dueDate` e status (`OVERDUE` / `PENDING` via `isDateStrictlyOverdue`) caso a parcela esteja vinculada a uma fatura aberta como parcela única ou balizadora.
+    - `updateInvoiceDueDateAction(invoiceId, newDateString)`: Atualiza `Invoice.dueDate` via `parseLocalDate` (bloqueando faturas `PAID`) e recalcula dinamicamente o status (`OVERDUE` vs `PENDING`) segundo a regra estrita D+1 (`isDateStrictlyOverdue`).
+    - `updateSustainabilityStartDateAction(contractId, newDateString)`: Valida `contractType === 'SUSTAINABILITY'` e atualiza `Contract.startDate` via `parseLocalDate`.
+  - **Melhorias de UI/UX (`app/admin/clients/[id]/edit/page.tsx`):**
+    - Edição rápida inline (`✎` $\rightarrow$ `<input type="date">` + `✓` / `✕`) na coluna **Vencimento** das tabelas de **Parcelas de Contrato** e **Faturas Emitidas** para itens não liquidados (`status !== 'PAID'`).
+    - Exibição e edição inline (`✎ Alterar Início`) da **Data de Início/Vigência** nos cards de contrato de `SUSTAINABILITY`.
 - [x] Linter e Typecheck auditados: `0 errors / 0 warnings`.
 
 ## 4. Próximas Implementações Planejadas

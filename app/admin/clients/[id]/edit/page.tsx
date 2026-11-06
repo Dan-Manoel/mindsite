@@ -12,6 +12,9 @@ import {
   resetClientPasswordAction,
   updateProjectAction,
   updateContractStatusAction,
+  updateInstallmentDueDateAction,
+  updateInvoiceDueDateAction,
+  updateSustainabilityStartDateAction,
 } from "@/app/actions/adminClients";
 import { ContractStatus } from "@prisma/client";
 import { issueImmediateInvoiceAction } from "@/app/actions/admin";
@@ -55,6 +58,8 @@ interface ContractItem {
   notes?: string | null;
   totalAmount?: number | string | null;
   paidAmount?: number | string | null;
+  startDate?: string | Date | null;
+  endDate?: string | Date | null;
   installments?: ContractInstallmentItem[];
 }
 
@@ -109,9 +114,85 @@ interface ProjectItem {
   // Modal: Confirmar Encerramento de Contrato de Sustentação
   const [endingContract, setEndingContract] = useState<{ id: string; projectName: string } | null>(null);
 
+  // Estados de Edição Inline de Datas (Parcelas, Faturas e Sustentação)
+  const [editingInstallmentId, setEditingInstallmentId] = useState<string | null>(null);
+  const [editingInstallmentDate, setEditingInstallmentDate] = useState<string>("");
+
+  const [editingInvoiceId, setEditingInvoiceId] = useState<string | null>(null);
+  const [editingInvoiceDate, setEditingInvoiceDate] = useState<string>("");
+
+  const [editingSustContractId, setEditingSustContractId] = useState<string | null>(null);
+  const [editingSustStartDate, setEditingSustStartDate] = useState<string>("");
+
+  const toBrasiliaInputDate = (dateInput?: string | Date | null): string => {
+    if (!dateInput) return new Date().toISOString().split("T")[0];
+    const d = typeof dateInput === "string" ? new Date(dateInput) : dateInput;
+    if (isNaN(d.getTime())) return new Date().toISOString().split("T")[0];
+    return new Intl.DateTimeFormat("en-CA", {
+      timeZone: "America/Sao_Paulo",
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
+    }).format(d);
+  };
+
   const showNotification = (text: string, type: "success" | "error" = "success") => {
     setFeedbackMsg({ text, type });
     setTimeout(() => setFeedbackMsg(null), 4000);
+  };
+
+  const handleSaveInstallmentDueDate = (installmentId: string) => {
+    if (!editingInstallmentDate) {
+      showNotification("Selecione uma data de vencimento válida.", "error");
+      return;
+    }
+
+    startTransition(async () => {
+      const res = await updateInstallmentDueDateAction(installmentId, editingInstallmentDate);
+      if (res.success) {
+        showNotification(res.message || "Vencimento da parcela atualizado com sucesso!");
+        setEditingInstallmentId(null);
+        await reloadClient();
+      } else {
+        showNotification(res.error || "Erro ao atualizar vencimento da parcela.", "error");
+      }
+    });
+  };
+
+  const handleSaveInvoiceDueDate = (invoiceId: string) => {
+    if (!editingInvoiceDate) {
+      showNotification("Selecione uma data de vencimento válida.", "error");
+      return;
+    }
+
+    startTransition(async () => {
+      const res = await updateInvoiceDueDateAction(invoiceId, editingInvoiceDate);
+      if (res.success) {
+        showNotification(res.message || "Vencimento da fatura atualizado com sucesso!");
+        setEditingInvoiceId(null);
+        await reloadClient();
+      } else {
+        showNotification(res.error || "Erro ao atualizar vencimento da fatura.", "error");
+      }
+    });
+  };
+
+  const handleSaveSustStartDate = (contractId: string) => {
+    if (!editingSustStartDate) {
+      showNotification("Selecione uma data de início válida.", "error");
+      return;
+    }
+
+    startTransition(async () => {
+      const res = await updateSustainabilityStartDateAction(contractId, editingSustStartDate);
+      if (res.success) {
+        showNotification(res.message || "Data de início da sustentação atualizada com sucesso!");
+        setEditingSustContractId(null);
+        await reloadClient();
+      } else {
+        showNotification(res.error || "Erro ao atualizar data de início da sustentação.", "error");
+      }
+    });
   };
 
   const handleOpenEditProject = (proj: ProjectItem) => {
@@ -726,6 +807,101 @@ interface ProjectItem {
                                 </span>
                               </>
                             )}
+                            {c.contractType === "SUSTAINABILITY" && (
+                              <>
+                                <span style={{ color: "var(--st-medium)" }}>|</span>
+                                <span style={{ display: "inline-flex", alignItems: "center", gap: "0.8rem", fontSize: "1.1rem", color: "var(--t-muted)", fontFamily: "var(--_font-accent)" }}>
+                                  Início/Vigência:{" "}
+                                  {editingSustContractId === c.id ? (
+                                    <span style={{ display: "inline-flex", alignItems: "center", gap: "0.5rem" }}>
+                                      <input
+                                        type="date"
+                                        value={editingSustStartDate}
+                                        onChange={(e) => setEditingSustStartDate(e.target.value)}
+                                        style={{
+                                          height: "3.2rem",
+                                          padding: "0 0.8rem",
+                                          backgroundColor: "var(--base)",
+                                          border: "1px solid var(--accent)",
+                                          color: "var(--t-bright)",
+                                          fontFamily: "var(--_font-accent)",
+                                          fontSize: "1.1rem",
+                                          borderRadius: "0.2rem",
+                                          outline: "none",
+                                        }}
+                                      />
+                                      <button
+                                        type="button"
+                                        disabled={isPending}
+                                        onClick={() => handleSaveSustStartDate(c.id)}
+                                        title="Salvar"
+                                        style={{
+                                          height: "3.2rem",
+                                          padding: "0 0.9rem",
+                                          backgroundColor: "var(--accent)",
+                                          border: "none",
+                                          color: "#ffffff",
+                                          fontFamily: "var(--_font-accent)",
+                                          fontSize: "1.1rem",
+                                          fontWeight: 700,
+                                          borderRadius: "0.2rem",
+                                          cursor: "pointer",
+                                        }}
+                                      >
+                                        ✓ Salvar
+                                      </button>
+                                      <button
+                                        type="button"
+                                        disabled={isPending}
+                                        onClick={() => setEditingSustContractId(null)}
+                                        title="Cancelar"
+                                        style={{
+                                          height: "3.2rem",
+                                          padding: "0 0.8rem",
+                                          backgroundColor: "var(--base)",
+                                          border: "1px solid var(--st-medium)",
+                                          color: "var(--t-muted)",
+                                          fontFamily: "var(--_font-accent)",
+                                          fontSize: "1.1rem",
+                                          borderRadius: "0.2rem",
+                                          cursor: "pointer",
+                                        }}
+                                      >
+                                        ✕
+                                      </button>
+                                    </span>
+                                  ) : (
+                                    <>
+                                      <strong style={{ color: "var(--t-bright)" }}>
+                                        {c.startDate
+                                          ? new Date(c.startDate).toLocaleDateString("pt-BR", { timeZone: "America/Sao_Paulo" })
+                                          : "Não definida"}
+                                      </strong>
+                                      <button
+                                        type="button"
+                                        onClick={() => {
+                                          setEditingSustContractId(c.id);
+                                          setEditingSustStartDate(toBrasiliaInputDate(c.startDate));
+                                        }}
+                                        style={{
+                                          padding: "0.3rem 0.8rem",
+                                          fontSize: "1.05rem",
+                                          backgroundColor: "var(--base)",
+                                          color: "var(--t-bright)",
+                                          border: "1px solid var(--st-medium)",
+                                          borderRadius: "0.2rem",
+                                          cursor: "pointer",
+                                          fontFamily: "var(--_font-accent)",
+                                          fontWeight: 600,
+                                        }}
+                                      >
+                                        ✎ Alterar Início
+                                      </button>
+                                    </>
+                                  )}
+                                </span>
+                              </>
+                            )}
                           </div>
 
                           <div style={{ display: "flex", alignItems: "center", gap: "1rem", flexWrap: "wrap" }}>
@@ -908,7 +1084,91 @@ interface ProjectItem {
                                         )}
                                       </td>
                                       <td style={{ padding: "1rem 0.8rem", color: "var(--t-medium)" }}>
-                                        {dateStr}
+                                        {editingInstallmentId === inst.id && !isPaid ? (
+                                          <div style={{ display: "inline-flex", alignItems: "center", gap: "0.5rem" }}>
+                                            <input
+                                              type="date"
+                                              value={editingInstallmentDate}
+                                              onChange={(e) => setEditingInstallmentDate(e.target.value)}
+                                              style={{
+                                                height: "3.2rem",
+                                                padding: "0 0.8rem",
+                                                backgroundColor: "var(--base)",
+                                                border: "1px solid var(--accent)",
+                                                color: "var(--t-bright)",
+                                                fontFamily: "var(--_font-accent)",
+                                                fontSize: "1.1rem",
+                                                borderRadius: "0.2rem",
+                                                outline: "none",
+                                              }}
+                                            />
+                                            <button
+                                              type="button"
+                                              disabled={isPending}
+                                              onClick={() => handleSaveInstallmentDueDate(inst.id)}
+                                              title="Salvar vencimento"
+                                              style={{
+                                                height: "3.2rem",
+                                                padding: "0 0.8rem",
+                                                backgroundColor: "var(--accent)",
+                                                border: "none",
+                                                color: "#ffffff",
+                                                fontFamily: "var(--_font-accent)",
+                                                fontSize: "1.1rem",
+                                                fontWeight: 700,
+                                                borderRadius: "0.2rem",
+                                                cursor: "pointer",
+                                              }}
+                                            >
+                                              ✓
+                                            </button>
+                                            <button
+                                              type="button"
+                                              disabled={isPending}
+                                              onClick={() => setEditingInstallmentId(null)}
+                                              title="Cancelar"
+                                              style={{
+                                                height: "3.2rem",
+                                                padding: "0 0.8rem",
+                                                backgroundColor: "var(--base)",
+                                                border: "1px solid var(--st-medium)",
+                                                color: "var(--t-muted)",
+                                                fontFamily: "var(--_font-accent)",
+                                                fontSize: "1.1rem",
+                                                borderRadius: "0.2rem",
+                                                cursor: "pointer",
+                                              }}
+                                            >
+                                              ✕
+                                            </button>
+                                          </div>
+                                        ) : (
+                                          <div style={{ display: "inline-flex", alignItems: "center", gap: "0.6rem" }}>
+                                            <span>{dateStr}</span>
+                                            {!isPaid && (
+                                              <button
+                                                type="button"
+                                                onClick={() => {
+                                                  setEditingInstallmentId(inst.id);
+                                                  setEditingInstallmentDate(toBrasiliaInputDate(inst.scheduledDate));
+                                                }}
+                                                title="Editar data de vencimento da parcela"
+                                                style={{
+                                                  padding: "0.2rem 0.6rem",
+                                                  fontSize: "1rem",
+                                                  backgroundColor: "var(--base)",
+                                                  color: "var(--t-bright)",
+                                                  border: "1px solid var(--st-medium)",
+                                                  borderRadius: "0.2rem",
+                                                  cursor: "pointer",
+                                                  fontFamily: "var(--_font-accent)",
+                                                }}
+                                              >
+                                                ✎
+                                              </button>
+                                            )}
+                                          </div>
+                                        )}
                                       </td>
                                       <td style={{ padding: "1rem 0.8rem", textAlign: "right", color: "var(--t-bright)", fontWeight: 700 }}>
                                         R$ {Number(inst.amount).toFixed(2).replace(".", ",")}
@@ -1019,7 +1279,91 @@ interface ProjectItem {
                             </span>
                           </td>
                           <td style={{ padding: "1rem 0.8rem", color: "var(--t-medium)" }}>
-                            {new Date(inv.dueDate).toLocaleDateString("pt-BR", { timeZone: "America/Sao_Paulo" })}
+                            {editingInvoiceId === inv.id && !isPaid ? (
+                              <div style={{ display: "inline-flex", alignItems: "center", gap: "0.5rem" }}>
+                                <input
+                                  type="date"
+                                  value={editingInvoiceDate}
+                                  onChange={(e) => setEditingInvoiceDate(e.target.value)}
+                                  style={{
+                                    height: "3.2rem",
+                                    padding: "0 0.8rem",
+                                    backgroundColor: "var(--base)",
+                                    border: "1px solid var(--accent)",
+                                    color: "var(--t-bright)",
+                                    fontFamily: "var(--_font-accent)",
+                                    fontSize: "1.1rem",
+                                    borderRadius: "0.2rem",
+                                    outline: "none",
+                                  }}
+                                />
+                                <button
+                                  type="button"
+                                  disabled={isPending}
+                                  onClick={() => handleSaveInvoiceDueDate(inv.id)}
+                                  title="Salvar vencimento"
+                                  style={{
+                                    height: "3.2rem",
+                                    padding: "0 0.8rem",
+                                    backgroundColor: "var(--accent)",
+                                    border: "none",
+                                    color: "#ffffff",
+                                    fontFamily: "var(--_font-accent)",
+                                    fontSize: "1.1rem",
+                                    fontWeight: 700,
+                                    borderRadius: "0.2rem",
+                                    cursor: "pointer",
+                                  }}
+                                >
+                                  ✓
+                                </button>
+                                <button
+                                  type="button"
+                                  disabled={isPending}
+                                  onClick={() => setEditingInvoiceId(null)}
+                                  title="Cancelar"
+                                  style={{
+                                    height: "3.2rem",
+                                    padding: "0 0.8rem",
+                                    backgroundColor: "var(--base)",
+                                    border: "1px solid var(--st-medium)",
+                                    color: "var(--t-muted)",
+                                    fontFamily: "var(--_font-accent)",
+                                    fontSize: "1.1rem",
+                                    borderRadius: "0.2rem",
+                                    cursor: "pointer",
+                                  }}
+                                >
+                                  ✕
+                                </button>
+                              </div>
+                            ) : (
+                              <div style={{ display: "inline-flex", alignItems: "center", gap: "0.6rem" }}>
+                                <span>{new Date(inv.dueDate).toLocaleDateString("pt-BR", { timeZone: "America/Sao_Paulo" })}</span>
+                                {!isPaid && (
+                                  <button
+                                    type="button"
+                                    onClick={() => {
+                                      setEditingInvoiceId(inv.id);
+                                      setEditingInvoiceDate(toBrasiliaInputDate(inv.dueDate));
+                                    }}
+                                    title="Editar data de vencimento da fatura"
+                                    style={{
+                                      padding: "0.2rem 0.6rem",
+                                      fontSize: "1rem",
+                                      backgroundColor: "var(--base)",
+                                      color: "var(--t-bright)",
+                                      border: "1px solid var(--st-medium)",
+                                      borderRadius: "0.2rem",
+                                      cursor: "pointer",
+                                      fontFamily: "var(--_font-accent)",
+                                    }}
+                                  >
+                                    ✎
+                                  </button>
+                                )}
+                              </div>
+                            )}
                           </td>
                           <td style={{ padding: "1rem 0.8rem", textAlign: "right", color: "var(--t-bright)", fontWeight: 700 }}>
                             R$ {Number(inv.totalAmount).toFixed(2).replace(".", ",")}

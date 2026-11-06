@@ -24,22 +24,22 @@ type HeroSlide = {
 
 const HERO_SLIDES: HeroSlide[] = [
   {
-    src: "/img/hero/1920x1200_h03.webp",
-    name: "Solei",
-    description: "Conceito interativo",
-    descriptionAccent: "com IA",
-  },
-  {
     src: "/img/hero/1920x1200_h04.webp",
     name: "MINDSITE",
-    description: "Agência digital & portfólio pessoal",
-    descriptionAccent: "Template React Nextjs",
+    description: "Agência digital",
+    descriptionAccent: "Sites de alta performance",
+  },
+  {
+    src: "/img/hero/1920x1200_h03.webp",
+    name: "MINDSITE",
+    description: "Conquiste sua casa digital",
+    descriptionAccent: "Registre sua presença Online",
   },
   {
     src: "/img/hero/1920x1200_h05.webp",
-    name: "Sunset",
-    description: "Editorial Midjourney",
-    descriptionAccent: "conjunto de ilustrações",
+    name: "MINDSITE",
+    description: "Agência digital & portfólio pessoal",
+    descriptionAccent: "Design e performance",
   },
 ];
 

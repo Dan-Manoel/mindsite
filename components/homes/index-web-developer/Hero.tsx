@@ -208,9 +208,9 @@ export default function Hero() {
                           className="t-bold t-large loading-split"
                           animation="splitLinesLoad"
                         >
-                          Eu sou Danilo Oliveira.
+                          Somos a MindSite.
                           <span>
-                            Sou apaixonado por criar designs e aplicações web que contam
+                            Somos apaixonados por criar designs e aplicações web que contam
                             histórias, despertam emoções e geram impacto.
                           </span>
                         </CommonAnimatedText>

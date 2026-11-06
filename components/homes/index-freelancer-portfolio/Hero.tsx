@@ -38,7 +38,7 @@ export default function Hero() {
                       className="loading-chars"
                       animation="animCharsLoad"
                     >
-                      SEU NOME
+                      MINDSITE
                     </CommonAnimatedText>
                   </div>
                   <div className="mxd-hero-09__divider" />
@@ -60,9 +60,9 @@ export default function Hero() {
                         className="t-bold t-permanent loading-split"
                         animation="splitLinesLoad"
                       >
-                        Sou SEU NOME.
+                        Somos a MindSite.
                         <span>
-                          Sou apaixonado por criar designs que contam
+                          Somos apaixonados por criar designs que contam
                           histórias, despertam emoções e causam impacto.
                         </span>
                       </CommonAnimatedText>

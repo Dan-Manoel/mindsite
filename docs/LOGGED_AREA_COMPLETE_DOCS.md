@@ -469,6 +469,9 @@ Todas as Server Actions respeitam a regra do Next.js 16 de **não exportar objet
 | `settleInstallmentManuallyAction` | `installmentId: string` | Baixa parcela manualmente (`PAID`), incrementa `Contract.paidAmount` e quita `Invoice` vinculada. |
 | `addInstallmentToContractAction` | `(contractId, { amount, scheduledDate, description })` | Adiciona parcela extra ao contrato e incrementa `Contract.totalAmount`. |
 | `resetClientPasswordAction` | `(userId, newPassword)` | Redefine senha do cliente diretamente via Supabase Admin API. |
+| `updateInstallmentDueDateAction` | `(installmentId: string, newDateString: string)` | Altera o vencimento (`scheduledDate`) de uma parcela não liquidada (`status !== 'PAID'`) usando `parseLocalDate` e sincroniza o `dueDate` e status da `Invoice` vinculada caso seja parcela única ou balizadora. |
+| `updateInvoiceDueDateAction` | `(invoiceId: string, newDateString: string)` | Altera o vencimento (`dueDate`) de uma fatura não paga (`status !== 'PAID'`) usando `parseLocalDate` e recalcula o status (`OVERDUE` ou `PENDING`) via `isDateStrictlyOverdue`. |
+| `updateSustainabilityStartDateAction` | `(contractId: string, newDateString: string)` | Valida se o contrato é do tipo `SUSTAINABILITY` e atualiza a data de início/vigência (`startDate`) via `parseLocalDate`. |
 
 ### 11.6 `app/actions/expenses.ts` & `app/actions/finance.ts`
 | Action | Arquivo | Retorno / Comportamento |
@@ -552,7 +555,8 @@ Organizado em **5 Abas Operacionais**:
     - Se `ACTIVE`: Botões **"⏸ Pausar Cobrança"** (`SUSPENDED`) e **"✕ Encerrar Contrato"**.
     - Se `SUSPENDED`: Botões **"▶ Reativar Sustentação"** (`ACTIVE`) e **"✕ Encerrar Contrato"**.
     - Modal de confirmação de encerramento permite escolher entre **Concluído (`COMPLETED`)** ou **Cancelado (`CANCELLED`)**, gravando `endDate = new Date()`.
-  - **Cronograma de Parcelas do Setup**: Exibe todas as parcelas com status (`SCHEDULED`, `BILLED`, `PAID`), número da fatura vinculada (`#INV-XXXXXX`), botão para **+ Adicionar Parcela Extra** e botão de **Baixa Manual**.
+    - **Edição de Início/Vigência (`updateSustainabilityStartDateAction`)**: Exibe a data de início do contrato de sustentação com botão **"✎ Alterar Início"** para edição inline com `parseLocalDate`.
+  - **Cronograma de Parcelas do Setup & Faturas Emitidas**: Exibe todas as parcelas com status (`SCHEDULED`, `BILLED`, `PAID`), número da fatura vinculada (`#INV-XXXXXX`), edição rápida inline de vencimento (`✎` $\rightarrow$ `updateInstallmentDueDateAction` / `updateInvoiceDueDateAction` para itens `status !== 'PAID'`), botão para **+ Adicionar Parcela Extra** e botão de **Baixa Manual**.
 
 ---
 

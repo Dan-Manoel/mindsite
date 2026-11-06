@@ -11,6 +11,8 @@ export interface TemplateItem {
   name: string;
   image: string;
   href: string;
+  videoWebm?: string;
+  videoMp4?: string;
   tags: string[];
 }
 
@@ -24,6 +26,12 @@ const PORTFOLIO_CATEGORIES: PortfolioCategory[] = [
     name: "Essencial",
     templates: [
       {
+        name: "Dottoressa",
+        image: "/img/demo/screens/dottoressa.webp",
+        href: "/preview/dottoressa",
+        tags: ["Clínica & Saúde", "Agendamento", "Design Editorial", "Clean UI"],
+      },
+      {
         name: "Web Clinic",
         image: "/img/demo/screens/web-clinic.webp",
         href: "/preview/web-clinic",
@@ -33,14 +41,6 @@ const PORTFOLIO_CATEGORIES: PortfolioCategory[] = [
           "High-Conversion"
         ],
       },
-
-      {
-        name: "Dottoressa",
-        image: "/img/demo/screens/dottoressa.webp",
-        href: "/preview/dottoressa",
-        tags: ["Clínica & Saúde", "Agendamento", "Design Editorial", "Clean UI"],
-      },
-
     ],
   },
   {
@@ -68,6 +68,22 @@ const PORTFOLIO_CATEGORIES: PortfolioCategory[] = [
     name: "Corporate & Hubs",
     templates: [
       {
+        name: "Agência Digital",
+        image: "/img/demo/screens/08.webp",
+        videoWebm: "/img/demo/screens/capa_8.webm",
+        videoMp4: "/img/demo/screens/capa_8.mp4",
+        href: "/preview/digital-agency",
+        tags: ["Imagens 3D", "Carrossel Tela Cheia", "Rastro de Cursor"],
+      },
+      {
+        name: "Portfólio Freelancer",
+        image: "/img/demo/screens/04.webp",
+        videoWebm: "/img/demo/screens/capa_4.webm",
+        videoMp4: "/img/demo/screens/capa_4.mp4",
+        href: "/preview/freelancer-portfolio",
+        tags: ["Cursor de Imagem", "Slides com Zoom", "Física"],
+      },
+      {
         name: "Agência Criativa",
         image: "/img/demo/screens/01.webp",
         href: "/preview/branding-studio",
@@ -86,12 +102,6 @@ const PORTFOLIO_CATEGORIES: PortfolioCategory[] = [
         tags: ["Rastro de Cursor", "Prévia de Vídeo", "Pilha de Serviços"],
       },
       {
-        name: "Portfólio Freelancer",
-        image: "/img/demo/screens/04.webp",
-        href: "/preview/freelancer-portfolio",
-        tags: ["Cursor de Imagem", "Slides com Zoom", "Física"],
-      },
-      {
         name: "Estúdio de Design",
         image: "/img/demo/screens/05.webp",
         href: "/preview/design-studio",
@@ -108,12 +118,6 @@ const PORTFOLIO_CATEGORIES: PortfolioCategory[] = [
         image: "/img/demo/screens/07.webp",
         href: "/preview/personal-portfolio",
         tags: ["Perspectiva", "Currículo", "Física"],
-      },
-      {
-        name: "Agência Digital",
-        image: "/img/demo/screens/08.webp",
-        href: "/preview/digital-agency",
-        tags: ["Imagens 3D", "Carrossel Tela Cheia", "Rastro de Cursor"],
       },
       {
         name: "Estúdio Web",
@@ -147,6 +151,8 @@ const PORTFOLIO_CATEGORIES: PortfolioCategory[] = [
 ];
 
 function TemplateCard({ template, isDragging = false }: { template: TemplateItem; isDragging?: boolean }) {
+  const hasVideo = Boolean(template.videoWebm || template.videoMp4);
+
   return (
     <div className="demo-carousel-card" style={{ pointerEvents: isDragging ? 'none' : 'auto' }}>
       <Link
@@ -166,15 +172,36 @@ function TemplateCard({ template, isDragging = false }: { template: TemplateItem
         }}
         draggable={false}
       >
-        <Image
-          alt={template.name}
-          src={template.image}
-          fill
-          sizes="(max-width: 768px) 85vw, (max-width: 1024px) 50vw, 650px"
-          style={{ objectFit: 'cover', pointerEvents: 'none' }}
-          draggable={false}
-          priority={template.name === "Nightfolio"}
-        />
+        {hasVideo ? (
+          <video
+            autoPlay
+            loop
+            muted
+            playsInline
+            preload="metadata"
+            poster={template.image}
+            style={{
+              width: '100%',
+              height: '100%',
+              objectFit: 'cover',
+              pointerEvents: 'none',
+              display: 'block'
+            }}
+          >
+            {template.videoWebm && <source src={template.videoWebm} type="video/webm" />}
+            {template.videoMp4 && <source src={template.videoMp4} type="video/mp4" />}
+          </video>
+        ) : (
+          <Image
+            alt={template.name}
+            src={template.image}
+            fill
+            sizes="(max-width: 768px) 85vw, (max-width: 1024px) 50vw, 650px"
+            style={{ objectFit: 'cover', pointerEvents: 'none' }}
+            draggable={false}
+            priority={template.name === "Nightfolio"}
+          />
+        )}
       </Link>
 
       <div style={{ marginTop: '1.25rem', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>

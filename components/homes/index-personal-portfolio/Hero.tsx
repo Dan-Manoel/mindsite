@@ -23,7 +23,7 @@ export default function Hero() {
                 <div className="mxd-hero-10__top w-full max-w-full overflow-hidden">
                   <div className="mxd-hero-10__headline mxd-grid-item w-full max-w-full overflow-hidden">
                     <div className="hero-10-headline__wrap w-full max-w-full overflow-hidden">
-                      <h1 
+                      <h1
                         className="!normal-case w-full overflow-hidden"
                         style={{ textTransform: "none" }}
                       >
@@ -47,7 +47,7 @@ export default function Hero() {
                             animation="animCharsLoad"
                             style={{ textTransform: "none" }}
                           >
-                            Danilo Oliveira
+                            MINDSITE
                           </CommonAnimatedText>
                         </Link>
                       </h1>
@@ -73,9 +73,9 @@ export default function Hero() {
                         className="t-bold loading-split"
                         animation="splitLinesLoad"
                       >
-                        Sou Danilo Oliveira.
+                        Somos a MindSite.
                         <span>
-                          Sou apaixonado por criar designs que contam
+                          Somos apassixonados por criar designs que contam
                           histórias, despertam emoções e causam impacto.
                         </span>
                       </CommonAnimatedText>
